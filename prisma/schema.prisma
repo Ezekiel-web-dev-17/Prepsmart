@@ -17,3 +17,63 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model University {
+  id                 String              @id @default(cuid())
+  slug               String              @unique
+  name               String
+  acronym            String?
+  type               String              // "federal" | "state" | "private"
+  state              String
+  city               String
+  zone               String?             // "South-West", "North-Central", etc.
+  generalCutOff      Int                 // General JAMB minimum cutoff (e.g. 180, 200)
+  postUtmeRequired   Boolean             @default(true)
+  screeningType      String              // "Post-UTME CBT Exam" | "O'Level Screening" | etc.
+  annualTuitionEst   String?             // e.g. "₦110,000 - ₦190,000"
+  estYear            Int?
+  website            String?
+  campusHighlights   String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  courses            CourseRequirement[]
+  documents          AdmissionDocument[]
+
+  @@index([type])
+  @@index([state])
+  @@index([generalCutOff])
+}
+
+model CourseRequirement {
+  id                      String      @id @default(cuid())
+  universityId            String
+  courseName              String      // e.g. "Medicine & Surgery", "Computer Science"
+  faculty                 String?     // e.g. "College of Medicine", "Engineering"
+  cutOffMark              Int         // Departmental cut-off (e.g. 280, 250)
+  durationYears           Int         @default(4)
+  oLevelRequirements      String?     // "5 SSCE credits in Eng, Math, Phy, Chem, Bio"
+  directEntryAccepted     Boolean     @default(true)
+  directEntryRequirements String?     // "JUPEB / A-Levels / ND Upper Credit"
+  
+  university              University  @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@index([universityId])
+  @@index([courseName])
+  @@index([cutOffMark])
+}
+
+model AdmissionDocument {
+  id           String      @id @default(cuid())
+  universityId String
+  title        String      // e.g. "Original JAMB Result Slip", "O'Level Certificate"
+  category     String      // "O'Level" | "JAMB" | "Identity" | "Direct Entry"
+  isRequired   Boolean     @default(true)
+  description  String?     // Instructions (e.g. "Colour printout with passport photograph")
+
+  university   University  @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@index([universityId])
+  @@index([category])
+}
+
