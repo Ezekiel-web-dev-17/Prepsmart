@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, createContext, useContext } from "react";
 import type { XpEventType } from "@/lib/gamification";
+import { getRandomMotivation } from "./MotivationToast";
 
 export interface XPToastEvent {
   id: string;
@@ -182,8 +183,8 @@ function XPToastContainer({
                   {toast.message || meta.title}
                 </h4>
 
-                <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                  {meta.subtitle}
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold mt-0.5 truncate">
+                  {getRandomMotivation()}
                 </p>
 
                 {/* Points Pill */}
