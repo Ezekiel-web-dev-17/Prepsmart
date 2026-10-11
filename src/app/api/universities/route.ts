@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { getUniversitiesQuerySchema } from "@/lib/validations/university";
 import type { Prisma } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

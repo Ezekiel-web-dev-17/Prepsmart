@@ -11,11 +11,32 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   name      String?
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  email     String       @unique
+  image     String?
+  xp        Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  xpHistory XpHistory[]
+
+  @@index([xp])
+}
+
+model XpHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  eventType     String   // "TOPIC_COMPLETED" | "QUESTION_ANSWERED" | "DIAGNOSTIC_COMPLETED" | "DAILY_STREAK" | "MOCK_EXAM_COMPLETED"
+  pointsAwarded Int
+  metadata      String?  // Optional JSON string (e.g. topicId, score, streakDay)
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
 }
 
 model University {

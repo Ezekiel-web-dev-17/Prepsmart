@@ -4,6 +4,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { GamificationProvider } from "@/components/gamification/XPToast";
 import ThemeScript from "@/components/theme/ThemeScript";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -87,17 +88,19 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col bg-background text-foreground font-sans transition-colors duration-200 selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100">
           <ThemeProvider>
             <QueryProvider>
-              <Suspense
-                fallback={
-                  <div className="h-16 border-b border-border bg-card" />
-                }
-              >
-                <Navbar />
-              </Suspense>
-              <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-                {children}
-              </main>
-              <Footer />
+              <GamificationProvider>
+                <Suspense
+                  fallback={
+                    <div className="h-16 border-b border-border bg-card" />
+                  }
+                >
+                  <Navbar />
+                </Suspense>
+                <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+                  {children}
+                </main>
+                <Footer />
+              </GamificationProvider>
             </QueryProvider>
           </ThemeProvider>
         </body>
