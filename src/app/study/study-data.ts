@@ -80,16 +80,17 @@ function extractTopics(
   subjectCode: string
 ): NormalizedTopic[] {
   const result: NormalizedTopic[] = [];
+  let topicCounter = 1;
 
   if (syllabus.sections) {
-    syllabus.sections.forEach((sec) => {
+    syllabus.sections.forEach((sec, sIdx) => {
       sec.topics.forEach((t) => {
         result.push({
-          id: `${subjectId}-${t.topicNumber}`,
+          id: `${subjectId}-s${sIdx + 1}-t${t.topicNumber}`,
           subjectId,
           subjectName,
           subjectCode,
-          topicNumber: t.topicNumber,
+          topicNumber: topicCounter++,
           title: t.title,
           section: sec.section,
           contents: t.contents || [],
@@ -101,11 +102,11 @@ function extractTopics(
   } else if (syllabus.topics) {
     syllabus.topics.forEach((t) => {
       result.push({
-        id: `${subjectId}-${t.topicNumber}`,
+        id: `${subjectId}-t${t.topicNumber}`,
         subjectId,
         subjectName,
         subjectCode,
-        topicNumber: t.topicNumber,
+        topicNumber: topicCounter++,
         title: t.title,
         contents: t.contents || [],
         objectives: t.objectives || [],
