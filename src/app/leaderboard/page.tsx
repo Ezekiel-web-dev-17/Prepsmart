@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { getTopLeaderboard } from "@/lib/leaderboard";
 import LeaderboardView from "./LeaderboardView";
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LeaderboardPage() {
+  await connection();
   const leaderboard = await getTopLeaderboard(50);
 
   return <LeaderboardView initialEntries={leaderboard} />;
