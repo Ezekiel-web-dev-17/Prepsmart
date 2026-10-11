@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root,
+[data-theme="light"] {
+  /* Light Palette */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --card-border: #e2e8f0;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --ring: #3b82f6;
+
+  /* Primary Brand: Academic Sapphire / Indigo (Trust & Focus) */
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --primary-hover: #1d4ed8;
+  --primary-subtle: #eff6ff;
+
+  /* Accent: Sage / Emerald (Mastery & Calm Progress) */
+  --accent-sage: #10b981;
+  --accent-sage-subtle: #ecfdf5;
+  --accent-sage-foreground: #065f46;
+
+  /* Focus: Warm Amber (High-yield notes & Attention) */
+  --accent-amber: #f59e0b;
+  --accent-amber-subtle: #fffbeb;
+  --accent-amber-foreground: #92400e;
+
+  /* Alert: Muted Rose (Revision Queue & Examiner Traps) */
+  --accent-rose: #f43f5e;
+  --accent-rose-subtle: #fff1f2;
+  --accent-rose-foreground: #9f1239;
+}
+
+:root.dark,
+.dark,
+[data-theme="dark"] {
+  /* Dark Palette */
+  --background: #0b0f19;
+  --foreground: #f8fafc;
+  --card: #131b2e;
+  --card-foreground: #f8fafc;
+  --card-border: #1e293b;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --border: #1e293b;
+  --ring: #60a5fa;
+
+  /* Primary Brand in Dark: Luminous Celestial Sapphire */
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --primary-hover: #60a5fa;
+  --primary-subtle: rgba(59, 130, 246, 0.15);
+
+  /* Accent in Dark: Mint / Emerald */
+  --accent-sage: #34d399;
+  --accent-sage-subtle: rgba(52, 211, 153, 0.12);
+  --accent-sage-foreground: #a7f3d0;
+
+  /* Focus in Dark: Warm Amber */
+  --accent-amber: #fbbf24;
+  --accent-amber-subtle: rgba(251, 191, 36, 0.12);
+  --accent-amber-foreground: #fde68a;
+
+  /* Alert in Dark: Soft Sunset Rose */
+  --accent-rose: #fb7185;
+  --accent-rose-subtle: rgba(251, 113, 133, 0.12);
+  --accent-rose-foreground: #fecdd3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-subtle: var(--primary-subtle);
+
+  --color-sage: var(--accent-sage);
+  --color-sage-subtle: var(--accent-sage-subtle);
+  --color-sage-foreground: var(--accent-sage-foreground);
+
+  --color-amber-accent: var(--accent-amber);
+  --color-amber-subtle: var(--accent-amber-subtle);
+  --color-amber-foreground: var(--accent-amber-foreground);
+
+  --color-rose-accent: var(--accent-rose);
+  --color-rose-subtle: var(--accent-rose-subtle);
+  --color-rose-foreground: var(--accent-rose-foreground);
+
+  --font-sans:
+    var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+}
+
+html {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
