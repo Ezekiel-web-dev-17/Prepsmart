@@ -116,3 +116,28 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
 }
+
+/* Apple HIG Liquid Glass Utility Presets */
+@layer utilities {
+  .shadow-liquid-sm {
+    box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .shadow-liquid-md {
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .shadow-liquid-lg {
+    box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04), inset 0 1px 2px 0 rgba(255, 255, 255, 0.7);
+  }
+  .shadow-liquid-dock {
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.18), 0 8px 16px -4px rgba(0, 0, 0, 0.06), inset 0 1px 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .dark .shadow-liquid-dark-md,
+  [data-theme="dark"] .shadow-liquid-dark-md {
+    box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  .dark .shadow-liquid-dark-dock,
+  [data-theme="dark"] .shadow-liquid-dark-dock {
+    box-shadow: 0 28px 56px -12px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  }
+}
+

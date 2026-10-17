@@ -1,19 +1,31 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { getCandidateProgressData } from "@/lib/progress";
+import { ProgressDashboardClient } from "./ProgressDashboardClient";
 
 export const metadata: Metadata = {
-  title: "My Progress & Readiness",
-  description: "Track your JAMB syllabus completion, mastery score, and projected UTME points.",
+  title: "Exam Readiness & Progress Analytics | PrepSmart",
+  description:
+    "Track your JAMB UTME readiness index, subject mastery scores, active study streak, and high-yield concepts to review.",
 };
 
-export default function ProgressPage() {
-  return (
-    <div className="space-y-6">
-      <div className="bg-card border border-border rounded-2xl p-6 shadow-xs transition-colors duration-200">
-        <h1 className="text-2xl font-bold text-foreground">Progress & UTME Readiness</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Detailed metrics across subjects, diagnostic score progression, weak topics queue, and cohort export options.
-        </p>
-      </div>
-    </div>
-  );
+export default async function ProgressPage() {
+  await connection();
+  const { userId } = await auth();
+
+  // Redirect unauthenticated visitors to sign in
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
+  const progressData = await getCandidateProgressData(userId);
+
+  // If user profile does not exist or onboarding has not been done, guide them to onboarding
+  if (!progressData) {
+    redirect("/onboarding");
+  }
+
+  return <ProgressDashboardClient data={progressData} />;
 }
