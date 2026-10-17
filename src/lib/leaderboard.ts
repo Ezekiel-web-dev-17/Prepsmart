@@ -25,7 +25,23 @@ export function getTierForXp(xp: number): LeaderboardEntry["tier"] {
  */
 export async function getTopLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
   // 1. Fetch top member IDs and scores from Redis
-  const redisEntries = await redis.zrevrangeWithScores(LEADERBOARD_KEY, 0, limit - 1);
+  let redisEntries = await redis.zrevrangeWithScores(LEADERBOARD_KEY, 0, limit - 1);
+
+  // Fallback or dev sync: If Redis is empty or has fewer entries than DB in development, hydrate from DB
+  if (redisEntries.length === 0 || (redisEntries.length < 5 && process.env.NODE_ENV !== "production")) {
+    const topUsers = await prisma.user.findMany({
+      take: limit,
+      orderBy: { xp: "desc" },
+      select: { id: true, name: true, image: true, xp: true },
+    });
+
+    if (topUsers.length > 0) {
+      await Promise.all(
+        topUsers.map((u) => redis.zadd(LEADERBOARD_KEY, u.xp, u.id))
+      ).catch((err) => console.warn("Redis backfill error:", err));
+      redisEntries = await redis.zrevrangeWithScores(LEADERBOARD_KEY, 0, limit - 1);
+    }
+  }
 
   if (redisEntries.length > 0) {
     const userIds = redisEntries.map((e) => e.member);
@@ -52,21 +68,14 @@ export async function getTopLeaderboard(limit = 50): Promise<LeaderboardEntry[]>
     });
   }
 
-  // 3. Fallback: If Redis is empty, query PostgreSQL directly
-  const topUsers = await prisma.user.findMany({
+  // Final fallback if both redis and previous sync produced no entries
+  const fallbackUsers = await prisma.user.findMany({
     take: limit,
     orderBy: { xp: "desc" },
     select: { id: true, name: true, image: true, xp: true },
   });
 
-  // Populate Redis sorted set in background for future fast reads
-  if (topUsers.length > 0) {
-    Promise.all(
-      topUsers.map((u) => redis.zadd(LEADERBOARD_KEY, u.xp, u.id))
-    ).catch((err) => console.warn("Background Redis backfill error:", err));
-  }
-
-  return topUsers.map((user, idx) => ({
+  return fallbackUsers.map((user, idx) => ({
     rank: idx + 1,
     userId: user.id,
     name: user.name || `Student ${user.id.slice(-4)}`,

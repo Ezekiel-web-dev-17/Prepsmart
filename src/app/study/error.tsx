@@ -24,10 +24,10 @@ export default function StudyError({
 
         <div className="space-y-2">
           <h2 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-            Something went wrong!
+            Let&apos;s Get You Back on Track!
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            We couldn&apos;t load the requested syllabus or study materials.
+            We couldn&apos;t load the requested study segment right now. Tap retry to continue your preparation.
           </p>
         </div>
 

@@ -717,8 +717,9 @@ export default function StudyCurriculumHub() {
                         </button>
 
                         <Link
-                          href={`/quiz/${topic.drillTopicId}`}
-                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-2xs transition-all flex items-center gap-1"
+                          href={`/quiz/${topic.subjectId}?topic=${encodeURIComponent(topic.title)}`}
+                          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer hover:shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98]"
+                          title={`Start CBT Drill for ${topic.title}`}
                         >
                           <span>CBT Drill</span>
                           <span aria-hidden="true">⚡</span>
@@ -764,6 +765,20 @@ export default function StudyCurriculumHub() {
                             </div>
                           </div>
                         )}
+
+                        {/* Interactive Launch Action */}
+                        <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-3">
+                          <p className="text-xs text-muted-foreground">
+                            Ready to test your comprehension on this topic?
+                          </p>
+                          <Link
+                            href={`/quiz/${topic.subjectId}?topic=${encodeURIComponent(topic.title)}`}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-2xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+                          >
+                            <span>Launch CBT Drill for {topic.title}</span>
+                            <span aria-hidden="true">⚡</span>
+                          </Link>
+                        </div>
                       </div>
                     )}
                   </div>

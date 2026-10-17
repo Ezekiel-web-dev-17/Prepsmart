@@ -46,6 +46,11 @@ export default async function DashboardPage() {
     parsedSubjects = ["Use of English", "Mathematics", "Physics", "Chemistry"];
   }
 
+  // Count user's questions in the revision queue
+  const reviewQuestionsCount = await prisma.failedQuestion.count({
+    where: { userId: user.id },
+  });
+
   return (
     <DashboardView
       user={{
@@ -67,6 +72,7 @@ export default async function DashboardPage() {
         preferredStudyTime: user.onboardingProfile.preferredStudyTime,
       }}
       rank={rank}
+      reviewQuestionsCount={reviewQuestionsCount}
     />
   );
 }

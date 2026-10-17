@@ -77,9 +77,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             ⚠️
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-foreground">Something went wrong!</h3>
+            <h3 className="text-base font-bold text-foreground">Let&apos;s Get You Back on Track!</h3>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              {this.state.error.message || "An unexpected error occurred in this component."}
+              {this.state.error.message || "An unexpected hiccup occurred in this section."}
             </p>
           </div>
           {this.state.error.digest && (

@@ -28,9 +28,15 @@ interface DashboardViewProps {
   user: DashboardUser;
   profile: DashboardProfile | null;
   rank: number | null;
+  reviewQuestionsCount?: number;
 }
 
-export default function DashboardView({ user, profile, rank }: DashboardViewProps) {
+export default function DashboardView({
+  user,
+  profile,
+  rank,
+  reviewQuestionsCount = 0,
+}: DashboardViewProps) {
   const { triggerXPToast } = useGamification();
   const { isSubscribed, subscribeToPush, sendTestNotification } = usePushNotifications();
   const [activeSubjectTab, setActiveSubjectTab] = useState<string>(
@@ -38,6 +44,25 @@ export default function DashboardView({ user, profile, rank }: DashboardViewProp
   );
   const [isClaimingDaily, setIsClaimingDaily] = useState(false);
   const [hasClaimedToday, setHasClaimedToday] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [testSentSuccess, setTestSentSuccess] = useState(false);
+
+  const handleSendTestNotification = async () => {
+    if (isSendingTest) return;
+    setIsSendingTest(true);
+    try {
+      await sendTestNotification(
+        "PrepSmart Study Challenge 🔥",
+        "Keep your streak alive! 10 minutes of high-yield practice awaits."
+      );
+      setTestSentSuccess(true);
+      setTimeout(() => setTestSentSuccess(false), 3000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
 
   const subjects = profile?.selectedSubjects || [
     "Use of English",
@@ -101,6 +126,29 @@ export default function DashboardView({ user, profile, rank }: DashboardViewProp
               upcoming UTME. Your personalized study curriculum is calibrated for{" "}
               <strong>{profile?.dailyStudyMinutes || 45} mins/day</strong>.
             </p>
+
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Link
+                href="/revision"
+                className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <span>Revision Hub</span>
+                <span>🎯</span>
+              </Link>
+              <Link
+                href="/mock-exam"
+                className="px-4 py-2.5 rounded-xl bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <span>Take Mock Exam</span>
+                <span>⏱️</span>
+              </Link>
+              <Link
+                href="/study"
+                className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-all"
+              >
+                Continue Syllabus →
+              </Link>
+            </div>
           </div>
 
           {/* Quick Exam Countdown & Push Status */}
@@ -211,30 +259,143 @@ export default function DashboardView({ user, profile, rank }: DashboardViewProp
             </h3>
             <p className="text-xs text-muted-foreground mt-1">
               {isSubscribed
-                ? "Active! Native alerts scheduled for your preferred evening study routine."
-                : "Inactive. Turn on browser push to ensure you never miss study milestones."}
+                ? "Active! Native alerts scheduled for your preferred study routine."
+                : "Turn on browser alerts to protect your streak and receive high-yield study cues."}
             </p>
           </div>
 
-          {isSubscribed ? (
+          <div className="space-y-2 pt-1">
             <button
               type="button"
-              onClick={() => sendTestNotification()}
-              className="w-full py-2.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold transition-all border border-border cursor-pointer"
+              disabled={isSendingTest}
+              onClick={handleSendTestNotification}
+              className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 ${
+                testSentSuccess
+                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-extrabold"
+                  : "bg-muted hover:bg-muted/80 text-foreground border-border hover:border-blue-500/40"
+              }`}
             >
-              Send Test Notification 🚀
+              {isSendingTest ? (
+                <>
+                  <span className="animate-spin inline-block">⏳</span>
+                  <span>Sending Alert...</span>
+                </>
+              ) : testSentSuccess ? (
+                <>
+                  <span>✓</span>
+                  <span>Test Notification Sent! 🚀</span>
+                </>
+              ) : (
+                <>
+                  <span>Send Test Notification</span>
+                  <span>🚀</span>
+                </>
+              )}
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => subscribeToPush()}
-              className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-            >
-              Enable Push Notifications
-            </button>
-          )}
+
+            {!isSubscribed && (
+              <button
+                type="button"
+                onClick={async () => {
+                  const success = await subscribeToPush();
+                  if (success) {
+                    await handleSendTestNotification();
+                  }
+                }}
+                className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+              >
+                <span>Enable Native Push</span>
+                <span>🔔</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Featured: JAMB CBT Simulation Engine */}
+      <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-card via-card to-blue-500/5 border-2 border-blue-500/20 p-6 sm:p-8 shadow-md">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span>OFFICIAL CBT SIMULATION ENGINE</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+              JAMB Mock Exam & Timed Practice
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Experience the authentic UTME exam environment. Test yourself with live countdown timers, a 10-column question grid, keyboard-accessible BODMAS calculator, and post-exam AI diagnostics.
+            </p>
+            <div className="flex flex-wrap gap-4 text-xs font-bold text-muted-foreground pt-1">
+              <span className="flex items-center gap-1.5">
+                <span className="text-emerald-500">✓</span> Full 4-Subject Mock (120 Mins)
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-blue-500">✓</span> Single Subject Sprint (30 Mins)
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-purple-500">✓</span> AI Concept Mastery & Revision Insights
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+            <Link
+              href="/mock-exam"
+              className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm text-center shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2 active:scale-98"
+            >
+              <span>Launch Mock Simulation</span>
+              <span>🚀</span>
+            </Link>
+            <div className="text-[11px] text-center text-muted-foreground font-medium">
+              Earn up to <strong className="text-foreground">+150 XP</strong> per completed simulation
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PROMINENT REVISION HUB FEATURE CARD ── */}
+      <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-amber-500/10 via-amber-500/5 to-indigo-500/10 border-2 border-amber-500/30 p-6 sm:p-8 shadow-md transition-all hover:border-amber-500/50">
+        <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-black">
+              <span>🎯 ACTIVE RECALL & MASTERY</span>
+              <span>•</span>
+              <span>
+                {reviewQuestionsCount && reviewQuestionsCount > 0
+                  ? `${reviewQuestionsCount} Question${reviewQuestionsCount === 1 ? "" : "s"} Ready for Review`
+                  : "Continuous Concept Reinforcement"}
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+              Personalized Revision Hub
+            </h2>
+
+            <p className="text-sm sm:text-base text-foreground font-bold leading-relaxed">
+              Review your previous practice and master these concepts!
+            </p>
+
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Strengthen questions from previous mock exams and drills in targeted 10-question batches. Practice with active recall, review step-by-step examiner solutions, and convert every tricky topic into guaranteed UTME marks.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+            <Link
+              href="/revision"
+              className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm text-center shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 active:scale-98"
+            >
+              <span>Launch Revision Hub</span>
+              <span>🎯</span>
+            </Link>
+            <div className="text-[11px] text-center text-muted-foreground font-medium">
+              Earn <strong className="text-foreground">+15 XP</strong> for every concept you master
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Recommended Study Materials Based On Onboarding */}
       <section className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">

@@ -254,7 +254,7 @@ export const FOUR_WEEK_CURRICULUM: WeekPlan[] = [
       { time: "40 mins", activity: "System Breakdown", purpose: "Study complex mechanisms and multi-step concepts" },
       { time: "30 mins", activity: "Formula Synthesis", purpose: "Derive key relationships and cross-concept connections" },
       { time: "35 mins", activity: "35-Question Drill", purpose: "Timed practice under 50 seconds per question" },
-      { time: "15 mins", activity: "Distractor Deconstruction", purpose: "Explain why the 3 incorrect options are wrong" },
+      { time: "15 mins", activity: "Distractor Deconstruction", purpose: "Analyze how the alternate options serve as distractors" },
     ],
     milestones: [
       "Deconstruct chemical reaction mechanisms and balancing redox equations",

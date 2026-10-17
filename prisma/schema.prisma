@@ -23,6 +23,11 @@ model User {
   onboardingProfile  OnboardingProfile?
   pushSubscriptions  PushSubscription[]
 
+  // Exam feature relations
+  failedQuestions    FailedQuestion[]
+  examAttempts       ExamAttempt[]
+  examSessions       ExamSession[]
+
   @@index([xp])
 }
 
@@ -78,6 +83,146 @@ model XpHistory {
   @@index([createdAt])
 }
 
+// ==========================================
+// JAMB Question Bank
+// ==========================================
+model Question {
+  id             String   @id @default(cuid())
+  subject        String   // "Use of English" | "Mathematics" | "Physics" | "Chemistry" | "Biology" | "Economics" | "Literature" | "Government"
+  year           Int      // JAMB past exam year (e.g. 2024, 2023, 2022)
+  text           String   // Full question stem - may include LaTeX notation for math
+  options        String   // JSON: [{"id":"A","text":"..."},{"id":"B","text":"..."},{"id":"C","text":"..."},{"id":"D","text":"..."}]
+  correctOption  String   // "A" | "B" | "C" | "D"  — NEVER sent to client before submission
+  topic          String   // Syllabus topic e.g. "Calculus", "Organic Chemistry", "Figurative Language"
+  concept        String   // Core concept tested e.g. "Integration by Parts", "Isomerism", "Metaphor"
+  explanation    String   // Detailed examiner-quality step-by-step solution
+  difficulty     String   @default("medium") // "easy" | "medium" | "hard"
+  isActive       Boolean  @default(true) // Soft-delete / QA toggle
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  failedRecords  FailedQuestion[]
+  examQuestions  ExamSessionQuestion[]
+
+  @@unique([text, subject, year])
+  @@index([subject])
+  @@index([year])
+  @@index([subject, year])
+  @@index([topic])
+  @@index([concept])
+  @@index([isActive])
+}
+
+// ==========================================
+// Server-Side Exam Session (Anti-Cheat Core)
+//
+// Security design: The exam session is created server-side. The
+// correctOption fields are NEVER sent to the client. All answer
+// validation and scoring happens exclusively server-side on submission.
+// The sessionToken ties client state to a server-owned record.
+// ==========================================
+model ExamSession {
+  id               String    @id @default(cuid())
+  userId           String
+  sessionToken     String    @unique // Cryptographically random 32-byte hex — sent to client, never correctAnswers
+  status           String    @default("in_progress") // "in_progress" | "submitted" | "expired"
+  subjectMode      String    // "four_subjects" | "single_subject"
+  selectedSubjects String    // JSON: ["Use of English","Mathematics","Physics","Chemistry"]
+  durationSeconds  Int       // Exam duration limit (7200 = 2hrs for 4 subjects, 1800 = 30min for 1)
+  startedAt        DateTime  @default(now())
+  expiresAt        DateTime  // Server-enforced timer — submission rejected if now() > expiresAt
+  submittedAt      DateTime?
+  createdAt        DateTime  @default(now())
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions        ExamSessionQuestion[]
+  attempt          ExamAttempt?
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// ==========================================
+// Questions assigned to a specific exam session (join table)
+// Stores the server-side ordering so we can validate that submitted
+// questionIds actually belong to this session.
+// ==========================================
+model ExamSessionQuestion {
+  id            String @id @default(cuid())
+  sessionId     String
+  questionId    String
+  orderIndex    Int    // Stable display order within the session
+
+  session       ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question      Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, questionId]) // A question appears at most once per session
+  @@unique([sessionId, orderIndex]) // Enforce stable ordering per session
+  @@index([sessionId])
+}
+
+// ==========================================
+// Completed Exam Attempt — Created server-side on submission
+// Scoring is computed server-side; client never knows correctOptions
+// until this record is created and the results page loads.
+// ==========================================
+model ExamAttempt {
+  id                 String    @id @default(cuid())
+  userId             String
+  sessionId          String    @unique // One attempt per session (prevents replay)
+  score              Int       // Raw score (number correct)
+  totalQuestions     Int       // e.g. 180 for 4-subject, 40 for single
+  accuracyPct        Float     // Computed server-side percentage
+  timeSpentSeconds   Int       // Actual seconds elapsed (clamped to durationSeconds)
+  subjectMode        String    // "four_subjects" | "single_subject"
+  selectedSubjects   String    // JSON string
+  answers            String    // JSON: Record<questionId, "A"|"B"|"C"|"D"> — saved for post-analysis
+  correctAnswers     String    // JSON: Record<questionId, "A"|"B"|"C"|"D"> — only persisted server-side
+  subjectBreakdown   String    // JSON: Record<subject, { score, total }> — per-subject analysis
+  guessedQuestions   String?   // JSON: string[] — questionIds flagged as guessed, set by client pre-submit
+  failedConceptTags  String?   // JSON: string[] — aggregated concepts from wrong answers
+  createdAt          DateTime  @default(now())
+
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session            ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ==========================================
+// Failed Question Revision Queue (Duolingo-style)
+//
+// Security: Records are only created server-side (in the submit route)
+// after validated scoring. The client can only DELETE (resolve) records
+// through the revision action, which re-validates the answer server-side.
+// ==========================================
+model FailedQuestion {
+  id             String    @id @default(cuid())
+  userId         String
+  questionId     String
+  concept        String    // Denormalized for fast AI prompt construction
+  topic          String    // Denormalized subject topic
+  failedCount    Int       @default(1)
+  lastFailedAt   DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question       Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId]) // At most one active failure record per user+question
+  @@index([userId])
+  @@index([concept])
+  @@index([userId, concept])
+  @@index([lastFailedAt])
+}
+
+// ==========================================
+// University Models (unchanged)
+// ==========================================
 model University {
   id                 String              @id @default(cuid())
   slug               String              @unique
@@ -136,4 +281,3 @@ model AdmissionDocument {
   @@index([universityId])
   @@index([category])
 }
-

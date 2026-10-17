@@ -38,10 +38,10 @@ export default function Error({
         {/* Header Content */}
         <div className="space-y-2">
           <h2 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-            Something went wrong!
+            Let&apos;s Get You Back on Track!
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            We ran into an unexpected issue while loading this study section. Don&apos;t worry — your lesson progress is safe.
+            We ran into an unexpected hiccup loading this section. Don&apos;t worry — your study progress is safe.
           </p>
         </div>
 

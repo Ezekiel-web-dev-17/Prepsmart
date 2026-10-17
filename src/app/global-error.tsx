@@ -36,10 +36,10 @@ export default function GlobalError({
 
           <div className="space-y-2">
             <h2 className="text-2xl font-extrabold text-slate-900">
-              Something went wrong!
+              Let&apos;s Get You Back on Track!
             </h2>
             <p className="text-sm text-slate-500 leading-relaxed">
-              An unexpected system error occurred at the root level. Please try refreshing or retrying the operation.
+              An unexpected system hiccup occurred. Please try refreshing to continue your practice session.
             </p>
           </div>
 
