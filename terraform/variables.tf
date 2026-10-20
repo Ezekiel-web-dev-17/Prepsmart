@@ -15,3 +15,9 @@ variable "public_key" {
   type        = string
   default     = "~/.ssh/id_ed25519.pub"
 }
+
+variable "domain_name" {
+  description = "The root domain name for Route 53."
+  type        = string
+  default     = "prepsmart.ng"
+}

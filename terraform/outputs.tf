@@ -22,3 +22,8 @@ output "public_ip" {
   description = "Public static Elastic IP address of the EC2 instance."
   value       = aws_eip.app_ip.public_ip
 }
+
+output "route53_name_servers" {
+  description = "Name servers to configure at your domain registrar for prepsmart.ng."
+  value       = aws_route53_zone.primary.name_servers
+}

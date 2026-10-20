@@ -130,3 +130,31 @@ resource "aws_eip" "app_ip" {
     Name = "prepsmart-static-ip"
   }
 }
+
+# Route 53 Hosted Zone for domain management
+resource "aws_route53_zone" "primary" {
+  name = var.domain_name
+
+  tags = {
+    Name        = "${var.instance_name}-dns"
+    Environment = "production"
+  }
+}
+
+# Apex / Root A Record (prepsmart.ng -> Elastic IP)
+resource "aws_route53_record" "apex" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = 300
+  records = [aws_eip.app_ip.public_ip]
+}
+
+# Subdomain www A Record (www.prepsmart.ng -> Elastic IP)
+resource "aws_route53_record" "www" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "www.${var.domain_name}"
+  type    = "A"
+  ttl     = 300
+  records = [aws_eip.app_ip.public_ip]
+}
