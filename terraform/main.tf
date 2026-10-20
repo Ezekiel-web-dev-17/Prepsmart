@@ -59,6 +59,13 @@ module "vpc" {
       cidr_blocks = "0.0.0.0/0"
     },
     {
+      description = "Allow HTTPS web traffic"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
       description = "Allow Next.js web port"
       from_port   = 3000
       to_port     = 3000
