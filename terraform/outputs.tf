@@ -24,6 +24,6 @@ output "public_ip" {
 }
 
 output "route53_name_servers" {
-  description = "Name servers to configure at your domain registrar for prepsmart.ng."
+  description = "Name servers to configure at your domain registrar for prepsmart.tech."
   value       = aws_route53_zone.primary.name_servers
 }

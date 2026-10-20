@@ -19,5 +19,5 @@ variable "public_key" {
 variable "domain_name" {
   description = "The root domain name for Route 53."
   type        = string
-  default     = "prepsmart.ng"
+  default     = "prepsmart.tech"
 }
