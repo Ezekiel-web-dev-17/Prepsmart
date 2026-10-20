@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { getTopLeaderboard } from "@/lib/leaderboard";
 
 export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit")) || 50));
+  const { searchParams } = new URL(request.url);
+  const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit")) || 50));
 
+  try {
     const leaderboard = await getTopLeaderboard(limit);
 
     return NextResponse.json({

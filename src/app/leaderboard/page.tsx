@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   ],
 };
 
+export const instant = false;
+
 export default async function LeaderboardPage() {
   await connection();
   const leaderboard = await getTopLeaderboard(50);

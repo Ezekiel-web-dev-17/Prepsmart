@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Review your previous practice and master these concepts! Spaced active recall and step-by-step examiner solutions for JAMB CBT.",
 };
 
+export const instant = false;
+
 export default async function RevisionPage() {
   await connection();
   const { userId } = await auth();

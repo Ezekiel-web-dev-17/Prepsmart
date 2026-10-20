@@ -4,8 +4,9 @@ import { getUniversitiesQuerySchema } from "@/lib/validations/university";
 import type { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
   try {
-    const { searchParams } = new URL(request.url);
 
     const validation = getUniversitiesQuerySchema.safeParse({
       search: searchParams.get("search") ?? undefined,

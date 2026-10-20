@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Track your JAMB UTME readiness index, subject mastery scores, active study streak, and high-yield concepts to review.",
 };
 
+export const instant = false;
+
 export default async function ProgressPage() {
   await connection();
   const { userId } = await auth();

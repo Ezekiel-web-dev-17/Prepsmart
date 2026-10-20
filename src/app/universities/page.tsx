@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   ],
 };
 
+export const instant = false;
+
 export default async function UniversitiesPage() {
   const rawUniversities = await prisma.university.findMany({
     orderBy: [{ generalCutOff: "desc" }, { name: "asc" }],

@@ -13,6 +13,8 @@ export const metadata: Metadata = {
     "Your personalized PrepSmart preparation dashboard. Track your UTME countdown, daily study routine, recommended syllabus materials, and study streaks.",
 };
 
+export const instant = false;
+
 export default async function DashboardPage() {
   await connection();
   const { userId: clerkUserId } = await auth();
