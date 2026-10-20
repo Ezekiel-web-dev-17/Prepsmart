@@ -41,13 +41,14 @@ services:
       - app_net
 
   app:
+    image: prepsmart:latest
     build:
       context: .
       dockerfile: Dockerfile
     container_name: prepsmart-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${PORT:-80}:3000"
     env_file:
       - .env
     environment:
