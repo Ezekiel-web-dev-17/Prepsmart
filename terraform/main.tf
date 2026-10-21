@@ -64,13 +64,6 @@ module "vpc" {
       to_port     = 443
       protocol    = "tcp"
       cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      description = "Allow Next.js web port"
-      from_port   = 3000
-      to_port     = 3000
-      protocol    = "tcp"
-      cidr_blocks = "0.0.0.0/0"
     }
   ]
 
@@ -96,7 +89,6 @@ module "vpc" {
     { rule_number = 120, rule_action = "allow", from_port = 22, to_port = 22, protocol = "tcp", cidr_block = "0.0.0.0/0" },
     { rule_number = 130, rule_action = "allow", from_port = 1024, to_port = 65535, protocol = "tcp", cidr_block = "0.0.0.0/0" },
     { rule_number = 140, rule_action = "allow", from_port = 8, to_port = 0, protocol = "icmp", cidr_block = "0.0.0.0/0" },
-    { rule_number = 150, rule_action = "allow", from_port = 3000, to_port = 3000, protocol = "tcp", cidr_block = "0.0.0.0/0" },
   ]
   public_outbound_acl_rules = [
     { rule_number = 100, rule_action = "allow", from_port = 0, to_port = 0, protocol = "-1", cidr_block = "0.0.0.0/0" },
