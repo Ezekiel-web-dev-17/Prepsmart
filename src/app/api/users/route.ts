@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 import {
   getUsersQuerySchema,
   createUserSchema,
@@ -25,15 +26,23 @@ export async function GET(request: Request) {
   const skip = (page - 1) * limit;
 
   try {
+    // Data Minimization (NDPA / Privacy compliance): Explicit field selection
     const users: User[] = await prisma.user.findMany({
       take: limit,
       skip,
       orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     return NextResponse.json({ success: true, data: users, page, limit });
   } catch (error) {
-    console.error("Failed to fetch users:", error);
+    logger.error("Failed to fetch users", error, { page, limit }, "api:users:GET");
     return NextResponse.json(
       { error: "Failed to fetch users" },
       { status: 500 },
@@ -64,7 +73,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: newUser }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create user:", error);
+    logger.error("Failed to create user", error, undefined, "api:users:POST");
     return NextResponse.json(
       { error: "Failed to create user" },
       { status: 500 },

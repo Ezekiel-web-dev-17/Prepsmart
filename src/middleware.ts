@@ -6,6 +6,29 @@ import {
   getRateLimitHeaders,
 } from "@/lib/ratelimit";
 
+// Secure-by-Design: Explicit CORS origin whitelist (No wildcard allowed)
+const ALLOWED_ORIGINS = new Set([
+  "https://prepsmart.tech",
+  "https://www.prepsmart.tech",
+  ...(process.env.NODE_ENV !== "production"
+    ? ["http://localhost:3000", "http://127.0.0.1:3000"]
+    : []),
+]);
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    return {
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers":
+        "Content-Type, Authorization, X-Requested-With, Sentry-Trace, Baggage",
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Max-Age": "86400",
+    };
+  }
+  return {};
+}
+
 // Routes that require authentication (only accessible to signed-in users)
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
@@ -18,6 +41,22 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Reject unsafe HTTP methods at the perimeter
+  if (["TRACE", "TRACK"].includes(req.method.toUpperCase())) {
+    return new NextResponse("Method Not Allowed", { status: 405 });
+  }
+
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new NextResponse(null, {
+      status: 204,
+      headers: corsHeaders,
+    });
+  }
+
   // 1. Identify client (authenticated user or IP address)
   const { userId } = await auth();
   const identifier = getClientIdentifier(req.headers, userId);
@@ -181,10 +220,13 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect();
   }
 
-  // 5. Attach Rate Limit metrics to the response headers
+  // 5. Attach Rate Limit metrics and CORS headers to the response
   const response = NextResponse.next();
   const headers = getRateLimitHeaders(rateLimitResult);
   Object.entries(headers).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
+  Object.entries(corsHeaders).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
 
