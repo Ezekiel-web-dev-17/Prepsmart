@@ -97,7 +97,7 @@ jobs:
 
       - name: Post-Deployment Smoke & Health Verification
         run: |
-          echo "Verifying production health endpoint..."
+          echo "Verifying production endpoint is healthy..."
           sleep 5
           for i in {1..10}; do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prepsmart.tech/api/health)
