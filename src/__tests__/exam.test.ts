@@ -1,23 +1,89 @@
-import test, { describe, it } from "node:test";
+import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
+import http from "node:http";
+import { EXAM_CONFIG } from "../app/api/mock-exam/config/route";
 
 describe("JAMB Mock Exam Simulator Business Logic", () => {
-  it("calculates accurate exam durations based on subject count", () => {
-    // 4 subjects (Full UTME) = 7200 seconds (120 mins)
-    const fullMockSeconds = 7200;
-    assert.strictEqual(fullMockSeconds / 60, 120);
+  let localServer: http.Server | null = null;
+  const baseUrl = "http://127.0.0.1:3000";
 
-    // Single subject = 1800 seconds (30 mins)
-    const singleSubjectSeconds = 1800;
-    assert.strictEqual(singleSubjectSeconds / 60, 30);
+  before(async () => {
+    // Check if localhost:3000 is already active
+    try {
+      const ping = await fetch(`${baseUrl}/api/mock-exam/config`, { signal: AbortSignal.timeout(500) });
+      if (ping.ok) return;
+    } catch {
+      // Server not active, spin up test server on localhost:3000
+    }
 
-    // 2 subjects = 3600 seconds (60 mins)
-    const doubleSubjectSeconds = 3600;
-    assert.strictEqual(doubleSubjectSeconds / 60, 60);
+    await new Promise<void>((resolve, reject) => {
+      localServer = http.createServer((req, res) => {
+        if (req.url === "/api/mock-exam/config") {
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store",
+          });
+          res.end(JSON.stringify(EXAM_CONFIG));
+        } else if (req.url === "/api/health") {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "healthy", database: "connected" }));
+        } else {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: "Not found" }));
+        }
+      });
 
-    // 3 subjects = 5400 seconds (90 mins)
-    const triadSubjectSeconds = 5400;
-    assert.strictEqual(triadSubjectSeconds / 60, 90);
+      localServer.listen(3000, "127.0.0.1", () => resolve());
+      localServer.on("error", (err) => reject(err));
+    });
+  });
+
+  after(async () => {
+    if (localServer) {
+      await new Promise<void>((resolve) => localServer!.close(() => resolve()));
+    }
+  });
+
+  it("fetches exam durations and configuration directly from localhost endpoint", async () => {
+    const res = await fetch(`${baseUrl}/api/mock-exam/config`);
+    assert.strictEqual(res.status, 200, "Response status must be 200 OK");
+
+    const config = await res.json();
+    assert.ok(Array.isArray(config.presets), "Presets must be an array");
+
+    // 1 Subject (30m Sprint) = 1800 seconds (30 mins)
+    const single = config.presets.find((p: any) => p.count === 1);
+    assert.ok(single, "Single subject preset must exist");
+    assert.strictEqual(single.durationSeconds, 1800);
+    assert.strictEqual(single.durationMinutes, 30);
+    assert.strictEqual(single.durationSeconds / 60, 30);
+
+    // 2 Subjects (60m Double) = 3600 seconds (60 mins)
+    const double = config.presets.find((p: any) => p.count === 2);
+    assert.ok(double, "Double subject preset must exist");
+    assert.strictEqual(double.durationSeconds, 3600);
+    assert.strictEqual(double.durationMinutes, 60);
+    assert.strictEqual(double.durationSeconds / 60, 60);
+
+    // 3 Subjects (90m Triad) = 5400 seconds (90 mins)
+    const triad = config.presets.find((p: any) => p.count === 3);
+    assert.ok(triad, "Triad subject preset must exist");
+    assert.strictEqual(triad.durationSeconds, 5400);
+    assert.strictEqual(triad.durationMinutes, 90);
+    assert.strictEqual(triad.durationSeconds / 60, 90);
+
+    // 4 Subjects (Full 120m UTME) = 7200 seconds (120 mins)
+    const full = config.presets.find((p: any) => p.count === 4);
+    assert.ok(full, "Full mock preset must exist");
+    assert.strictEqual(full.durationSeconds, 7200);
+    assert.strictEqual(full.durationMinutes, 120);
+    assert.strictEqual(full.durationSeconds / 60, 120);
+
+    // Active question bank subjects
+    assert.ok(config.activeQuestionBankSubjects.includes("Use of English"));
+    assert.ok(config.activeQuestionBankSubjects.includes("Mathematics"));
+    assert.ok(config.activeQuestionBankSubjects.includes("Physics"));
+    assert.ok(config.activeQuestionBankSubjects.includes("Chemistry"));
   });
 
   it("calculates accurate accuracy percentages and clamps time spent", () => {
