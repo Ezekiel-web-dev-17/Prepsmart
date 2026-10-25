@@ -1,0 +1,97 @@
+name: Development Suite CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================
+  # Gate 1: Static Quality & Type Safety
+  # ==========================================
+  code-quality:
+    name: Lint & Type Safety
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Static Type Safety Gate
+        run: npx tsc --noEmit
+
+  # ==========================================
+  # Gate 2: Automated Unit Testing
+  # ==========================================
+  unit-tests:
+    name: Automated Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit test suite
+        run: npm test
+
+  # ==========================================
+  # Gate 3: Security & Vulnerabilities (CVSS >= 7)
+  # ==========================================
+  security-checks:
+    name: Security & Vulnerability Audits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret Detection (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dependency Audit (CVSS >= 7.0)
+        run: npm audit --audit-level=high
+
+      - name: Code Security Validation
+        run: |
+          set -e
+          echo "Scanning application code for security policies..."
+          if grep -rnE "(debugEndpoint|swagger-ui|/api/debug)" src/ --include="*.ts" --include="*.tsx" --include="*.js" 2>/dev/null; then
+            echo "ERROR: Debug endpoints found in application code"
+            exit 1
+          fi
+          if grep -rn "Access-Control-Allow-Origin: \*" src/ config/ 2>/dev/null; then
+            echo "ERROR: Wildcard CORS configuration detected"
+            exit 1
+          fi
+          if grep -rnE "(BEGIN (RSA )?PRIVATE KEY|password\s*=\s*['\"][^$\{])" src/ config/ 2>/dev/null; then
+            echo "ERROR: Hardcoded credentials detected"
+            exit 1
+          fi
+          echo "Security validation passed."

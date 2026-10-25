@@ -97,12 +97,12 @@ jobs:
 
       - name: Post-Deployment Smoke & Health Verification
         run: |
-          echo "Verifying production endpoint is healthy..."
+          echo "Verifying production health endpoint..."
           sleep 5
           for i in {1..10}; do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prepsmart.tech)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://prepsmart.tech/api/health)
             if [ "$STATUS" = "200" ]; then
-              echo "Health check PASSED! Prepsmart is live and returning HTTP 200 OK."
+              echo "Health check PASSED! Prepsmart is live and database is connected (HTTP 200 OK)."
               exit 0
             fi
             echo "Attempt $i: Received HTTP $STATUS, retrying in 3s..."
