@@ -150,6 +150,17 @@ export async function createExamSession(
     ];
   }
 
+  // Ensure the user record exists in the database to satisfy the foreign key constraint
+  await prisma.user.upsert({
+    where: { id: userId },
+    update: {},
+    create: {
+      id: userId,
+      email: `${userId}@student.prepsmart.ng`,
+      name: `Student ${userId.slice(-4)}`,
+    },
+  });
+
   // 2. Parallel Database Fetching via Promise.all
   // English = exactly 60 questions; all other subjects = exactly 40 questions
   const subjectBatches = await Promise.all(
@@ -157,24 +168,22 @@ export async function createExamSession(
       const requiredCount =
         subject === "Use of English" ? ENGLISH_QUESTIONS : ELECTIVE_QUESTIONS;
 
-      // Fetch all active candidate questions for this subject ordered randomly
-      const rawCandidates = await prisma.$queryRawUnsafe<
-        {
-          id: string;
-          subject: string;
-          year: number;
-          text: string;
-          options: string;
-          topic: string;
-          concept: string;
-        }[]
-      >(
-        `SELECT id, subject, year, text, options, topic, concept
-         FROM "Question"
-         WHERE subject = ? AND isActive = 1
-         ORDER BY RANDOM()`,
-        subject
-      );
+      // Fetch all active candidate questions for this subject
+      const rawCandidates = await prisma.question.findMany({
+        where: {
+          subject,
+          isActive: true,
+        },
+        select: {
+          id: true,
+          subject: true,
+          year: true,
+          text: true,
+          options: true,
+          topic: true,
+          concept: true,
+        },
+      });
 
       // Perform rigorous deduplication using strict Sets
       // Enforces:

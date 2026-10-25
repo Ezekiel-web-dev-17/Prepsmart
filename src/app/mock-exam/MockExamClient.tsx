@@ -20,6 +20,15 @@ const ALL_AVAILABLE_SUBJECTS = [
   "Commerce",
 ];
 
+const ACTIVE_QUESTION_BANK_SUBJECTS = new Set([
+  "Use of English",
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Economics",
+]);
+
 interface MockExamClientProps {
   userSubjects: string[];
 }
@@ -28,10 +37,10 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
   const router = useRouter();
   const [examSession, setExamSession] = useState<ExamSessionClientData | null>(null);
 
-  // Initialize with up to 4 subjects from user's profile or defaults
+  // Initialize with up to 4 subjects from user's profile or defaults (only active ones)
   const initialSubjects = Array.from(
     new Set([
-      ...userSubjects,
+      ...userSubjects.filter((s) => ACTIVE_QUESTION_BANK_SUBJECTS.has(s)),
       "Use of English",
       "Mathematics",
       "Physics",
@@ -45,6 +54,11 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
 
   const toggleSubject = (subject: string) => {
     setErrorMessage(null);
+    if (!ACTIVE_QUESTION_BANK_SUBJECTS.has(subject)) {
+      setErrorMessage(`The question bank for ${subject} is currently being curated. Please select from English, Mathematics, Physics, Chemistry, Biology, or Economics.`);
+      return;
+    }
+
     if (selectedSubjects.includes(subject)) {
       if (selectedSubjects.length <= 1) {
         setErrorMessage("You must select at least 1 subject.");
@@ -62,12 +76,13 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
 
   const setPresetCount = (targetCount: number) => {
     setErrorMessage(null);
+    const activeCandidates = Array.from(ACTIVE_QUESTION_BANK_SUBJECTS);
     if (targetCount === 1) {
       setSelectedSubjects([selectedSubjects[0] || "Use of English"]);
     } else if (targetCount <= selectedSubjects.length) {
       setSelectedSubjects(selectedSubjects.slice(0, targetCount));
     } else {
-      const candidates = ALL_AVAILABLE_SUBJECTS.filter((s) => !selectedSubjects.includes(s));
+      const candidates = activeCandidates.filter((s) => !selectedSubjects.includes(s));
       const needed = targetCount - selectedSubjects.length;
       setSelectedSubjects([...selectedSubjects, ...candidates.slice(0, needed)]);
     }
@@ -249,6 +264,7 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
           {ALL_AVAILABLE_SUBJECTS.map((subj) => {
             const isSelected = selectedSubjects.includes(subj);
             const badgeNumber = selectedSubjects.indexOf(subj) + 1;
+            const isAvailable = ACTIVE_QUESTION_BANK_SUBJECTS.has(subj);
 
             return (
               <button
@@ -258,7 +274,9 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
                 className={`relative p-4 rounded-2xl text-xs font-bold text-center border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 min-h-20 ${
                   isSelected
                     ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/15 scale-[1.02]"
-                    : "bg-muted/40 border-border/80 text-muted-foreground hover:border-blue-400/50 hover:bg-muted hover:text-foreground"
+                    : isAvailable
+                    ? "bg-muted/40 border-border/80 text-muted-foreground hover:border-blue-400/50 hover:bg-muted hover:text-foreground"
+                    : "bg-muted/20 border-border/40 text-muted-foreground/60 hover:border-amber-400/30"
                 }`}
               >
                 {isSelected && (
@@ -269,10 +287,14 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
                 <span className="leading-snug">{subj}</span>
                 <span
                   className={`text-[10px] font-medium ${
-                    isSelected ? "text-blue-100" : "text-muted-foreground"
+                    isSelected
+                      ? "text-blue-100"
+                      : isAvailable
+                      ? "text-muted-foreground"
+                      : "text-amber-500/70"
                   }`}
                 >
-                  40 Questions
+                  {isAvailable ? "40 Questions" : "Coming Soon"}
                 </span>
               </button>
             );

@@ -56,8 +56,11 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create exam session";
-    // Security: don't expose internal errors
-    if (message.includes("No questions available")) {
+    if (
+      message.includes("No questions available") ||
+      message.includes("Unable to generate full exam session") ||
+      message.includes("Please select")
+    ) {
       return NextResponse.json({ error: message }, { status: 422 });
     }
     console.error("[exam/create] Error:", message);
