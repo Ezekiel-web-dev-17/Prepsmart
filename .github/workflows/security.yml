@@ -11,18 +11,19 @@ jobs:
     name: Scan for secrets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   static-analysis:
     name: Static analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: semgrep/semgrep-action@v1
         with:
@@ -30,13 +31,15 @@ jobs:
             p/owasp-top-ten
             p/secrets
             p/sql-injection
+            p/typescript
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
   dependency-scan:
     name: Dependency vulnerability scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: dependency-check/Dependency-Check_Action@main
         with:
@@ -47,8 +50,45 @@ jobs:
             --failOnCVSS 7
             --enableRetired
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: dependency-check-report
           path: reports/
+
+  config-validation:
+    name: Validate security configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate security configuration
+        run: |
+          set -e
+          echo "Verifying security-by-design configuration rules..."
+
+          # Check 1: Insecure debug endpoints in TypeScript/JavaScript application code
+          if grep -rnE "(debugEndpoint|swagger-ui|/api/debug)" src/ --include="*.ts" --include="*.tsx" --include="*.js" 2>/dev/null; then
+            echo "ERROR: Debug endpoints found in application code"
+            exit 1
+          fi
+
+          # Check 2: Wildcard CORS configuration
+          if grep -rn "Access-Control-Allow-Origin: \*" src/ config/ 2>/dev/null; then
+            echo "ERROR: Wildcard CORS configuration detected"
+            exit 1
+          fi
+
+          # Check 3: Plaintext private keys or hardcoded database passwords
+          if grep -rnE "(BEGIN (RSA )?PRIVATE KEY|password\s*=\s*['\"][^$\{])" src/ config/ 2>/dev/null; then
+            echo "ERROR: Hardcoded private key or credentials detected"
+            exit 1
+          fi
+
+          # Check 4: Stack trace exposure flags
+          if grep -rnE "(showStackTrace\s*:\s*true|expose_errors\s*:\s*true)" src/ config/ 2>/dev/null; then
+            echo "ERROR: Stack trace exposure enabled in configuration"
+            exit 1
+          fi
+
+          echo "Security configuration validation passed."
