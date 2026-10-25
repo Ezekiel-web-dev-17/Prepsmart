@@ -41,6 +41,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Audit npm dependencies (CVSS >= 7.0)
+        run: npm audit --audit-level=high
+
       - uses: dependency-check/Dependency-Check_Action@main
         with:
           project: "Prepsmart"

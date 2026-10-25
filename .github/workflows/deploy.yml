@@ -58,10 +58,15 @@ jobs:
 
           echo "Security validation passed."
 
-      - name: 5. Generate Prisma Client
+      - name: 5. Dependency Vulnerability Gate (CVSS >= 7.0)
+        run: |
+          echo "Scanning dependencies for high/critical vulnerabilities (CVSS >= 7.0)..."
+          npm audit --audit-level=high
+
+      - name: 6. Generate Prisma Client
         run: npx prisma generate
 
-      - name: 6. Static Type Safety Gate
+      - name: 7. Static Type Safety Gate
         run: npx tsc --noEmit
 
   # ==========================================
