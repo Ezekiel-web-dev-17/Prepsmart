@@ -30,6 +30,42 @@ export interface SeedQuestion {
 
 export type SeedQuestionInput = SeedQuestion;
 
+const OPTION_LETTERS = ["A", "B", "C", "D"] as const;
+
+export function randomizeSeedQuestionOptions(q: SeedQuestion): SeedQuestion {
+  let hash = 0;
+  for (let i = 0; i < q.text.length; i++) {
+    hash = (hash << 5) - hash + q.text.charCodeAt(i);
+    hash |= 0;
+  }
+  const rng = () => {
+    hash = (hash * 9301 + 49297) % 233280;
+    return Math.abs(hash / 233280);
+  };
+
+  const correctText = q.options.find((opt) => opt.id === q.correctOption)?.text;
+  const shuffled = [...q.options];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  let newCorrectOption: "A" | "B" | "C" | "D" = "A";
+  const finalOptions = shuffled.map((opt, index) => {
+    const letter = OPTION_LETTERS[index] || "A";
+    if (opt.text === correctText) {
+      newCorrectOption = letter;
+    }
+    return { id: letter, text: opt.text };
+  });
+
+  return {
+    ...q,
+    options: finalOptions,
+    correctOption: newCorrectOption,
+  };
+}
+
 // =========================================================================
 // 1. USE OF ENGLISH (125 Unique Questions)
 // =========================================================================
@@ -285,7 +321,341 @@ export function getEnglishQuestions(): SeedQuestion[] {
     });
   });
 
-  return items;
+  // Comprehension Passage I: Artificial Intelligence & Technological Transformation in Africa (10 items)
+  const comprehensionPassage1 = 
+    "In recent years, the exponential diffusion of artificial intelligence (AI) across Sub-Saharan Africa has elicited both unbridled enthusiasm and profound apprehension. Proponents herald algorithmic automation as an unprecedented leapfrog catalyst capable of surmounting longstanding deficits in clinical healthcare delivery, agricultural precision diagnostics, and financial inclusion. Machine-learning diagnostic tools deployed in rural clinics can analyze thoracic radiographs with accuracy comparable to specialist radiologists, who remain desperately scarce across rural provinces. Similarly, satellite-driven agronomic models empower smallholder farmers by forecasting precipitation anomalies and detecting crop blights before devastating infestations take root.\n\n" +
+    "Yet, this technological renaissance is not devoid of insidious perils. Skeptics point out that the datasets feeding these sophisticated computational models are predominantly harvested from the Global North, inadvertently encoding systemic algorithmic biases that misjudge local demographic nuances. Furthermore, the headlong rush to substitute automated decision engines for human judgment threatens to erode institutional accountability. When an automated loan evaluation algorithm arbitrarily denies credit to an impoverished trader in a bustling metropolis, the algorithmic opacity—frequently described as the 'black-box phenomenon'—renders meaningful redress virtually impossible.\n\n" +
+    "Ultimately, artificial intelligence must not be treated as a magical panacea for systemic socio-economic bottlenecks. Technological integration requires robust regulatory guardrails, sovereign data infrastructure, and an unwavering commitment to human-centered ethics. Without stringent oversight, technological progress risks exacerbating existing inequalities rather than bridging them.";
+
+  const comp1Questions = [
+    {
+      qNum: 1,
+      stem: "What is the primary purpose of the author in this passage?",
+      target: "To evaluate both the transformative potential and systemic risks of adopting AI in Africa",
+      distractors: [
+        "To advocate for the total prohibition of automated technology in rural African healthcare",
+        "To argue that artificial intelligence has eliminated the need for human medical specialists",
+        "To showcase that algorithmic loan applications are superior to traditional banking systems",
+      ],
+      concept: "Primary Purpose & Central Thesis",
+      explanation: "The passage objectively weighs both the immense leapfrog benefits (healthcare, agronomy) and serious ethical/structural perils (bias, opacity, lack of redress) of AI adoption in Africa.",
+    },
+    {
+      qNum: 2,
+      stem: "According to the passage, why are machine-learning diagnostic tools particularly beneficial in rural clinics?",
+      target: "They help mitigate the acute deficit of specialist medical personnel",
+      distractors: [
+        "They operate without requiring electrical power or data connectivity",
+        "They are significantly more expensive than foreign medical practitioners",
+        "They replace the necessity for prescription pharmaceuticals",
+      ],
+      concept: "Direct Factual Retrieval",
+      explanation: "Paragraph 1 explicitly notes that specialist radiologists 'remain desperately scarce across rural provinces', making machine-learning diagnostic tools valuable.",
+    },
+    {
+      qNum: 3,
+      stem: "The word 'unbridled' as used in the first paragraph most nearly means:",
+      target: "unrestrained and enthusiastic",
+      distractors: [
+        "cautious and hesitant",
+        "hostile and dismissive",
+        "artificial and simulated",
+      ],
+      concept: "Vocabulary in Context",
+      explanation: "'Unbridled' means unchecked, uncontrolled, or free from restraint, conveying passionate enthusiasm.",
+    },
+    {
+      qNum: 4,
+      stem: "What constitutes the 'black-box phenomenon' alluded to in the second paragraph?",
+      target: "The opacity of machine-learning models where decision-making pathways cannot be easily audited or explained",
+      distractors: [
+        "The physical casing used to protect servers from harsh weather conditions",
+        "The clandestine interception of financial records by cybercriminals",
+        "The electrical failure of rural computational diagnostic hardware",
+      ],
+      concept: "Concept Interpretation",
+      explanation: "Paragraph 2 defines algorithmic opacity as the 'black-box phenomenon', where opaque algorithms make decisions that cannot be easily inspected or questioned.",
+    },
+    {
+      qNum: 5,
+      stem: "The author suggests that algorithmic biases in local applications primarily arise because:",
+      target: "The training datasets are predominantly imported from foreign societies with different demographics",
+      distractors: [
+        "African software engineers deliberately program discriminatory rules",
+        "Smallholder farmers refuse to share their agricultural records",
+        "Mobile telecommunication networks in rural areas are too slow",
+      ],
+      concept: "Inference & Causality",
+      explanation: "Paragraph 2 notes that datasets 'are predominantly harvested from the Global North, inadvertently encoding systemic algorithmic biases that misjudge local demographic nuances'.",
+    },
+    {
+      qNum: 6,
+      stem: "In paragraph 2, the author's attitude towards unregulated automated loan systems can best be described as:",
+      target: "critical and alarmed",
+      distractors: [
+        "indifferent and neutral",
+        "jubilant and unreserved",
+        "cynical and dismissive",
+      ],
+      concept: "Authorial Tone & Attitude",
+      explanation: "The author expresses concern over automated credit denial without accountability or avenue for redress.",
+    },
+    {
+      qNum: 7,
+      stem: "Which of the following can be inferred from the passage regarding technological progress?",
+      target: "Technology alone cannot resolve structural socio-economic challenges without ethical regulation and oversight",
+      distractors: [
+        "Africa should reject all modern technological innovations from the Global North",
+        "Human judgment will be entirely eradicated within the next decade",
+        "Satellite agronomic models have failed to assist smallholder farming communities",
+      ],
+      concept: "Logical Deduction",
+      explanation: "Paragraph 3 concludes that AI must not be treated as a magical panacea, emphasizing that regulatory guardrails and ethics are essential.",
+    },
+    {
+      qNum: 8,
+      stem: "The phrase 'leapfrog catalyst' in paragraph 1 implies that technology:",
+      target: "enables developing regions to rapidly bypass traditional developmental stages",
+      distractors: [
+        "slows down industrial growth in favor of agrarian lifestyle",
+        "forces farmers to purchase expensive imported machinery",
+        "causes financial institutions to lose market capitalization",
+      ],
+      concept: "Idiomatic Meaning in Context",
+      explanation: "A 'leapfrog catalyst' refers to rapid progression skipping intermediate stages of infrastructural development.",
+    },
+    {
+      qNum: 9,
+      stem: "What is the grammatical function of the dependent clause: 'who remain desperately scarce across rural provinces'?",
+      target: "An adjectival (relative) clause qualifying the noun 'radiologists'",
+      distractors: [
+        "An adverbial clause of reason modifying 'analyzed'",
+        "A noun clause functioning as the subject of the sentence",
+        "A prepositional phrase indicating geographical position",
+      ],
+      concept: "Grammatical Function & Syntax",
+      explanation: "The clause begins with the relative pronoun 'who' and post-modifies the noun 'radiologists', making it an adjectival relative clause.",
+    },
+    {
+      qNum: 10,
+      stem: "Which of the following is the most suitable title for this passage?",
+      target: "Artificial Intelligence in Africa: Opportunities, Vulnerabilities, and the Imperative for Governance",
+      distractors: [
+        "How Smallholder Farmers Conquered Modern Agronomy",
+        "The Complete Eradication of Specialist Doctors in Africa",
+        "Why Banking Regulations Have Failed Urban Metropolises",
+      ],
+      concept: "Main Idea & Title Selection",
+      explanation: "This title accurately encapsulates the dual themes of transformative benefits, societal vulnerabilities, and the need for regulatory oversight.",
+    },
+  ];
+
+  comp1Questions.forEach((q, idx) => {
+    items.push({
+      subject: "Use of English",
+      year: 2021 + (idx % 5),
+      text: `[COMPREHENSION PASSAGE I: ARTIFICIAL INTELLIGENCE & ETHICS]\nRead the passage below carefully and answer the question that follows:\n\n${comprehensionPassage1}\n\nQuestion ${q.qNum}: ${q.stem}`,
+      options: [
+        { id: "A", text: q.target },
+        { id: "B", text: q.distractors[0] },
+        { id: "C", text: q.distractors[1] },
+        { id: "D", text: q.distractors[2] },
+      ],
+      correctOption: "A",
+      topic: "Reading Comprehension",
+      concept: q.concept,
+      explanation: q.explanation,
+      difficulty: "medium",
+    });
+  });
+
+  // Comprehension Passage II: Sahelian Ecology & The Great Green Wall (10 items)
+  const comprehensionPassage2 =
+    "Spanning the arid frontier between the Sahara Desert and the Sudanian Savanna, the Sahel represents one of the planet's most ecologically vulnerable yet culturally resilient ecological zones. For decades, recurrent droughts, demographic expansion, and unsustainable pastoral grazing practices have accelerated the southwards encroachment of desertification, stripping fertile topsoils and depleting historic subterranean aquifers. In response to this catastrophic ecological hemorrhage, the African Union spearheaded the Great Green Wall Initiative—an audacious ecological restoration campaign aimed at cultivating an 8,000-kilometer living mosaic of drought-resistant trees, vegetative shrublands, and sustainable agroforestry belts across eleven nations.\n\n" +
+    "The ecological rationale underpinning this continental bulwark extends far beyond arresting wind-borne sand dunes. Indigenous acacia species such as Acacia senegal fix vital atmospheric nitrogen into nutrient-depleted soils, while their extensive root architectures stabilize subterranean moisture reserves. Furthermore, the revival of indigenous vegetative canopy lowers ambient ground temperatures by up to four degrees Celsius, stimulating microclimatic precipitation cycles.\n\n" +
+    "Nevertheless, the execution of this visionary ecological endeavor has encountered severe geopolitical headwinds. Insurgent conflicts in the Lake Chad Basin, administrative inertia in regional ministries, and volatile international donor funding have significantly slowed planting schedules. Environmental economists argue that top-down bureaucratic directives will inevitably flounder unless peripheral agrarian and pastoral communities are granted full stewardship of the restored forest lands. Only when local pastoralists perceive tangible economic returns from sustainable non-timber forest products, such as gum arabic and medicinal resins, will the green barrier become genuinely self-sustaining.";
+
+  const comp2Questions = [
+    {
+      qNum: 1,
+      stem: "The primary theme explored in the passage is:",
+      target: "The ecological imperative, scientific mechanism, and socioeconomic challenges of the Great Green Wall Initiative",
+      distractors: [
+        "The immediate abandonment of pastoral grazing in Northern Africa",
+        "The permanent drying up of all subterranean aquifers across the Sahel",
+        "The exclusive reliance on foreign timber exports to finance regional development",
+      ],
+      concept: "Central Theme & Overview",
+      explanation: "The passage comprehensively examines the ecological significance, environmental science, and socioeconomic dynamics of the Great Green Wall.",
+    },
+    {
+      qNum: 2,
+      stem: "According to the passage, which factor has contributed to desertification in the Sahel?",
+      target: "A combination of recurring droughts, population pressure, and overgrazing",
+      distractors: [
+        "Excessive microclimatic rainfall in the Sudanian Savanna",
+        "The planting of 8,000 kilometers of non-indigenous trees",
+        "Widespread commercial manufacturing across eleven nations",
+      ],
+      concept: "Explicit Fact Identification",
+      explanation: "Paragraph 1 lists 'recurrent droughts, demographic expansion, and unsustainable pastoral grazing practices' as causes of desertification.",
+    },
+    {
+      qNum: 3,
+      stem: "As used in the passage, the word 'bulwark' most nearly means:",
+      target: "a protective defensive barrier",
+      distractors: [
+        "a temporary agricultural nursery",
+        "an administrative political treaty",
+        "a destructive sandstorm",
+      ],
+      concept: "Vocabulary in Context",
+      explanation: "'Bulwark' denotes a solid defensive wall or safeguard against encroaching danger (here, desertification).",
+    },
+    {
+      qNum: 4,
+      stem: "How do indigenous acacia species contribute to soil rejuvenation in the Sahel?",
+      target: "They fix atmospheric nitrogen and their root systems stabilize subterranean water",
+      distractors: [
+        "They absorb all underground water to prevent flash flooding",
+        "They eradicate native insect species and clear arable grasslands",
+        "They generate toxic resins that deter wild foraging animals",
+      ],
+      concept: "Scientific Mechanism in Context",
+      explanation: "Paragraph 2 states that Acacia senegal fixes atmospheric nitrogen and its root architectures stabilize underground moisture reserves.",
+    },
+    {
+      qNum: 5,
+      stem: "It can be inferred from the passage that local communities are critical to the project because:",
+      target: "Without grassroots economic incentives and communal stewardship, environmental initiatives tend to fail",
+      distractors: [
+        "Central governments have banned non-governmental organizations from visiting the Sahel",
+        "Only pastoralists possess the tools to plant trees",
+        "International donors refuse to release funds to democratic nations",
+      ],
+      concept: "Inference & Policy Analysis",
+      explanation: "The text emphasizes that top-down directives flounder unless local communities gain stewardship and economic incentives.",
+    },
+    {
+      qNum: 6,
+      stem: "What is identified in the final paragraph as a major obstacle to the initiative?",
+      target: "Insecurity from insurgencies, bureaucratic inertia, and fluctuating external financing",
+      distractors: [
+        "The total absence of drought-resistant indigenous acacia trees",
+        "The refusal of African Union leaders to endorse international treaties",
+        "Extreme snowfall across the Sahara Desert during winter months",
+      ],
+      concept: "Detail Identification",
+      explanation: "Paragraph 3 explicitly identifies 'insurgent conflicts in the Lake Chad Basin, administrative inertia... and volatile international donor funding'.",
+    },
+    {
+      qNum: 7,
+      stem: "The author's tone throughout the passage is best characterized as:",
+      target: "analytical, pragmatic, and constructive",
+      distractors: [
+        "sentimental, nostalgic, and despairing",
+        "sarcastic, mocking, and dismissive",
+        "euphoric, hyperbolic, and uncritical",
+      ],
+      concept: "Authorial Tone",
+      explanation: "The author presents balanced scientific facts alongside realistic sociopolitical assessments.",
+    },
+    {
+      qNum: 8,
+      stem: "The phrase 'ecological hemorrhage' in paragraph 1 is a figure of speech known as a:",
+      target: "Metaphor",
+      distractors: [
+        "Hyperbole",
+        "Personification",
+        "Irony",
+      ],
+      concept: "Figures of Speech",
+      explanation: "Describing severe ecological degradation and topsoil loss as a 'hemorrhage' (severe bleeding) is an implicit comparison or metaphor.",
+    },
+    {
+      qNum: 9,
+      stem: "What is the grammatical name of the phrase: 'Spanning the arid frontier between the Sahara Desert and the Sudanian Savanna'?",
+      target: "A participial phrase functioning as an adjectival modifier of 'the Sahel'",
+      distractors: [
+        "A gerund phrase functioning as the subject of the main verb",
+        "An adverbial clause of concession introduced by a conjunction",
+        "A prepositional phrase of spatial direction",
+      ],
+      concept: "Syntactic Structure",
+      explanation: "The phrase begins with the present participle 'Spanning' and modifies the subject 'the Sahel', functioning as a participial phrase.",
+    },
+    {
+      qNum: 10,
+      stem: "Based on the passage, sustainable economic returns for local pastoralists can be achieved through:",
+      target: "Commercial exploitation of non-timber forest goods such as gum arabic and medicinal resins",
+      distractors: [
+        "Wholesale clear-cutting of restored acacia woodlands for charcoal",
+        "Evicting rural inhabitants to make way for urban industrial parks",
+        "Importing synthetic timber from overseas corporations",
+      ],
+      concept: "Factual Conclusion",
+      explanation: "The final sentence specifically notes 'tangible economic returns from sustainable non-timber forest products, such as gum arabic and medicinal resins'.",
+    },
+  ];
+
+  comp2Questions.forEach((q, idx) => {
+    items.push({
+      subject: "Use of English",
+      year: 2020 + (idx % 5),
+      text: `[COMPREHENSION PASSAGE II: SAHELIAN ECOLOGY & THE GREEN WALL]\nRead the passage below carefully and answer the question that follows:\n\n${comprehensionPassage2}\n\nQuestion ${q.qNum}: ${q.stem}`,
+      options: [
+        { id: "A", text: q.target },
+        { id: "B", text: q.distractors[0] },
+        { id: "C", text: q.distractors[1] },
+        { id: "D", text: q.distractors[2] },
+      ],
+      correctOption: "A",
+      topic: "Reading Comprehension",
+      concept: q.concept,
+      explanation: q.explanation,
+      difficulty: "medium",
+    });
+  });
+
+  // Cloze Passage: The Evolution of Financial Technology in Nigeria (10 items)
+  const clozePassage =
+    "The proliferation of electronic payments has transformed Nigeria's commercial landscape, fundamentally reshaping how citizens transact on a daily basis. The rapid ...[1]... of mobile banking infrastructure has enabled millions of unbanked citizens to participate in the formal economy. Where individuals once waited in protracted queues for banking halls to open, intuitive mobile applications now ...[2]... instant cross-border remittances and retail payments. Central to this remarkable transition was the ...[3]... of interoperable settlement architecture by regulatory authorities, which forced legacy commercial banks to collaborate with agile financial technology startups.\n\n" +
+    "Notwithstanding these achievements, significant structural bottlenecks persist. Vulnerabilities in cybersecurity frameworks have created fertile ground for sophisticated syndicates to ...[4]... unsuspecting account holders through phishing scams and identity manipulation. Security analysts consistently ...[5]... that technical firewalls alone are inadequate without widespread public financial literacy campaigns. Furthermore, rural communities continue to grapple with ...[6]... telecommunications connectivity, which frequently disrupts digital point-of-sale terminals. To bridge this persistent divide, innovators are developing offline unstructured supplementary service data (USSD) channels that do not ...[7]... on high-speed internet data.\n\n" +
+    "Ultimately, maintaining sustainable consumer trust will require industry stakeholders to ...[8]... strict adherence to data privacy standards. Regulators must strike a delicate equilibrium between promoting financial ...[9]... and shielding vulnerable consumers from fraudulent exploitation. Only through collaborative vigilance can the nation consolidate its reputation as a leading continental hub for financial ...[10]....";
+
+  const clozeItems = [
+    { gapNum: 1, target: "adoption", distractors: ["abduction", "abstention", "adaptation"], exp: "'Adoption' refers to taking up and using technology, fitting the context of mobile banking infrastructure." },
+    { gapNum: 2, target: "facilitate", distractors: ["frustrate", "fabricate", "falsify"], exp: "'Facilitate' means to make an action or process easy or easier, which mobile applications do for payments." },
+    { gapNum: 3, target: "implementation", distractors: ["implication", "impediment", "imposition"], exp: "'Implementation' means putting a plan or system into active operation." },
+    { gapNum: 4, target: "defraud", distractors: ["defend", "defray", "deflate"], exp: "'Defraud' means illegally obtaining money from someone by deception." },
+    { gapNum: 5, target: "contend", distractors: ["condone", "confound", "concur"], exp: "'Contend' means to assert or argue a position earnestly in debate." },
+    { gapNum: 6, target: "sporadic", distractors: ["spontaneous", "superfluous", "splendid"], exp: "'Sporadic' means occurring at irregular intervals or scattered, perfectly describing unstable rural connectivity." },
+    { gapNum: 7, target: "rely", distractors: ["reckon", "relate", "reside"], exp: "'Rely' collocates with 'on' to denote dependence upon something." },
+    { gapNum: 8, target: "enforce", distractors: ["endure", "enrage", "entice"], exp: "'Enforce' means compelling observance of or compliance with a law or standard." },
+    { gapNum: 9, target: "innovation", distractors: ["inversion", "intervention", "invasion"], exp: "'Innovation' denotes the introduction of new methods and ideas in financial technology." },
+    { gapNum: 10, target: "inclusion", distractors: ["intrusion", "illusion", "infraction"], exp: "'Financial inclusion' is the established technical term for delivering banking services at affordable costs to disadvantaged segments." },
+  ];
+
+  clozeItems.forEach((c, idx) => {
+    items.push({
+      subject: "Use of English",
+      year: 2021 + (idx % 4),
+      text: `[CLOZE PASSAGE: FINTECH & ECONOMIC TRANSFORMATION]\nIn the passage below, numbered gaps indicate missing words. Read the passage and select the option that most suitably completes gap [${c.gapNum}]:\n\n${clozePassage}\n\nGap [${c.gapNum}]: Select the most appropriate word to fill gap [${c.gapNum}].`,
+      options: [
+        { id: "A", text: c.target },
+        { id: "B", text: c.distractors[0] },
+        { id: "C", text: c.distractors[1] },
+        { id: "D", text: c.distractors[2] },
+      ],
+      correctOption: "A",
+      topic: "Lexis & Cloze Passage",
+      concept: `Cloze Gap [${c.gapNum}]`,
+      explanation: c.exp,
+      difficulty: "medium",
+    });
+  });
+
+  return items.map(randomizeSeedQuestionOptions);
 }
 
 // =========================================================================
@@ -486,7 +856,7 @@ export function getMathematicsQuestions(): SeedQuestionInput[] {
     });
   }
 
-  return items;
+  return items.map(randomizeSeedQuestionOptions);
 }
 
 // =========================================================================
@@ -630,7 +1000,7 @@ export function getPhysicsQuestions(): SeedQuestionInput[] {
     });
   }
 
-  return items;
+  return items.map(randomizeSeedQuestionOptions);
 }
 
 // =========================================================================
@@ -871,7 +1241,7 @@ export function getChemistryQuestions(): SeedQuestionInput[] {
     });
   });
 
-  return items;
+  return items.map(randomizeSeedQuestionOptions);
 }
 
 // =========================================================================
@@ -1204,7 +1574,7 @@ export function getBiologyQuestions(): SeedQuestionInput[] {
     });
   });
 
-  return items;
+  return items.map(randomizeSeedQuestionOptions);
 }
 
 // =========================================================================
@@ -1399,7 +1769,7 @@ export function getEconomicsQuestions(): SeedQuestionInput[] {
     });
   });
 
-  return items;
+  return items.map(randomizeSeedQuestionOptions);
 }
 
 // =========================================================================
