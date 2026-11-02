@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { FlameIcon, SparklesIcon, CheckCircleIcon } from "@/components/ui/icons";
 
 export interface MotivationalBannerProps {
   message: string;
@@ -53,11 +54,11 @@ export function MotivationalBanner({
 
           {/* Active streak */}
           <div className="px-5 py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-center min-w-28 shadow-sm">
-            <div className="flex items-center justify-center gap-1 leading-none">
+            <div className="flex items-center justify-center gap-1.5 leading-none">
               <span className="text-2xl sm:text-3xl font-black text-amber-500 tabular-nums">
                 {activeStreak}
               </span>
-              <span className="text-lg">🔥</span>
+              <FlameIcon className="w-5 h-5 text-amber-500" />
             </div>
             <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mt-1.5">
               Day Streak
@@ -66,9 +67,12 @@ export function MotivationalBanner({
 
           {/* XP Accumulated */}
           <div className="px-5 py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-center min-w-28 shadow-sm">
-            <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums block leading-none">
-              {xp}
-            </span>
+            <div className="flex items-center justify-center gap-1 leading-none">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums block">
+                {xp}
+              </span>
+              <SparklesIcon className="w-4 h-4 text-emerald-500" />
+            </div>
             <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block mt-1.5">
               Total XP
             </span>

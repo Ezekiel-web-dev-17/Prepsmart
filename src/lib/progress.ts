@@ -143,13 +143,17 @@ export async function getCandidateProgressData(
 
   const subjectMastery: SubjectMasteryItem[] = selectedSubjects.map((subj) => {
     const stats = subjectStats[subj] || { correct: 0, total: 0 };
-    // If no questions attempted yet in this subject, set baseline onboarding mastery (60%)
-    let pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 60;
-    pct = Math.min(100, Math.max(15, pct));
+    // Real recorded data: 0% if no questions attempted yet
+    const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
 
     let status: SubjectMasteryItem["status"] = "Building Momentum";
-    if (pct >= 80) status = "Mastery Level";
-    else if (pct >= 65) status = "On Track";
+    if (stats.total === 0) {
+      status = "Building Momentum";
+    } else if (pct >= 80) {
+      status = "Mastery Level";
+    } else if (pct >= 60) {
+      status = "On Track";
+    }
 
     return {
       subject: subj,
@@ -160,39 +164,36 @@ export async function getCandidateProgressData(
     };
   });
 
-  // 5. Calculate Exam Readiness Score (0 - 100%)
+  // 5. Calculate Real Recorded Exam Readiness Score (0 - 100%)
   const totalMocks = examAttempts.length;
   const totalDrills = xpLogs.filter((l) => l.eventType === "TOPIC_COMPLETED").length;
-
-  let averageMockAccuracy = 0;
-  if (totalMocks > 0) {
-    const sumAccuracy = examAttempts.reduce((acc, curr) => acc + curr.accuracyPct, 0);
-    averageMockAccuracy = sumAccuracy / totalMocks;
-  }
-
-  const averageSubjectMastery =
-    subjectMastery.reduce((acc, curr) => acc + curr.masteryPct, 0) /
-    (subjectMastery.length || 1);
-
-  // Practice habit factor (streak + drills completed + XP milestones)
-  const habitFactor = Math.min(
-    100,
-    activeStreak * 14 + totalDrills * 10 + Math.min(user.xp / 15, 30)
+  const totalQuestionsAttempted = Object.values(subjectStats).reduce(
+    (sum, s) => sum + s.total,
+    0
+  );
+  const totalQuestionsCorrect = Object.values(subjectStats).reduce(
+    (sum, s) => sum + s.correct,
+    0
   );
 
   let examReadinessScore = 0;
-  if (totalMocks > 0) {
-    examReadinessScore = Math.round(
-      averageMockAccuracy * 0.5 + averageSubjectMastery * 0.3 + habitFactor * 0.2
+  if (totalQuestionsAttempted > 0) {
+    const rawAccuracy = (totalQuestionsCorrect / totalQuestionsAttempted) * 100;
+    const streakBonus = Math.min(10, activeStreak * 2);
+    const volumeFactor = Math.min(15, Math.round((totalQuestionsAttempted / 180) * 15));
+    examReadinessScore = Math.min(
+      100,
+      Math.max(5, Math.round(rawAccuracy * 0.75 + volumeFactor + streakBonus))
     );
+  } else if (totalDrills > 0 || user.xp > 0) {
+    // Some drills or XP logged but no full exam sessions
+    examReadinessScore = Math.min(35, Math.round(totalDrills * 5 + Math.min(user.xp / 50, 15)));
   } else {
-    // Before full mock exam, readiness draws from drills and syllabus coverage
-    examReadinessScore = Math.round(averageSubjectMastery * 0.65 + habitFactor * 0.35);
+    // Brand new user: 0% real readiness until assessments are completed
+    examReadinessScore = 0;
   }
-  // Keep clamped to a realistic, encouraging score
-  examReadinessScore = Math.min(99, Math.max(20, examReadinessScore));
 
-  // 6. Aggregate Top 3 Concepts to Review (strictly positive phrasing)
+  // 6. Aggregate Real Recorded Concepts to Review from Error Log
   const conceptMap = new Map<
     string,
     { concept: string; topic: string; subject: string; count: number }
@@ -215,38 +216,15 @@ export async function getCandidateProgressData(
 
   const sortedConcepts = Array.from(conceptMap.values())
     .sort((a, b) => b.count - a.count)
-    .slice(0, 3);
+    .slice(0, 5);
 
-  let conceptsToReview: ConceptToReviewItem[] = sortedConcepts.map((c) => ({
+  // Return strictly real recorded concepts (NO fake fallback concepts!)
+  const conceptsToReview: ConceptToReviewItem[] = sortedConcepts.map((c) => ({
     concept: c.concept,
     topic: c.topic,
     subject: c.subject,
     reviewCount: c.count,
   }));
-
-  // Fallback high-yield concepts if candidate has completed all active review items
-  if (conceptsToReview.length === 0) {
-    conceptsToReview = [
-      {
-        concept: "Oral Forms & Stress Patterns",
-        topic: "Phonology & Lexis",
-        subject: "Use of English",
-        reviewCount: 0,
-      },
-      {
-        concept: "Differential Calculus & Tangents",
-        topic: "Calculus",
-        subject: "Mathematics",
-        reviewCount: 0,
-      },
-      {
-        concept: "Electrolysis & Faraday's Laws",
-        topic: "Physical Chemistry",
-        subject: "Chemistry",
-        reviewCount: 0,
-      },
-    ];
-  }
 
   // 7. Calculate Weekly Question Count
   const weeklyQuestionLogs = recentWeeklyXp.filter(
@@ -292,7 +270,7 @@ export async function getCandidateProgressData(
 /**
  * Calculates continuous consecutive active calendar days
  */
-function calculateActiveStreak(
+export function calculateActiveStreak(
   xpDates: Date[],
   examDates: Date[]
 ): number {

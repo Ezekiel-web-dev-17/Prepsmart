@@ -26,11 +26,11 @@ export function ReadinessRing({ score, targetScore }: ReadinessRingProps) {
   const strokeDashoffset =
     circumference - (animatedScore / 100) * circumference;
 
-  // Determine readiness tier with strictly positive phrasing
-  let tierLabel = "Building Momentum";
-  let tierColor = "text-blue-500 dark:text-blue-400";
-  let tierBg = "bg-blue-500/10 border-blue-400/20";
-  let projectedJambRange = "210 - 240";
+  // Determine readiness tier based on real recorded score
+  let tierLabel = "Unassessed";
+  let tierColor = "text-neutral-500 dark:text-neutral-400";
+  let tierBg = "bg-neutral-500/10 border-neutral-400/20";
+  let projectedJambRange = "Pending Drills";
 
   if (score >= 80) {
     tierLabel = "Excellence Track";
@@ -47,6 +47,11 @@ export function ReadinessRing({ score, targetScore }: ReadinessRingProps) {
     tierColor = "text-amber-500 dark:text-amber-400";
     tierBg = "bg-amber-500/10 border-amber-400/20";
     projectedJambRange = "220 - 250";
+  } else if (score > 0) {
+    tierLabel = "Building Momentum";
+    tierColor = "text-blue-500 dark:text-blue-400";
+    tierBg = "bg-blue-500/10 border-blue-400/20";
+    projectedJambRange = "180 - 220";
   }
 
   return (

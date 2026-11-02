@@ -8,6 +8,7 @@ import { ReadinessRing } from "./components/ReadinessRing";
 import { ConceptsToReview } from "./components/ConceptsToReview";
 import { SubjectMasteryCards } from "./components/SubjectMasteryCards";
 import type { CandidateProgressData } from "@/lib/progress";
+import { ClockIcon, TargetIcon, BookOpenIcon, ArrowRightIcon } from "@/components/ui/icons";
 
 export interface ProgressDashboardClientProps {
   data: CandidateProgressData;
@@ -51,7 +52,9 @@ export function ProgressDashboardClient({ data }: ProgressDashboardClientProps) 
           {/* Card 1: Mock Exam */}
           <div className="group relative p-6 rounded-3xl bg-white/65 dark:bg-[#1C1C1E]/65 backdrop-blur-2xl backdrop-saturate-180 border border-white/60 dark:border-white/10 shadow-liquid-md hover:shadow-liquid-lg dark:shadow-liquid-dark-md dark:hover:shadow-liquid-dark-dock transition-all duration-300 flex flex-col justify-between">
             <div className="space-y-2">
-              <span className="text-xl">⏱️</span>
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20">
+                <ClockIcon className="w-5 h-5" />
+              </div>
               <h3 className="font-extrabold text-base text-[#1D1D1F] dark:text-[#F5F5F7]">
                 Full UTME Mock Exam
               </h3>
@@ -60,20 +63,20 @@ export function ProgressDashboardClient({ data }: ProgressDashboardClientProps) 
               </p>
             </div>
             <Link
-              href="/mock-exam"
+              href="/study?tab=mock-exam"
               className="mt-5 w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold text-center shadow-xs transition-all flex items-center justify-center gap-1.5"
             >
               <span>Launch Mock Exam</span>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           {/* Card 2: Revision Hub */}
           <div className="group relative p-6 rounded-3xl bg-white/65 dark:bg-[#1C1C1E]/65 backdrop-blur-2xl backdrop-saturate-180 border border-white/60 dark:border-white/10 shadow-liquid-md hover:shadow-liquid-lg dark:shadow-liquid-dark-md dark:hover:shadow-liquid-dark-dock transition-all duration-300 flex flex-col justify-between">
             <div className="space-y-2">
-              <span className="text-xl">🎯</span>
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20">
+                <TargetIcon className="w-5 h-5" />
+              </div>
               <h3 className="font-extrabold text-base text-[#1D1D1F] dark:text-[#F5F5F7]">
                 Revision Hub
               </h3>
@@ -82,20 +85,20 @@ export function ProgressDashboardClient({ data }: ProgressDashboardClientProps) 
               </p>
             </div>
             <Link
-              href="/revision"
+              href="/dashboard?tab=revision"
               className="mt-5 w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold text-center shadow-xs transition-all flex items-center justify-center gap-1.5"
             >
               <span>Open Revision Hub</span>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           {/* Card 3: Syllabus Modules */}
           <div className="group relative p-6 rounded-3xl bg-white/65 dark:bg-[#1C1C1E]/65 backdrop-blur-2xl backdrop-saturate-180 border border-white/60 dark:border-white/10 shadow-liquid-md hover:shadow-liquid-lg dark:shadow-liquid-dark-md dark:hover:shadow-liquid-dark-dock transition-all duration-300 flex flex-col justify-between">
             <div className="space-y-2">
-              <span className="text-xl">📚</span>
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+                <BookOpenIcon className="w-5 h-5" />
+              </div>
               <h3 className="font-extrabold text-base text-[#1D1D1F] dark:text-[#F5F5F7]">
                 Syllabus & Course Modules
               </h3>
@@ -108,9 +111,7 @@ export function ProgressDashboardClient({ data }: ProgressDashboardClientProps) 
               className="mt-5 w-full py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-black text-xs font-bold text-center shadow-xs transition-all flex items-center justify-center gap-1.5"
             >
               <span>Explore Syllabus</span>
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>

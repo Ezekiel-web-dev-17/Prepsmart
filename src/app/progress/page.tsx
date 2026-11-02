@@ -1,33 +1,21 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
-import { auth } from "@/lib/auth";
-import { getCandidateProgressData } from "@/lib/progress";
-import { ProgressDashboardClient } from "./ProgressDashboardClient";
-
-export const metadata: Metadata = {
-  title: "Exam Readiness & Progress Analytics | PrepSmart",
-  description:
-    "Track your JAMB UTME readiness index, subject mastery scores, active study streak, and high-yield concepts to review.",
-};
 
 export const dynamic = "force-dynamic";
 
-export default async function ProgressPage() {
-  await connection();
-  const { userId } = await auth();
+interface ProgressPageProps {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
 
-  // Redirect unauthenticated visitors to sign in
-  if (!userId) {
-    redirect("/sign-in");
+export default async function ProgressPage({ searchParams }: ProgressPageProps) {
+  const params = searchParams ? await searchParams : {};
+  const query = new URLSearchParams();
+  query.set("tab", "readiness");
+
+  for (const [key, val] of Object.entries(params)) {
+    if (key !== "tab" && typeof val === "string") {
+      query.set(key, val);
+    }
   }
 
-  const progressData = await getCandidateProgressData(userId);
-
-  // If user profile does not exist or onboarding has not been done, guide them to onboarding
-  if (!progressData) {
-    redirect("/onboarding");
-  }
-
-  return <ProgressDashboardClient data={progressData} />;
+  redirect(`/dashboard?${query.toString()}`);
 }

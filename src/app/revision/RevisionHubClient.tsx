@@ -3,6 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useGamification } from "@/components/gamification/XPToast";
+import {
+  TrophyIcon,
+  ClockIcon,
+  BookOpenIcon,
+  TargetIcon,
+  SparklesIcon,
+  CheckIcon,
+  LightbulbIcon,
+  ArrowRightIcon,
+} from "@/components/ui/icons";
 
 export interface RevisionQuestion {
   failedRecordId: string;
@@ -78,7 +88,7 @@ export default function RevisionHubClient({
         triggerXPToast({
           points: 15,
           eventType: "QUESTION_ANSWERED",
-          message: "Concept Mastered! +15 XP 🎯",
+          message: "Concept Mastered! +15 XP",
         });
       }
     } catch (err) {
@@ -132,8 +142,8 @@ export default function RevisionHubClient({
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 space-y-8 text-center">
         <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-amber-500/15 via-card to-emerald-500/10 border-2 border-amber-500/30 p-8 sm:p-12 shadow-xl space-y-6">
-          <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-4xl shadow-inner shadow-amber-500/20">
-            🏆
+          <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shadow-inner shadow-amber-500/20">
+            <TrophyIcon className="w-10 h-10 text-amber-500" />
           </div>
 
           <div className="space-y-3 max-w-lg mx-auto">
@@ -152,33 +162,34 @@ export default function RevisionHubClient({
             </p>
 
             {masteredCount > 0 && (
-              <div className="inline-block px-4 py-2 rounded-2xl bg-muted/60 border border-border text-xs font-extrabold text-foreground">
-                🎉 You locked down <span className="text-amber-500">{masteredCount}</span> concept{masteredCount === 1 ? "" : "s"} in this revision session!
+              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-muted/60 border border-border text-xs font-extrabold text-foreground">
+                <SparklesIcon className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>You locked down <span className="text-amber-500">{masteredCount}</span> concept{masteredCount === 1 ? "" : "s"} in this revision session!</span>
               </div>
             )}
           </div>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
             <Link
-              href="/mock-exam"
+              href="/study?tab=mock-exam"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
             >
               <span>Take Full Mock Exam</span>
-              <span>⏱️</span>
+              <ClockIcon className="w-4 h-4" />
             </Link>
             <Link
               href="/study"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-muted hover:bg-muted/80 text-foreground font-bold text-xs border border-border transition-all flex items-center justify-center gap-2"
             >
               <span>Explore Syllabus Topics</span>
-              <span>📚</span>
+              <BookOpenIcon className="w-4 h-4" />
             </Link>
             <Link
               href="/dashboard"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-card hover:bg-muted text-foreground font-bold text-xs border border-border/80 transition-all flex items-center justify-center gap-1.5"
             >
               <span>Dashboard</span>
-              <span>→</span>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -193,7 +204,8 @@ export default function RevisionHubClient({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-black border border-amber-500/30">
-              <span>🎯 ACTIVE RECALL HUB</span>
+              <TargetIcon className="w-3.5 h-3.5 text-amber-500" />
+              <span>ACTIVE RECALL HUB</span>
               <span>•</span>
               <span>SPACED REPETITION ENGINE</span>
             </div>
@@ -217,8 +229,9 @@ export default function RevisionHubClient({
               </span>
             </div>
             {masteredCount > 0 && (
-              <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                +{masteredCount} Mastered Today ✨
+              <span className="inline-flex items-center gap-1 text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                <span>+{masteredCount} Mastered Today</span>
+                <SparklesIcon className="w-3 h-3 text-emerald-500" />
               </span>
             )}
           </div>
@@ -360,7 +373,7 @@ export default function RevisionHubClient({
                   className="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/25 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   <span>{isSubmitting ? "Checking..." : "Confirm Answer"}</span>
-                  <span>✓</span>
+                  <CheckIcon className="w-4 h-4" />
                 </button>
               </div>
             ) : (
@@ -373,13 +386,17 @@ export default function RevisionHubClient({
                       : "bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-200"
                   }`}
                 >
-                  <span className="text-2xl shrink-0">
-                    {feedback.isCorrect ? "🎉" : "💡"}
-                  </span>
+                  <div className="shrink-0 mt-0.5">
+                    {feedback.isCorrect ? (
+                      <SparklesIcon className="w-6 h-6 text-emerald-500" />
+                    ) : (
+                      <LightbulbIcon className="w-6 h-6 text-amber-500" />
+                    )}
+                  </div>
                   <div className="space-y-1">
                     <h4 className="font-black text-sm">
                       {feedback.isCorrect
-                        ? "Mastered! ✨ Great work locking down this concept."
+                        ? "Mastered! Great work locking down this concept."
                         : "Not quite yet! You're building mastery with every try."}
                     </h4>
                     <p className="text-xs leading-relaxed opacity-90">
@@ -393,7 +410,7 @@ export default function RevisionHubClient({
                 {/* Examiner Explanation */}
                 <div className="p-5 rounded-2xl bg-muted/60 border border-border/80 space-y-2 text-xs">
                   <div className="font-extrabold text-foreground flex items-center gap-1.5">
-                    <span>💡</span>
+                    <LightbulbIcon className="w-4 h-4 text-amber-500" />
                     <span>Examiner Solution & Concept Working:</span>
                   </div>
                   <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-wrap">
@@ -409,7 +426,7 @@ export default function RevisionHubClient({
                     className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-600/25 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
                   >
                     <span>Next Question</span>
-                    <span>→</span>
+                    <ArrowRightIcon className="w-4 h-4" />
                   </button>
                 </div>
               </div>

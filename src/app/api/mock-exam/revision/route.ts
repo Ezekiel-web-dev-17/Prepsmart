@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       correctOption: record.question.correctOption,
       explanation: record.question.explanation,
       message: isCorrect
-        ? "Mastered! ✨ Excellent work locking down this concept."
+        ? "Mastered! Excellent work locking down this concept."
         : "Not quite yet! You're learning every time. Review the examiner rationale below to lock in the principle.",
     });
   } catch (err) {
