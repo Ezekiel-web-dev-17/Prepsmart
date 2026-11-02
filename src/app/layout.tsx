@@ -7,6 +7,7 @@ import { GamificationProvider } from "@/components/gamification/XPToast";
 import ThemeScript from "@/components/theme/ThemeScript";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import StudyNotificationManager from "@/components/notifications/StudyNotificationManager";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -92,6 +93,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <Footer />
+                <StudyNotificationManager />
               </GamificationProvider>
             </QueryProvider>
           </ThemeProvider>

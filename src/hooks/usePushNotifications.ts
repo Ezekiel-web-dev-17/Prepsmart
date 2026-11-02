@@ -91,7 +91,7 @@ export function usePushNotifications() {
       customTitle?: string,
       customBody?: string
     ): Promise<{ success: boolean; message: string }> => {
-      const title = customTitle || "PrepSmart Daily Challenge 🔥";
+      const title = customTitle || "PrepSmart Daily Challenge";
       const body =
         customBody ||
         "Keep your study habit strong! 10 mins of Mathematics practice is ready.";
@@ -184,6 +184,76 @@ export function usePushNotifications() {
     []
   );
 
+  const dispatchNotification = useCallback(
+    async ({
+      title,
+      body,
+      url = "/study",
+      tag,
+    }: {
+      title: string;
+      body: string;
+      url?: string;
+      tag?: string;
+    }): Promise<boolean> => {
+      if (typeof window === "undefined" || !("Notification" in window)) {
+        return false;
+      }
+
+      let currentPerm = Notification.permission;
+      if (currentPerm !== "granted") {
+        return false;
+      }
+
+      const uniqueTag = tag || `prepsmart-${Date.now()}`;
+      let shown = false;
+
+      if ("serviceWorker" in navigator) {
+        try {
+          let reg = await navigator.serviceWorker.getRegistration();
+          if (!reg) {
+            reg = await navigator.serviceWorker.register("/sw.js");
+          }
+          const activeReg = await navigator.serviceWorker.ready;
+          await activeReg.showNotification(title, {
+            body,
+            icon: "/favicon.ico",
+            badge: "/favicon.ico",
+            vibrate: [100, 50, 100],
+            data: { url },
+            tag: uniqueTag,
+            renotify: true,
+          } as NotificationOptions);
+          shown = true;
+        } catch (e) {
+          console.warn("ServiceWorker dispatch error, trying window.Notification:", e);
+        }
+      }
+
+      if (!shown) {
+        try {
+          const popup = new Notification(title, {
+            body,
+            icon: "/favicon.ico",
+            badge: "/favicon.ico",
+            tag: uniqueTag,
+          });
+          popup.onclick = () => {
+            window.focus();
+            window.location.href = url;
+            popup.close();
+          };
+          shown = true;
+        } catch (e) {
+          console.warn("Direct Notification constructor failed:", e);
+        }
+      }
+
+      return shown;
+    },
+    []
+  );
+
   return {
     isSupported,
     permission,
@@ -191,5 +261,6 @@ export function usePushNotifications() {
     isLoading,
     subscribeToPush,
     sendTestNotification,
+    dispatchNotification,
   };
 }
