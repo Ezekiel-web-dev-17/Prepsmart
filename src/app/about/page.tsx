@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "About Us — Demystifying JAMB UTME | PrepSmart",
+  title: "About Us — Helping Nigerian Students Clear JAMB UTME | PrepSmart",
   description:
-    "The story, conviction, and methodology behind PrepSmart. Discover why 76% of Nigerian JAMBites struggle, why JAMB is actually one of the easiest exams in academics, and how our creators practiced to excel.",
+    "The story, conviction, and study routine behind PrepSmart. Learn why so many candidates struggle, why JAMB is one of the most predictable exams to pass, and how our team practiced to excel.",
   keywords: [
     "About PrepSmart",
     "JAMB failure statistics Nigeria",
@@ -116,7 +116,7 @@ export default function AboutPage() {
         </div>
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight max-w-4xl mx-auto leading-tight">
-          Demystifying JAMB UTME for Every Nigerian Student.
+          Making JAMB UTME Clear and Straightforward for Every Nigerian Student.
         </h1>
 
         <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -279,7 +279,7 @@ export default function AboutPage() {
                 We saw our friends, younger siblings, and thousands of brilliant candidates repeating JAMB year after year simply because nobody showed them the system.
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                PrepSmart is the exact digital embodiment of how we practiced. We automated the Spaced Repetition Queue, embedded examiner trap alerts, integrated authentic 120-minute CBT calculators, and created a 4-week roadmap so any student in Nigeria can execute the same winning routine.
+                PrepSmart was built using the exact study routine we used to clear our exams. We automated the Spaced Repetition Queue, added examiner trap alerts, integrated authentic 120-minute CBT calculators, and created a step-by-step syllabus roadmap so any student in Nigeria can follow the same winning routine.
               </p>
             </div>
             <div className="pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "seed": "npx tsx prisma/seed.ts",
+    "seed:questions": "npx tsx --env-file=.env.local prisma/seed-unique-questions.ts",
     "lint": "eslint",
     "test": "npx tsx --test 'src/__tests__/**/*.test.ts'"
   },

@@ -35,6 +35,8 @@ export interface UniversityData {
   estYear: number | null;
   website: string | null;
   campusHighlights: string | null;
+  campusImage?: string | null;
+  landmarkName?: string | null;
   createdAt?: string | Date;
   updatedAt?: string | Date;
   courses: CourseRequirementData[];

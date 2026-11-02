@@ -30,39 +30,38 @@ export interface SeedQuestion {
 
 export type SeedQuestionInput = SeedQuestion;
 
-const OPTION_LETTERS = ["A", "B", "C", "D"] as const;
+const TARGET_SEQUENCE: ("A" | "B" | "C" | "D")[] = [
+  "B", "D", "A", "C",
+  "D", "B", "C", "A",
+  "C", "A", "D", "B",
+  "A", "C", "B", "D",
+];
 
-export function randomizeSeedQuestionOptions(q: SeedQuestion): SeedQuestion {
-  let hash = 0;
-  for (let i = 0; i < q.text.length; i++) {
-    hash = (hash << 5) - hash + q.text.charCodeAt(i);
-    hash |= 0;
-  }
-  const rng = () => {
-    hash = (hash * 9301 + 49297) % 233280;
-    return Math.abs(hash / 233280);
-  };
+export function randomizeSeedQuestionOptions(q: SeedQuestion, index: number = 0): SeedQuestion {
+  // Use a balanced Latin-square target sequence so:
+  // 1. Correct answers are distributed at exactly ~25% for every letter (A, B, C, D).
+  // 2. Maximum consecutive identical answer streak is never greater than 2 (satisfies <= 4 limit).
+  // 3. Shuffling is deterministic and consistent across test runs and database seeding.
+  const correctOptionObj = q.options.find((opt) => opt.id === q.correctOption);
+  const correctText = correctOptionObj ? correctOptionObj.text : q.options[0]?.text;
+  const distractors = q.options.filter((opt) => opt.id !== q.correctOption).map((opt) => opt.text);
 
-  const correctText = q.options.find((opt) => opt.id === q.correctOption)?.text;
-  const shuffled = [...q.options];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
+  const targetSlot = TARGET_SEQUENCE[index % TARGET_SEQUENCE.length];
+  const letters: ("A" | "B" | "C" | "D")[] = ["A", "B", "C", "D"];
+  const otherLetters = letters.filter((l) => l !== targetSlot);
 
-  let newCorrectOption: "A" | "B" | "C" | "D" = "A";
-  const finalOptions = shuffled.map((opt, index) => {
-    const letter = OPTION_LETTERS[index] || "A";
-    if (opt.text === correctText) {
-      newCorrectOption = letter;
+  const finalOptions = letters.map((letter) => {
+    if (letter === targetSlot) {
+      return { id: letter, text: correctText || "" };
     }
-    return { id: letter, text: opt.text };
+    const distractorIndex = otherLetters.indexOf(letter);
+    return { id: letter, text: distractors[distractorIndex] || "" };
   });
 
   return {
     ...q,
     options: finalOptions,
-    correctOption: newCorrectOption,
+    correctOption: targetSlot,
   };
 }
 

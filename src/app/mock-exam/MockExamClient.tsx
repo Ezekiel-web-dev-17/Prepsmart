@@ -42,6 +42,23 @@ export default function MockExamClient({
   const router = useRouter();
   const [examSession, setExamSession] = useState<ExamSessionClientData | null>(null);
 
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-md mx-auto p-8 rounded-3xl bg-card border border-border text-center space-y-4 shadow-sm">
+        <h3 className="text-xl font-bold text-foreground">Candidate Sign-In Required</h3>
+        <p className="text-xs text-muted-foreground">
+          Please sign in to configure and start your JAMB CBT mock exam session.
+        </p>
+        <Link
+          href="/sign-in?redirect_url=/study?tab=mock-exam"
+          className="inline-block px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition-colors"
+        >
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+
   // Initialize with up to 4 subjects from user's profile or defaults (only active ones)
   const initialSubjects = Array.from(
     new Set([
@@ -327,7 +344,7 @@ export default function MockExamClient({
           </div>
           <div className="flex items-center gap-2">
             <CheckIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-            <span>Guess-marking feature to unlock AI diagnostic breakdown</span>
+            <span>Guess-marking feature for detailed accuracy breakdown</span>
           </div>
         </div>
 

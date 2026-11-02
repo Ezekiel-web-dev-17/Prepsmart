@@ -143,7 +143,7 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
               Official 2026 JAMB Blueprint
             </span>
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-card/80 backdrop-blur-xs border border-border text-muted-foreground shadow-2xs">
-              4-Week Structured Sprints
+              2 to 3 Month Study Sprints
             </span>
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-card/80 backdrop-blur-xs border border-border text-emerald-600 dark:text-emerald-400 shadow-2xs inline-flex items-center gap-1.5">
               <TargetIcon className="w-3.5 h-3.5 text-emerald-500" />
@@ -154,10 +154,10 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
           {/* Heading */}
           <div className="space-y-2">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
-              4-Week Master Curriculum &amp; Syllabus Hub
+              Master Curriculum &amp; Syllabus Hub
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg max-w-3xl leading-relaxed">
-              Explore official syllabuses, structured 4-week milestones, and examiner trap warnings across{" "}
+              Explore official syllabuses, structured multi-week milestones across 2 to 3 months of practice, and examiner trap warnings across{" "}
               <strong className="text-foreground font-semibold">Science</strong>,{" "}
               <strong className="text-foreground font-semibold">Commercial</strong>, and{" "}
               <strong className="text-foreground font-semibold">Arts</strong> streams.
@@ -192,7 +192,7 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
 
             <div className="bg-card/70 backdrop-blur-xs border border-border rounded-2xl p-3.5 shadow-2xs">
               <span className="text-xs font-medium text-muted-foreground block">Curriculum Pace</span>
-              <span className="text-xl sm:text-2xl font-black text-foreground">4 Weeks</span>
+              <span className="text-xl sm:text-2xl font-black text-foreground">8-12 Weeks</span>
               <span className="text-[11px] text-purple-600 dark:text-purple-400 font-semibold block mt-0.5">
                 Foundation to Simulation
               </span>
@@ -219,7 +219,7 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
                   : "bg-card border border-border text-foreground hover:bg-muted"
                 }`}
             >
-              4-Week Milestone Roadmap
+              Milestone Roadmap
             </button>
             <button
               type="button"
@@ -278,7 +278,7 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
               </h2>
             </div>
             <p className="text-sm text-muted-foreground sm:max-w-md">
-              Each stream features a tailored 4-week syllabus timeline, specific faculty requirements, and daily study allocations.
+              Each stream features a structured 8 to 12 week syllabus timeline, specific faculty requirements, and daily study allocations.
             </p>
           </div>
 
@@ -403,7 +403,7 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
         </section>
       )}
 
-      {/* ================= SECTION 2: 4-WEEK ROADMAP ================= */}
+      {/* ================= SECTION 2: SYLLABUS ROADMAP ================= */}
       {activeTab === "roadmap" && (
         <section className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -412,11 +412,11 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
                 <span>Milestone Journey</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                The 4-Week High-Yield Sprint
+                The 2 to 3 Month Study Plan
               </h2>
             </div>
             <p className="text-sm text-muted-foreground sm:max-w-md">
-              A systematic progression from core formulas to full timed CBT simulation mocks.
+              A systematic progression from core formulas to full timed CBT simulation mocks across your study journey.
             </p>
           </div>
 
@@ -1100,7 +1100,7 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <h3 className="text-xl font-extrabold text-foreground tracking-tight">
-              Ready to Execute Your 4-Week Study Plan?
+              Ready to Start Your Study Plan?
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground">
               Sync your schedule with the interactive class roster and verify readiness with the diagnostic pre-test.

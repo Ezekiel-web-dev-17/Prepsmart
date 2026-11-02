@@ -18,6 +18,96 @@ import { prisma } from "@/lib/prisma";
 const DURATION_FOUR_SUBJECTS = 7200; // 2 hours
 const DURATION_SINGLE_SUBJECT = 1800; // 30 minutes
 
+// ─────────────────────────────────────────────────────────────
+// Per-session option shuffle helpers
+//
+// Options are shuffled server-side using a deterministic PRNG seeded with
+// (sessionToken + questionId). This means:
+//   1. Every session sees a different display order for each question.
+//   2. Scoring on submit can reproduce the exact same order and correctly
+//      map the submitted letter back to the DB's correctOption.
+//   3. No database migration is required — shuffle state is derived on-demand.
+//
+// Shuffle algorithm: Fisher-Yates with an FNV-1a + xorshift32 PRNG.
+// ─────────────────────────────────────────────────────────────
+
+function makeSessionRng(seed: string): () => number {
+  // FNV-1a string → 32-bit state
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) | 0;
+  }
+  // Avalanche mix so single-bit seed differences fan out
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b) | 0;
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35) | 0;
+  h ^= h >>> 16;
+  let state = h || 0xdeadbeef; // xorshift32 state must be non-zero
+  return function (): number {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 0x100000000;
+  };
+}
+
+const OPTION_LETTERS = ["A", "B", "C", "D"] as const;
+type OptionLetter = (typeof OPTION_LETTERS)[number];
+
+interface ParsedOption {
+  id: string;
+  text: string;
+}
+
+/**
+ * Deterministically shuffles the options for a single question and returns:
+ *  - shuffledOptions: the display-order options (safe for client)
+ *  - mappedCorrectOption: the letter of the correct answer AFTER shuffling
+ *
+ * Using sessionToken + questionId as the seed guarantees the same shuffle is
+ * reproduced identically during scoring without storing extra state.
+ */
+function deriveShuffledOptions(
+  rawOptionsJson: string,
+  dbCorrectOption: string,
+  sessionToken: string,
+  questionId: string
+): { shuffledOptions: ParsedOption[]; mappedCorrectOption: string } {
+  let parsed: ParsedOption[];
+  try {
+    parsed = JSON.parse(rawOptionsJson);
+    if (!Array.isArray(parsed) || parsed.length < 2) throw new Error("bad");
+  } catch {
+    // Unparseable — return as-is, scoring falls back to DB value
+    return { shuffledOptions: [], mappedCorrectOption: dbCorrectOption };
+  }
+
+  const rng = makeSessionRng(sessionToken + ":" + questionId);
+
+  // Fisher-Yates
+  const shuffled = [...parsed];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Find which original option was correct, then re-label with A/B/C/D
+  const correctText = parsed.find((o) => o.id === dbCorrectOption)?.text ?? null;
+  let mappedCorrectOption = dbCorrectOption;
+
+  const shuffledOptions: ParsedOption[] = shuffled.map((opt, idx) => {
+    const newLetter = OPTION_LETTERS[idx] ?? opt.id;
+    if (correctText !== null && opt.text === correctText) {
+      mappedCorrectOption = newLetter;
+    }
+    return { id: newLetter, text: opt.text };
+  });
+
+  return { shuffledOptions, mappedCorrectOption };
+}
+
 // Questions per subject
 const QUESTIONS_PER_SUBJECT = 40; // 4×40 = 160 for JAMB (use 40 per subject)
 
@@ -297,15 +387,26 @@ export async function createExamSession(
 
   // 6. Return client-safe questions (correctOption, topic, and concept are strictly stripped)
   // During active mock exam, candidate must NOT see helper metadata hints (topic/concept)
-  const clientQuestions: ClientSafeQuestion[] = allSelectedQuestions.map((q) => ({
-    id: q.id,
-    subject: q.subject,
-    year: q.year,
-    text: q.text,
-    options: JSON.parse(q.options) as { id: string; text: string }[],
-    orderIndex: q.orderIndex,
-    // Note: topic and concept hints are intentionally excluded during active testing
-  }));
+  const clientQuestions: ClientSafeQuestion[] = allSelectedQuestions.map((q) => {
+    const { shuffledOptions } = deriveShuffledOptions(
+      q.options,
+      "", // correctOption deliberately unused here — we only need shuffled display order
+      sessionToken,
+      q.id
+    );
+    return {
+      id: q.id,
+      subject: q.subject,
+      year: q.year,
+      text: q.text,
+      // Use shuffled options so each session displays a different A/B/C/D order
+      options: shuffledOptions.length > 0
+        ? shuffledOptions
+        : (JSON.parse(q.options) as { id: string; text: string }[]),
+      orderIndex: q.orderIndex,
+      // Note: topic and concept hints are intentionally excluded during active testing
+    };
+  });
 
   return {
     sessionId: session.id,
@@ -411,6 +512,9 @@ export async function submitExamSession(
   );
 
   // 6. Server-side scoring — only the server knows correctOption
+  // The client sees shuffled options (A/B/C/D in session-specific order), so we
+  // re-derive the same per-session shuffle to translate the submitted letter back
+  // to the original DB correctOption before comparing.
   const subjectBreakdown: Record<string, { score: number; total: number; pct: number }> = {};
   const failedQuestionData: { questionId: string; concept: string; topic: string }[] = [];
   const correctAnswersMap: Record<string, string> = {};
@@ -420,10 +524,22 @@ export async function submitExamSession(
 
   for (const esq of session.questions) {
     const q = esq.question;
-    const userAnswer = sanitizedAnswers[q.id] ?? null;
-    const isCorrect = userAnswer === q.correctOption;
 
-    correctAnswersMap[q.id] = q.correctOption;
+    // Re-derive the exact same shuffle that was shown to the candidate
+    const { shuffledOptions, mappedCorrectOption } = deriveShuffledOptions(
+      q.options,
+      q.correctOption,
+      session.sessionToken,
+      q.id
+    );
+
+    // The submitted answer is a letter in the *shuffled* space; compare against
+    // the shuffled correct letter (mappedCorrectOption), not the raw DB letter.
+    const userAnswer = sanitizedAnswers[q.id] ?? null;
+    const isCorrect = userAnswer !== null && userAnswer === mappedCorrectOption;
+
+    // Store the shuffled correct letter so the result page can highlight it correctly
+    correctAnswersMap[q.id] = mappedCorrectOption;
 
     if (!subjectBreakdown[q.subject]) {
       subjectBreakdown[q.subject] = { score: 0, total: 0, pct: 0 };
@@ -447,12 +563,15 @@ export async function submitExamSession(
       subject: q.subject,
       year: q.year,
       text: q.text,
-      options: JSON.parse(q.options) as { id: string; text: string }[],
+      // Use shuffled options so the result page matches what candidate saw during exam
+      options: shuffledOptions.length > 0
+        ? shuffledOptions
+        : (JSON.parse(q.options) as { id: string; text: string }[]),
       topic: q.topic,
       concept: q.concept,
       orderIndex: esq.orderIndex,
       userAnswer,
-      correctOption: q.correctOption, // Now safe to reveal
+      correctOption: mappedCorrectOption, // Shuffled letter — safe to reveal now
       isCorrect,
       wasGuessed: sanitizedGuessedIds.includes(q.id),
       explanation: q.explanation,
@@ -587,19 +706,32 @@ export async function getExamResult(
 
   const scoredQuestions: ScoredQuestion[] = attempt.session.questions.map((esq) => {
     const q = esq.question;
+    const sessionToken = attempt.session.sessionToken;
+
+    // Re-derive the same per-session shuffle used during exam creation so the
+    // result page shows options in exactly the same A/B/C/D order the candidate saw.
+    const { shuffledOptions, mappedCorrectOption } = deriveShuffledOptions(
+      q.options,
+      q.correctOption,
+      sessionToken,
+      q.id
+    );
+
     const userAnswer = answers[q.id] ?? null;
-    const isCorrect = userAnswer === q.correctOption;
+    const isCorrect = userAnswer !== null && userAnswer === mappedCorrectOption;
     return {
       id: q.id,
       subject: q.subject,
       year: q.year,
       text: q.text,
-      options: JSON.parse(q.options) as { id: string; text: string }[],
+      options: shuffledOptions.length > 0
+        ? shuffledOptions
+        : (JSON.parse(q.options) as { id: string; text: string }[]),
       topic: q.topic,
       concept: q.concept,
       orderIndex: esq.orderIndex,
       userAnswer,
-      correctOption: q.correctOption,
+      correctOption: mappedCorrectOption, // Shuffled letter matching what candidate saw
       isCorrect,
       wasGuessed: guessedIds.includes(q.id),
       explanation: q.explanation,

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +8,11 @@ interface MockExamPageProps {
 }
 
 export default async function MockExamPage({ searchParams }: MockExamPageProps) {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in?redirect_url=/study?tab=mock-exam");
+  }
+
   const params = searchParams ? await searchParams : {};
   const query = new URLSearchParams();
   query.set("tab", "mock-exam");

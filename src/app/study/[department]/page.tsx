@@ -78,7 +78,7 @@ const departmentsMap: Record<string, DepartmentData> = {
     id: "science",
     title: "Science & Technology",
     tagline:
-      "Comprehensive 4-week UTME preparation for Medicine, Engineering, Computer Science, and Pure Sciences.",
+      "Step-by-step 2 to 3 month UTME preparation for Medicine, Engineering, Computer Science, and Pure Sciences.",
     badge: "STEM Stream",
     targetScore: "310+ Target",
     studyTime: "2.5 hrs / day",
@@ -224,7 +224,7 @@ const departmentsMap: Record<string, DepartmentData> = {
           "Watch out for questions ending with 'all the following are correct EXCEPT' or 'which is LEAST likely'. Circle key qualifiers immediately.",
       },
       {
-        title: "Common Chemistry Byproduct Distractors",
+        title: "Common Chemistry Trap Options and Byproducts",
         explanation:
           "In organic chemistry and gas preparation, examiners place secondary byproducts in options A and B to trick hurried candidates.",
       },
@@ -522,7 +522,7 @@ const departmentsMap: Record<string, DepartmentData> = {
       {
         week: 4,
         title: "Full Mocks & Speed Analysis",
-        focus: "Context questions in literature, elimination of distractor options in government, and mock drills.",
+        focus: "Context questions in literature, spotting misleading options in government, and mock drills.",
         target: "Take two complete timed mocks under timed CBT conditions.",
       },
     ],
@@ -554,13 +554,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!data) {
     return {
       title: "Department Curriculum - Prepsmart",
-      description: "Explore the structured 4-week JAMB/UTME curriculum by department.",
+      description: "Explore the structured 2 to 3 month JAMB/UTME curriculum by department.",
     };
   }
 
   return {
     title: `${data.title} Curriculum - Prepsmart JAMB 2026`,
-    description: `${data.tagline} Structured 4-week syllabus, topic breakdown, and high-yield CBT drills.`,
+    description: `${data.tagline} Structured syllabus roadmap, topic breakdown, and CBT practice drills.`,
   };
 }
 
@@ -643,8 +643,8 @@ export default async function DepartmentStudyPage({ params }: PageProps) {
 
         <div className="bg-card border border-border rounded-2xl p-4 shadow-2xs space-y-1">
           <span className="text-xs font-semibold text-muted-foreground">Preparation Plan</span>
-          <div className="text-2xl font-black text-foreground">4 Weeks</div>
-          <p className="text-[11px] text-muted-foreground">Foundation to Mock Mocks</p>
+          <div className="text-2xl font-black text-foreground">8-12 Weeks</div>
+          <p className="text-[11px] text-muted-foreground">2 to 3 months of practice</p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-4 shadow-2xs space-y-1">
@@ -656,15 +656,15 @@ export default async function DepartmentStudyPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 4-Week Milestone Roadmap */}
+      {/* Syllabus Milestone Roadmap */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <div>
             <h2 className="text-xl font-extrabold text-foreground">
-              4-Week Syllabus Roadmap
+              Syllabus Milestone Roadmap
             </h2>
             <p className="text-xs text-muted-foreground">
-              Weekly progress milestones engineered for progressive mastery and active recall.
+              Step-by-step progress milestones designed for steady practice and solid revision.
             </p>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50 self-start sm:self-auto">

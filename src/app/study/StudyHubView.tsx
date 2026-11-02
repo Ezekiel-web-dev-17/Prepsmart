@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import StudyCurriculumHub from "./StudyCurriculumHub";
 import MockExamClient from "@/app/mock-exam/MockExamClient";
 import SubjectSyllabusView from "./SubjectSyllabusView";
-import { BookOpenIcon, TargetIcon, LightbulbIcon } from "@/components/ui/icons";
+import { BookOpenIcon, TargetIcon, LightbulbIcon, CheckCircleIcon, ArrowRightIcon } from "@/components/ui/icons";
 import {
   getSubjectCurriculum,
   normalizeSubjectSlug,
@@ -74,7 +74,7 @@ export default function StudyHubView({
       {/* Top Level Hub Navigator */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Tab 1: 4-Week Curriculum & Roadmap */}
+          {/* Tab 1: Syllabus Roadmap & Milestones */}
           <button
             type="button"
             onClick={() => handleTabChange("curriculum")}
@@ -85,7 +85,7 @@ export default function StudyHubView({
             }`}
           >
             <BookOpenIcon className="w-4 h-4" />
-            <span>4-Week Roadmap</span>
+            <span>Syllabus Roadmap</span>
             <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[10px] font-black">
               All Streams
             </span>
@@ -120,8 +120,14 @@ export default function StudyHubView({
           >
             <TargetIcon className="w-4 h-4" />
             <span>JAMB CBT Mock Exam</span>
-            <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 text-[10px] font-black">
-              120m Simulation
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                isAuthenticated
+                  ? "bg-purple-500/20 text-purple-600 dark:text-purple-300"
+                  : "bg-amber-500/20 text-amber-700 dark:text-amber-400"
+              }`}
+            >
+              {isAuthenticated ? "120m Simulation" : "Sign In Required"}
             </span>
           </button>
         </div>
@@ -145,7 +151,7 @@ export default function StudyHubView({
         </section>
       )}
 
-      {/* View 2: 4-Week Milestone Roadmap Overview */}
+      {/* View 2: Syllabus Milestone Roadmap Overview */}
       {activeTab === "curriculum" && (
         <section className="space-y-6 animate-fadeIn">
           <StudyCurriculumHub onSwitchToMockExam={() => handleTabChange("mock-exam")} />
@@ -155,23 +161,74 @@ export default function StudyHubView({
       {/* View 3: JAMB CBT Mock Exam Simulator */}
       {activeTab === "mock-exam" && (
         <section className="space-y-6 animate-fadeIn">
-          {!isAuthenticated && (
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <LightbulbIcon className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>
-                  <strong>Tip for candidates:</strong> Sign in to your PrepSmart account to save your mock exam scores, track percentiles, and feed missed questions into your personal Revision Hub.
-                </span>
+          {!isAuthenticated ? (
+            <div className="max-w-2xl mx-auto rounded-3xl bg-card border border-border p-8 sm:p-12 shadow-sm text-center space-y-6">
+              <div className="w-16 h-16 rounded-3xl bg-blue-600/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-xs">
+                <TargetIcon className="w-8 h-8" />
               </div>
-              <Link
-                href="/sign-in"
-                className="px-3.5 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs shrink-0 text-center hover:bg-amber-400 transition-colors"
-              >
-                Sign In
-              </Link>
+
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900/50 inline-block">
+                  Candidate Access Only
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+                  Sign In to Access JAMB CBT Mock Exam
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+                  The full 120-minute timed CBT simulation, authentic 8-key keyboard controls, on-screen calculator, and automatic spaced revision queue are reserved exclusively for registered candidates.
+                </p>
+              </div>
+
+              {/* Feature Checklist */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-w-lg mx-auto py-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>180 Questions across 4 Subjects</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>8-Key Keyboard Shortcuts</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Automatic Revision Queue</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Detailed Diagnostic Breakdown</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <Link
+                  href="/sign-in?redirect_url=/study?tab=mock-exam"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Sign In to Start Exam</span>
+                  <ArrowRightIcon className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/sign-up?redirect_url=/study?tab=mock-exam"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl border border-border bg-card hover:bg-muted font-bold text-sm text-foreground transition-all cursor-pointer text-center"
+                >
+                  Create Free Account
+                </Link>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("curriculum")}
+                  className="text-xs text-muted-foreground hover:text-foreground font-semibold transition-colors cursor-pointer"
+                >
+                  ← Browse Syllabus Topics First
+                </button>
+              </div>
             </div>
+          ) : (
+            <MockExamClient userSubjects={userSubjects} isAuthenticated={true} />
           )}
-          <MockExamClient userSubjects={userSubjects} isAuthenticated={isAuthenticated} />
         </section>
       )}
     </div>

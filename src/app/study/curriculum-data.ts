@@ -1104,7 +1104,7 @@ function getGenericSubjectCurriculum(
     generalObjectives: [
       `Demonstrate mastery of core syllabus principles and operational definitions in ${name}.`,
       "Apply analytical reasoning to solve multiple-choice CBT examination questions.",
-      "Identify examiner trick questions and eliminate distractors with speed and accuracy.",
+      "Identify examiner trick questions and eliminate misleading options with speed and accuracy.",
     ],
     recommendedTexts: [
       `Senior Secondary School ${name} — Official Curriculum Text`,

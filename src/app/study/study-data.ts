@@ -63,7 +63,7 @@ export interface ExaminerTrap {
   id: string;
   subject: string;
   title: string;
-  trapType: "SI Units" | "Distractor" | "Grammar & Phonetics" | "Negative Phrasing";
+  trapType: "SI Units" | "Trap Option" | "Grammar & Phonetics" | "Negative Phrasing";
   severity: "High" | "Critical";
   examinerTechnique: string;
   studentSolution: string;
@@ -249,12 +249,12 @@ export const FOUR_WEEK_CURRICULUM: WeekPlan[] = [
     badge: "Week 02",
     tagline: "Connect ideas together. Understand reaction mechanisms, circuitry, economics, and constitutional history.",
     focus: "Redox reactions, electric circuits, organic functional groups, macroeconomics, trial balances, and constitutional milestones.",
-    target: "Solve 120 intermediate-level past questions and identify distractors in multiple-choice options.",
+    target: "Solve 120 intermediate-level past questions and spot misleading options in multiple-choice questions.",
     dailyRoutine: [
       { time: "40 mins", activity: "System Breakdown", purpose: "Study complex mechanisms and multi-step concepts" },
       { time: "30 mins", activity: "Formula Synthesis", purpose: "Derive key relationships and cross-concept connections" },
       { time: "35 mins", activity: "35-Question Drill", purpose: "Timed practice under 50 seconds per question" },
-      { time: "15 mins", activity: "Distractor Deconstruction", purpose: "Analyze how the alternate options serve as distractors" },
+      { time: "15 mins", activity: "Trap Option Analysis", purpose: "Analyze how wrong options were designed to mislead" },
     ],
     milestones: [
       "Deconstruct chemical reaction mechanisms and balancing redox equations",
@@ -283,7 +283,7 @@ export const FOUR_WEEK_CURRICULUM: WeekPlan[] = [
     ],
     milestones: [
       "Reduce average question time from 75 seconds to under 42 seconds",
-      "Recognize all 4 common examiner traps without falling for distractors",
+      "Recognize all 4 common examiner traps without falling for trick options",
       "Complete 3 full 40-question speed drills under exam conditions",
       "Zero in on your 5 weakest topics and re-study their core objectives",
     ],
@@ -302,7 +302,7 @@ export const FOUR_WEEK_CURRICULUM: WeekPlan[] = [
     target: "Complete two full 400-mark mock examinations and score above your faculty target cutoff.",
     dailyRoutine: [
       { time: "120 mins", activity: "Full CBT Simulation Mock", purpose: "180 questions across 4 subjects in 2 hours non-stop" },
-      { time: "30 mins", activity: "Mock Score Analytics", purpose: "Deep dive into strengths and missed questions" },
+      { time: "30 mins", activity: "Mock Score Review", purpose: "Review strengths and missed questions in detail" },
       { time: "20 mins", activity: "Rapid High-Yield Review", purpose: "Light skim of formula summary sheet and traps" },
       { time: "10 mins", activity: "Mindset & Mental Rest", purpose: "Stress reduction, breath control, and exam strategy" },
     ],
@@ -345,8 +345,8 @@ export const EXAMINER_TRAPS: ExaminerTrap[] = [
   {
     id: "trap-3",
     subject: "Mathematics & Economics",
-    title: "Intermediate Value Calculation Distractors",
-    trapType: "Distractor",
+    title: "Intermediate Value Calculation Traps",
+    trapType: "Trap Option",
     severity: "Critical",
     examinerTechnique:
       "In a 2-step calculation (e.g. finding radius first, then finding total volume), the intermediate value for radius is placed as Option B to lure hasty students.",

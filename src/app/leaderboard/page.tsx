@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { getTopLeaderboard } from "@/lib/leaderboard";
 import LeaderboardView from "./LeaderboardView";
 
@@ -20,6 +22,11 @@ export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
   await connection();
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in?redirect_url=/leaderboard");
+  }
+
   const leaderboard = await getTopLeaderboard(50);
 
   return <LeaderboardView initialEntries={leaderboard} />;

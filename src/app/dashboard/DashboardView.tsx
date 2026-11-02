@@ -8,6 +8,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { ProgressDashboardClient } from "@/app/progress/ProgressDashboardClient";
 import RevisionHubClient, { type RevisionQuestion } from "@/app/revision/RevisionHubClient";
 import type { CandidateProgressData } from "@/lib/progress";
+import FirstLoginWelcomeModal from "@/components/dashboard/FirstLoginWelcomeModal";
 import {
   ChartBarIcon,
   TargetIcon,
@@ -144,6 +145,9 @@ export default function DashboardView({
 
   return (
     <div className="space-y-8 pb-16">
+      {/* First Login Workspace Welcome Modal */}
+      <FirstLoginWelcomeModal />
+
       {/* ── TOP UNIFIED COMMAND CENTER TABS ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -335,7 +339,7 @@ export default function DashboardView({
                   Unified Study &amp; CBT Simulator
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Explore 108+ official syllabus topics, 4-week roadmaps, and authentic CBT timed mocks.
+                  Explore 108+ official syllabus topics, comprehensive study roadmaps, and authentic CBT timed mocks.
                 </p>
               </div>
 

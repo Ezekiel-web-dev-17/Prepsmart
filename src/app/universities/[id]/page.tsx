@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import UniversityDetailView from "./UniversityDetailView";
 import type { UniversityData } from "../types";
+import { UNIVERSITIES_DATA } from "@/data/universities";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -12,9 +13,21 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const university = await prisma.university.findFirst({
+  let university = await prisma.university.findFirst({
     where: { OR: [{ slug: id }, { id }] },
-  });
+  }).catch(() => null);
+
+  if (!university) {
+    const catalogUni = UNIVERSITIES_DATA.find(
+      (u) => u.id === id || u.acronym?.toLowerCase() === id.toLowerCase()
+    );
+    if (catalogUni) {
+      university = {
+        name: catalogUni.name,
+        acronym: catalogUni.acronym,
+      } as any;
+    }
+  }
 
   if (!university) {
     return {
@@ -36,7 +49,7 @@ export async function generateMetadata({
 export default async function UniversityDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const rawUniversity = await prisma.university.findFirst({
+  let rawUniversity = await prisma.university.findFirst({
     where: {
       OR: [{ slug: id }, { id: id }],
     },
@@ -48,26 +61,111 @@ export default async function UniversityDetailPage({ params }: PageProps) {
         orderBy: [{ isRequired: "desc" }, { category: "asc" }],
       },
     },
-  });
+  }).catch(() => null);
 
-  if (!rawUniversity) {
-    notFound();
+  let university: UniversityData;
+
+  if (rawUniversity) {
+    university = {
+      ...rawUniversity,
+      createdAt: rawUniversity.createdAt.toISOString(),
+      updatedAt: rawUniversity.updatedAt.toISOString(),
+      coursesCount: rawUniversity.courses.length,
+      minCourseCutOff:
+        rawUniversity.courses.length > 0
+          ? Math.min(...rawUniversity.courses.map((c) => c.cutOffMark))
+          : rawUniversity.generalCutOff,
+      maxCourseCutOff:
+        rawUniversity.courses.length > 0
+          ? Math.max(...rawUniversity.courses.map((c) => c.cutOffMark))
+          : rawUniversity.generalCutOff,
+    };
+  } else {
+    // Check fallback catalog
+    const catalogUni = UNIVERSITIES_DATA.find(
+      (u) => u.id === id || u.acronym?.toLowerCase() === id.toLowerCase()
+    );
+    if (!catalogUni) {
+      notFound();
+    }
+
+    const courseValues = Object.values(catalogUni.departmentalCutOffs || {});
+    university = {
+      id: catalogUni.id,
+      slug: catalogUni.id,
+      name: catalogUni.name,
+      acronym: catalogUni.acronym || null,
+      type: catalogUni.type,
+      state: catalogUni.state,
+      city: catalogUni.city,
+      zone: catalogUni.zone,
+      generalCutOff: catalogUni.generalCutOff,
+      postUtmeRequired:
+        catalogUni.screeningType.toLowerCase().includes("post-utme") ||
+        catalogUni.screeningType.toLowerCase().includes("cbt") ||
+        catalogUni.screeningType.toLowerCase().includes("exam"),
+      screeningType: catalogUni.screeningType,
+      annualTuitionEst: catalogUni.annualTuitionEst,
+      estYear: catalogUni.estYear,
+      website: catalogUni.website,
+      campusHighlights: catalogUni.campusHighlights,
+      courses: Object.entries(catalogUni.departmentalCutOffs || {}).map(([key, cutOff]) => ({
+        id: `${catalogUni.id}-${key}`,
+        universityId: catalogUni.id,
+        courseName:
+          key === "medicine"
+            ? "Medicine & Surgery"
+            : key === "computerScience"
+            ? "Computer Science"
+            : key === "massCommunication"
+            ? "Mass Communication"
+            : key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1"),
+        faculty: null,
+        cutOffMark: cutOff,
+        durationYears: key === "medicine" ? 6 : key === "engineering" || key === "pharmacy" ? 5 : 4,
+        oLevelRequirements: "5 SSCE credits in English, Math, and relevant subjects",
+        directEntryAccepted: true,
+        directEntryRequirements: "JUPEB / ND Upper Credit in related discipline",
+      })),
+      documents: [
+        {
+          id: `${catalogUni.id}-doc-1`,
+          universityId: catalogUni.id,
+          title: "Original JAMB Result Slip",
+          category: "JAMB",
+          isRequired: true,
+          description: "Official colored JAMB result slip with candidate photograph.",
+        },
+        {
+          id: `${catalogUni.id}-doc-2`,
+          universityId: catalogUni.id,
+          title: "WAEC / NECO / NABTEB Certificate or Statement of Result",
+          category: "O'Level",
+          isRequired: true,
+          description: "Original certificate or verified online statement of result in max 2 sittings.",
+        },
+        {
+          id: `${catalogUni.id}-doc-3`,
+          universityId: catalogUni.id,
+          title: "Birth Certificate or Statutory Age Declaration",
+          category: "Identity",
+          isRequired: true,
+          description: "Official National Population Commission (NPC) certificate or court declaration.",
+        },
+        {
+          id: `${catalogUni.id}-doc-4`,
+          universityId: catalogUni.id,
+          title: "Local Government Area (LGA) Identification Certificate",
+          category: "Identity",
+          isRequired: true,
+          description: "Official certificate verifying candidate's state and LGA of origin.",
+        },
+      ],
+      coursesCount: courseValues.length,
+      minCourseCutOff: courseValues.length > 0 ? Math.min(...courseValues) : catalogUni.generalCutOff,
+      maxCourseCutOff: courseValues.length > 0 ? Math.max(...courseValues) : catalogUni.generalCutOff,
+    };
   }
-
-  const university: UniversityData = {
-    ...rawUniversity,
-    createdAt: rawUniversity.createdAt.toISOString(),
-    updatedAt: rawUniversity.updatedAt.toISOString(),
-    coursesCount: rawUniversity.courses.length,
-    minCourseCutOff:
-      rawUniversity.courses.length > 0
-        ? Math.min(...rawUniversity.courses.map((c) => c.cutOffMark))
-        : rawUniversity.generalCutOff,
-    maxCourseCutOff:
-      rawUniversity.courses.length > 0
-        ? Math.max(...rawUniversity.courses.map((c) => c.cutOffMark))
-        : rawUniversity.generalCutOff,
-  };
 
   return <UniversityDetailView university={university} />;
 }

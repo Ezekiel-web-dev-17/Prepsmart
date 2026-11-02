@@ -485,7 +485,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
               <div className="flex items-center gap-2.5 text-xs text-blue-900 dark:text-blue-200">
                 <GiftIcon className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>
-                  Completing onboarding unlocks <strong>+100 Gamification XP</strong>!
+                  Completing onboarding gives you <strong>+100 bonus XP</strong>!
                 </span>
               </div>
               <span className="text-xs font-black text-amber-500">+100 XP</span>

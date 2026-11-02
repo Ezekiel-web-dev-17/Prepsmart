@@ -3,6 +3,9 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import type { UniversityData, CourseRequirementData } from "../types";
+import UniversityLogo from "@/components/universities/UniversityLogo";
+import UniversityImage from "@/components/universities/UniversityImage";
+import { getUniversityImageMeta } from "@/data/university-images";
 
 interface UniversityDetailViewProps {
   university: UniversityData;
@@ -114,6 +117,11 @@ export default function UniversityDetailView({
       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
       : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20";
 
+  const typeLabel =
+    university.type.charAt(0).toUpperCase() + university.type.slice(1);
+
+  const imageMeta = getUniversityImageMeta(university.slug, university.acronym);
+
   return (
     <div className="space-y-8 pb-16">
       {/* Breadcrumb Navigation */}
@@ -131,15 +139,62 @@ export default function UniversityDetailView({
         </span>
       </nav>
 
+      {/* 1. Real Campus Panoramic Hero Banner */}
+      <div className="relative overflow-hidden rounded-3xl border border-border/80 shadow-md h-52 sm:h-72 lg:h-80 w-full group">
+        <UniversityImage
+          slug={university.slug}
+          name={university.name}
+          acronym={university.acronym}
+          aspectRatio="hero"
+          className="h-full w-full object-cover"
+          overlayGradient={true}
+        />
+
+        {/* Floating Verified Landmark Badge */}
+        <div className="absolute bottom-3.5 right-3.5 z-10 max-w-[90%]">
+          <div className="px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-white/15 text-white shadow-lg flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="text-[11px] leading-tight">
+              <span className="text-white/60 text-[9px] uppercase font-bold block">Campus Landmark</span>
+              <span className="font-extrabold text-white">{imageMeta.landmark}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Floating State/Zone Pill */}
+        <div className="absolute top-3.5 left-3.5 z-10 flex items-center gap-2">
+          <span
+            className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-md backdrop-blur-md border ${
+              university.type === "federal"
+                ? "bg-blue-950/85 text-blue-200 border-blue-400/40"
+                : university.type === "state"
+                ? "bg-emerald-950/85 text-emerald-200 border-emerald-400/40"
+                : "bg-purple-950/85 text-purple-200 border-purple-400/40"
+            }`}
+          >
+            {typeLabel} Institution
+          </span>
+          {university.zone && (
+            <span className="text-xs font-semibold text-white/95 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 shadow-md">
+              {university.zone}
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* University Header Hero Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-card border border-border/80 p-6 sm:p-8 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-card border border-border/80 p-6 sm:p-8 shadow-sm -mt-6 sm:-mt-10 mx-3 sm:mx-6 z-20 backdrop-blur-md bg-card/95">
         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-linear-to-br from-blue-600 via-indigo-600 to-slate-900 text-white font-black text-xl sm:text-2xl flex items-center justify-center shrink-0 shadow-md shadow-blue-600/20">
-              {initials.slice(0, 4)}
-            </div>
+            <UniversityLogo
+              slug={university.slug}
+              name={university.name}
+              acronym={university.acronym}
+              size="lg"
+              className="sm:w-20 sm:h-20"
+            />
 
             <div className="space-y-1.5 flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -648,6 +703,48 @@ export default function UniversityDetailView({
       {/* Tab 3: Campus Overview & Highlights */}
       {activeTab === "overview" && (
         <div className="space-y-6">
+          {/* Campus Landmark & Environment Visual Showcase */}
+          <div className="rounded-2xl bg-card border border-border/80 overflow-hidden shadow-xs grid grid-cols-1 md:grid-cols-2 gap-0">
+            <div className="relative h-60 md:h-auto min-h-60 overflow-hidden">
+              <UniversityImage
+                slug={university.slug}
+                name={university.name}
+                acronym={university.acronym}
+                aspectRatio="square"
+                className="h-full w-full object-cover"
+                showLandmarkBadge={true}
+              />
+            </div>
+            <div className="p-6 flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-full border border-blue-200 dark:border-blue-900/50 inline-block">
+                  Physical Campus &amp; Landmarks
+                </span>
+                <h4 className="text-xl font-extrabold text-foreground tracking-tight">
+                  {imageMeta.landmark}
+                </h4>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {imageMeta.caption}
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {university.campusHighlights || `${university.name} provides accredited learning spaces, laboratories, lecture theatres, and departmental complexes in ${university.city}, ${university.state} State.`}
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>NUC Accredited Campus</span>
+                </span>
+                <span className="font-semibold text-foreground">
+                  {university.city}, {university.state}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-2xl bg-card border border-border/80 p-6 shadow-xs space-y-4">
             <h3 className="text-base font-extrabold text-foreground">
               Campus Highlights & Strategic Profile

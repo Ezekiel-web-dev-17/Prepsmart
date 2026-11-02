@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import StudyHubView from "./StudyHubView";
@@ -46,13 +47,13 @@ export async function generateMetadata({
   return {
     title: "Study Hub, Subject Syllabuses & JAMB CBT Mock Exam | PrepSmart",
     description:
-      "Master the 2026 JAMB UTME syllabus with our 4-week structured roadmap, official subject topic lists, examiner trap alerts, and authentic 120-minute Computer-Based Test (CBT) mock exam simulations.",
+      "Master the 2026 JAMB UTME syllabus with our structured 2 to 3 month roadmap, official subject topic lists, examiner trap alerts, and authentic 120-minute Computer-Based Test (CBT) mock exam simulations.",
     keywords: [
       "JAMB mock exam",
       "UTME CBT simulator",
       "JAMB study curriculum",
       "JAMB 2026 syllabus",
-      "4-week UTME roadmap",
+      "UTME study roadmap",
       "examiner traps JAMB",
       "JAMB active recall",
     ],
@@ -73,6 +74,9 @@ export default async function StudyPage({ searchParams }: StudyPageProps) {
 
   let initialTab: "curriculum" | "mock-exam" | "subject-syllabus" = "curriculum";
   if (resolvedParams.tab === "mock-exam") {
+    if (!userId) {
+      redirect("/sign-in?redirect_url=/study?tab=mock-exam");
+    }
     initialTab = "mock-exam";
   } else if (hasSubjectParam) {
     initialTab = "subject-syllabus";

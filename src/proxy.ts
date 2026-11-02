@@ -43,7 +43,25 @@ const isProtectedRoute = createRouteMatcher([
   "/roster(.*)",
   "/quiz(.*)",
   "/users(.*)",
+  "/mock-exam(.*)",
+  "/revision(.*)",
+  "/onboarding(.*)",
+  "/leaderboard(.*)",
+  "/api/mock-exam(.*)",
+  "/api/notifications(.*)",
 ]);
+
+function isProtectedRequest(req: NextRequest): boolean {
+  if (isProtectedRoute(req)) return true;
+  // Protect Mock Exam tab when accessed directly with search param
+  if (
+    req.nextUrl.pathname === "/study" &&
+    req.nextUrl.searchParams.get("tab") === "mock-exam"
+  ) {
+    return true;
+  }
+  return false;
+}
 
 async function handleCommonMiddleware(
   req: NextRequest,
@@ -224,7 +242,7 @@ async function handleCommonMiddleware(
   }
 
   // 4. Authenticate protected routes (when Clerk is active)
-  if (protectAuth && isProtectedRoute(req)) {
+  if (protectAuth && isProtectedRequest(req)) {
     await protectAuth();
   }
 

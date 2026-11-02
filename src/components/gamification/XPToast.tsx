@@ -123,8 +123,8 @@ const EVENT_LABELS: Record<
     icon: ZapIcon,
   },
   TOPIC_COMPLETED: {
-    title: "Topic Mastered!",
-    subtitle: "Syllabus progress unlocked",
+    title: "Topic Completed!",
+    subtitle: "Syllabus progress recorded",
     icon: TrophyIcon,
   },
   DAILY_STREAK: {

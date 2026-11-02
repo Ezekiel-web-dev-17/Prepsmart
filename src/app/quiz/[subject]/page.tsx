@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -93,13 +94,12 @@ export default async function QuizSubjectPage({
   const resolvedSubject = resolveSubject(subjectSlug);
   const decodedTopic = topicQuery ? decodeURIComponent(topicQuery).trim() : null;
 
-  // Retrieve authenticated user if session exists
-  let userId: string | undefined;
-  try {
-    const session = await auth();
-    userId = session.userId || undefined;
-  } catch {
-    userId = undefined;
+  // Require authenticated user for practice drills
+  const session = await auth().catch(() => ({ userId: null }));
+  const userId = session.userId || undefined;
+
+  if (!userId) {
+    redirect(`/sign-in?redirect_url=/quiz/${subjectSlug}`);
   }
 
   // Build Prisma query condition

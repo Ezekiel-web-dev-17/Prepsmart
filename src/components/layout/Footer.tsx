@@ -13,6 +13,12 @@ export default function Footer() {
           <Link href="/about" className="hover:text-foreground transition-colors">
             About Us
           </Link>
+          <Link href="/community" className="hover:text-foreground transition-colors font-semibold text-blue-600 dark:text-blue-400">
+            Student Community
+          </Link>
+          <Link href="/feedback" className="hover:text-foreground transition-colors font-semibold text-purple-600 dark:text-purple-400">
+            Feedback &amp; Reviews
+          </Link>
           <Link href="/study" className="hover:text-foreground transition-colors">
             Study &amp; CBT Hub
           </Link>

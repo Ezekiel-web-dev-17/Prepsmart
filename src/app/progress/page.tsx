@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +8,11 @@ interface ProgressPageProps {
 }
 
 export default async function ProgressPage({ searchParams }: ProgressPageProps) {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in?redirect_url=/progress");
+  }
+
   const params = searchParams ? await searchParams : {};
   const query = new URLSearchParams();
   query.set("tab", "readiness");

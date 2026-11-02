@@ -19,17 +19,33 @@ export interface ShufflableQuestion {
 const LETTERS = ["A", "B", "C", "D"];
 
 /**
- * Simple pseudo-random hash generator for deterministic session shuffling
+ * Deterministic PRNG using a xorshift32-style hash (far better avalanche than
+ * the old LCG) so seeds that differ by one character produce wildly different
+ * streams.  The input seed is first hashed to a 32-bit integer via a
+ * MurmurHash-inspired mix, then each call advances the state with xorshift32.
  */
 function createDeterministicRandom(seed: string) {
-  let hash = 0;
+  // Mix seed string into a 32-bit state with better avalanche than a simple
+  // polynomial hash (the old hash << 5 trick collapsed similar seeds).
+  let h = 0x811c9dc5; // FNV-1a offset basis
   for (let i = 0; i < seed.length; i++) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash |= 0;
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) | 0; // FNV prime multiply
   }
-  return function () {
-    hash = (hash * 9301 + 49297) % 233280;
-    return Math.abs(hash / 233280);
+  // Final avalanche mix so even a single bit difference fans out across all bits
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b) | 0;
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35) | 0;
+  h ^= h >>> 16;
+  // State must be non-zero for xorshift32
+  let state = h || 0xdeadbeef;
+  return function (): number {
+    // xorshift32 — period 2^32-1, passes all basic randomness tests
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 0x100000000; // Unsigned float in [0, 1)
   };
 }
 

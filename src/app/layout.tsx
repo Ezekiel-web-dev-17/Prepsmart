@@ -22,11 +22,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "PREPSMART — Understand. Practise. Revise. | JAMB 4-Week Prep",
+    default: "PREPSMART — Understand. Practise. Revise. | JAMB UTME Prep",
     template: "%s | PREPSMART",
   },
   description:
-    "PREPSMART: A clean, modern 4-week JAMB/UTME preparation platform covering Science, Arts & Humanities, and Commercial streams according to the official syllabus.",
+    "PREPSMART: A comprehensive JAMB/UTME study and CBT practice platform covering Science, Arts & Humanities, and Commercial streams according to the official syllabus.",
   keywords: [
     "JAMB",
     "UTME",
@@ -53,13 +53,13 @@ export const metadata: Metadata = {
     siteName: "PREPSMART",
     title: "PREPSMART — Understand. Practise. Revise.",
     description:
-      "A clean, modern 4-week JAMB/UTME preparation platform covering Science, Arts & Humanities, and Commercial streams according to the official syllabus.",
+      "A comprehensive JAMB/UTME study and CBT practice platform covering Science, Arts & Humanities, and Commercial streams according to the official syllabus.",
   },
   twitter: {
     card: "summary_large_image",
     title: "PREPSMART — Understand. Practise. Revise.",
     description:
-      "A clean, modern 4-week JAMB/UTME preparation platform covering Science, Arts & Humanities, and Commercial streams according to the official syllabus.",
+      "A comprehensive JAMB/UTME study and CBT practice platform covering Science, Arts & Humanities, and Commercial streams according to the official syllabus.",
   },
 };
 
