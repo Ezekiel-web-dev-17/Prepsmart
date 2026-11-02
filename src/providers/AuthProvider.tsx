@@ -23,15 +23,19 @@ interface AuthContextValue {
   } | null;
 }
 
+const IS_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_USER_ENABLED === "true";
+
+const defaultDemoUser = {
+  id: "demo-user-1",
+  fullName: "Demo Candidate",
+  firstName: "Demo",
+  primaryEmailAddress: { emailAddress: "demo@prepsmart.ng" },
+};
+
 const LocalAuthContext = createContext<AuthContextValue>({
-  isSignedIn: true,
+  isSignedIn: IS_DEMO_MODE,
   isLoaded: true,
-  user: {
-    id: "demo-user-1",
-    fullName: "Demo Candidate",
-    firstName: "Demo",
-    primaryEmailAddress: { emailAddress: "demo@prepsmart.ng" },
-  },
+  user: IS_DEMO_MODE ? defaultDemoUser : null,
 });
 
 export default function AuthProvider({
@@ -43,14 +47,9 @@ export default function AuthProvider({
     return (
       <LocalAuthContext.Provider
         value={{
-          isSignedIn: true,
+          isSignedIn: IS_DEMO_MODE,
           isLoaded: true,
-          user: {
-            id: "demo-user-1",
-            fullName: "Demo Candidate",
-            firstName: "Demo",
-            primaryEmailAddress: { emailAddress: "demo@prepsmart.ng" },
-          },
+          user: IS_DEMO_MODE ? defaultDemoUser : null,
         }}
       >
         {children}
@@ -104,6 +103,9 @@ export function AppUserButton() {
   }
 
   if (!IS_CLERK_ENABLED) {
+    if (!IS_DEMO_MODE) {
+      return null;
+    }
     return (
       <div
         className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-bold"

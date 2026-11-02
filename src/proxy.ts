@@ -267,7 +267,7 @@ export default IS_CLERK_ENABLED
       });
     })
   : async function proxy(req: NextRequest) {
-      return handleCommonMiddleware(req, "demo-user-1");
+      return handleCommonMiddleware(req, null);
     };
 
 export const config = {

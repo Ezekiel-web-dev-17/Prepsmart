@@ -9,18 +9,20 @@ export const DEMO_USER_ID = "demo-user-1";
 
 /**
  * Universal auth helper for server components, route handlers, and server actions.
- * Falls back to local offline demo user when Clerk is deactivated.
+ * Returns { userId: null } when no user is signed in.
  */
 export async function auth(): Promise<{ userId: string | null }> {
   if (!IS_CLERK_ENABLED) {
-    return { userId: DEMO_USER_ID };
+    if (process.env.DEMO_USER_ENABLED === "true") {
+      return { userId: DEMO_USER_ID };
+    }
+    return { userId: null };
   }
 
   try {
     const session = await clerkAuth();
-    return { userId: session.userId || DEMO_USER_ID };
+    return { userId: session.userId || null };
   } catch (err) {
-    // In offline or fallback mode, smoothly fallback to demo user
-    return { userId: DEMO_USER_ID };
+    return { userId: null };
   }
 }
