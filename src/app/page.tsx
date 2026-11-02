@@ -82,16 +82,16 @@ export default function Home() {
               Start 4-Week Study Plan
             </Link>
             <Link
-              href="/onboarding"
-              className="px-5 py-2.5 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-bold text-sm transition-all"
+              href="/study?tab=mock-exam"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm shadow-emerald-500/25 transition-all"
             >
-              Diagnostic Pre-Test
+              Take CBT Mock Exam
             </Link>
             <Link
-              href="/revision"
+              href="/about"
               className="px-5 py-2.5 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-bold text-sm transition-all"
             >
-              Revision Hub
+              Why JAMB is Easy →
             </Link>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function Home() {
       {/* Quick Navigation Cards */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link
-          href="/progress"
+          href="/dashboard?tab=readiness"
           className="bg-card border border-border rounded-2xl p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-all space-y-1 block shadow-xs"
         >
           <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">
@@ -192,17 +192,17 @@ export default function Home() {
           </p>
         </Link>
         <Link
-          href="/revision"
+          href="/dashboard?tab=revision"
           className="bg-card border border-border rounded-2xl p-5 hover:border-purple-300 dark:hover:border-purple-700 transition-all space-y-1 block shadow-xs"
         >
           <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase">
             Active Recall
           </span>
           <h3 className="font-bold text-foreground">
-            Revision Flashcard Decks
+            Revision Hub &amp; Flashcards
           </h3>
           <p className="text-xs text-muted-foreground">
-            Interactive formula cards, mnemonics, and grammar rules.
+            Spaced active recall of past errors and examiner explanations.
           </p>
         </Link>
         <Link

@@ -9,15 +9,21 @@ export default function Footer() {
           <span>•</span>
           <span>Understand. Practise. Revise.</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <Link href="/about" className="hover:text-foreground transition-colors">
+            About Us
+          </Link>
           <Link href="/study" className="hover:text-foreground transition-colors">
-            Curriculum
+            Study &amp; CBT Hub
           </Link>
-          <Link href="/revision" className="hover:text-foreground transition-colors">
+          <Link href="/dashboard" className="hover:text-foreground transition-colors">
+            Dashboard
+          </Link>
+          <Link href="/dashboard?tab=readiness" className="hover:text-foreground transition-colors">
+            Readiness Index
+          </Link>
+          <Link href="/dashboard?tab=revision" className="hover:text-foreground transition-colors">
             Revision Hub
-          </Link>
-          <Link href="/progress" className="hover:text-foreground transition-colors">
-            Progress
           </Link>
           <Link href="/onboarding" className="hover:text-foreground transition-colors">
             Diagnostic Test
