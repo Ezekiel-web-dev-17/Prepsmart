@@ -104,7 +104,7 @@ export default async function DepartmentLayout({
         {/* Quick Utility Links */}
         <div className="flex items-center gap-2 self-end sm:self-auto px-1">
           <Link
-            href="/revision"
+            href="/dashboard?tab=revision"
             className="px-3 py-1 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors whitespace-nowrap"
           >
             Flashcards

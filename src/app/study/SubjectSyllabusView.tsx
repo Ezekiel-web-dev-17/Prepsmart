@@ -1,0 +1,748 @@
+"use client";
+
+import React, { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  SubjectCurriculum,
+  STREAM_SUBJECTS_MAP,
+  normalizeSubjectSlug,
+  normalizeStreamSlug,
+} from "./curriculum-data";
+import {
+  ZapIcon,
+  BookOpenIcon,
+  TargetIcon,
+  FlameIcon,
+  CheckIcon,
+  CheckCircleIcon,
+  SearchIcon,
+  XIcon,
+  AlertTriangleIcon,
+  ArrowRightIcon,
+} from "@/components/ui/icons";
+
+interface SubjectSyllabusViewProps {
+  curriculum: SubjectCurriculum;
+  currentStream: "science" | "commercial" | "arts";
+  currentSubject: string;
+  onSwitchToMockExam?: () => void;
+  onSwitchToCurriculumOverview?: () => void;
+}
+
+export default function SubjectSyllabusView({
+  curriculum,
+  currentStream,
+  currentSubject,
+  onSwitchToMockExam,
+  onSwitchToCurriculumOverview,
+}: SubjectSyllabusViewProps) {
+  const router = useRouter();
+
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSection, setSelectedSection] = useState<string>("all");
+  const [filterMastery, setFilterMastery] = useState<"all" | "mastered" | "pending">("all");
+  const [expandedTopics, setExpandedTopics] = useState<Record<number, boolean>>({});
+  const [showExamDetails, setShowExamDetails] = useState<boolean>(false);
+
+  // Mastered topics stored in localStorage (synced with prepsmart_mastered_topics)
+  const [masteredTopics, setMasteredTopics] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("prepsmart_mastered_topics");
+      if (saved) {
+        setMasteredTopics(JSON.parse(saved));
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const toggleMastery = (topicId: string) => {
+    setMasteredTopics((prev) => {
+      const updated = { ...prev, [topicId]: !prev[topicId] };
+      try {
+        localStorage.setItem("prepsmart_mastered_topics", JSON.stringify(updated));
+      } catch {
+        // Ignore
+      }
+      return updated;
+    });
+  };
+
+  const toggleExpand = (topicNumber: number) => {
+    setExpandedTopics((prev) => ({
+      ...prev,
+      [topicNumber]: !prev[topicNumber],
+    }));
+  };
+
+  // Flatten all topics for searching and calculations
+  const allTopics = useMemo(() => {
+    return curriculum.sections.flatMap((sec) => sec.topics);
+  }, [curriculum]);
+
+  // Mastered count for this subject
+  const masteredCount = useMemo(() => {
+    return allTopics.filter((t) => {
+      const key = `${curriculum.id}-t${t.topicNumber}`;
+      return !!masteredTopics[key];
+    }).length;
+  }, [allTopics, curriculum.id, masteredTopics]);
+
+  const masteryPercent = allTopics.length > 0 ? Math.round((masteredCount / allTopics.length) * 100) : 0;
+
+  // Filter sections and topics
+  const filteredSections = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+
+    return curriculum.sections
+      .map((sec) => {
+        if (selectedSection !== "all" && sec.sectionTitle !== selectedSection) {
+          return null;
+        }
+
+        const filteredTopics = sec.topics.filter((t) => {
+          const key = `${curriculum.id}-t${t.topicNumber}`;
+          const isMastered = !!masteredTopics[key];
+
+          if (filterMastery === "mastered" && !isMastered) return false;
+          if (filterMastery === "pending" && isMastered) return false;
+
+          if (!q) return true;
+
+          const matchesTitle = t.title.toLowerCase().includes(q);
+          const matchesContents = t.contents.some((c) => c.toLowerCase().includes(q));
+          const matchesObjectives = t.objectives.some((o) => o.toLowerCase().includes(q));
+          return matchesTitle || matchesContents || matchesObjectives;
+        });
+
+        if (filteredTopics.length === 0) return null;
+
+        return {
+          ...sec,
+          topics: filteredTopics,
+        };
+      })
+      .filter(Boolean) as typeof curriculum.sections;
+  }, [curriculum, selectedSection, filterMastery, searchQuery, masteredTopics]);
+
+  // Handle switching subjects or streams
+  const handleSelectSubject = (subjId: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("stream", currentStream);
+    url.searchParams.set("subject", subjId);
+    url.searchParams.delete("tab");
+    router.push(url.toString());
+  };
+
+  const handleSelectStream = (newStream: "science" | "commercial" | "arts") => {
+    const streamSubjects = STREAM_SUBJECTS_MAP[newStream];
+    // Keep current subject if in new stream, otherwise default to first
+    const hasCurrent = streamSubjects.some((s) => s.id === currentSubject);
+    const targetSubject = hasCurrent ? currentSubject : streamSubjects[0].id;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("stream", newStream);
+    url.searchParams.set("subject", targetSubject);
+    url.searchParams.delete("tab");
+    router.push(url.toString());
+  };
+
+  const streamSubjects = STREAM_SUBJECTS_MAP[currentStream] || STREAM_SUBJECTS_MAP.science;
+
+  return (
+    <div className="space-y-8 pb-16 animate-fadeIn">
+      {/* ── 1. BREADCRUMBS & TOP NAV ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground border-b border-border pb-3">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Link href="/dashboard" className="hover:text-foreground transition-colors font-medium">
+            Dashboard
+          </Link>
+          <span>/</span>
+          <button
+            type="button"
+            onClick={onSwitchToCurriculumOverview}
+            className="hover:text-foreground transition-colors font-medium cursor-pointer"
+          >
+            Study Hub
+          </button>
+          <span>/</span>
+          <span className="capitalize font-bold text-foreground">
+            {curriculum.streamName}
+          </span>
+          <span>/</span>
+          <span className="font-extrabold text-blue-600 dark:text-blue-400">
+            {curriculum.subjectName}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {onSwitchToMockExam ? (
+            <button
+              type="button"
+              onClick={onSwitchToMockExam}
+              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <ZapIcon className="w-3.5 h-3.5" />
+              <span>Take Full CBT Mock Exam</span>
+            </button>
+          ) : (
+            <Link
+              href="/study?tab=mock-exam"
+              className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5"
+            >
+              <ZapIcon className="w-3.5 h-3.5" />
+              <span>Take Full CBT Mock Exam</span>
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* ── 2. SUBJECT HERO BANNER ── */}
+      <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-6 sm:p-10 shadow-lg shadow-blue-500/10 space-y-6">
+        <div className="relative z-10 space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-black uppercase tracking-wider">
+              {curriculum.streamBadge}
+            </span>
+            <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-blue-100 text-xs font-bold">
+              JAMB UTME 2026 Official Syllabus
+            </span>
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 text-xs font-bold">
+              <CheckCircleIcon className="w-3.5 h-3.5" />
+              <span>Verified Curriculum</span>
+            </span>
+          </div>
+
+          <div className="space-y-2 max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+              {curriculum.subjectName} ({curriculum.subjectCode})
+            </h1>
+            <p className="text-xs sm:text-sm text-blue-100 leading-relaxed max-w-2xl">
+              {curriculum.overview}
+            </p>
+          </div>
+
+          {/* Quick Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 max-w-3xl">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 text-center">
+              <span className="text-xl sm:text-2xl font-black block tabular-nums">
+                {curriculum.totalQuestions}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 tracking-wider">
+                Exam Questions
+              </span>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 text-center">
+              <span className="text-xl sm:text-2xl font-black block tabular-nums">
+                {allTopics.length}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 tracking-wider">
+                Syllabus Topics
+              </span>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 text-center">
+              <span className="text-xl sm:text-2xl font-black block tabular-nums">
+                {curriculum.durationMinutes}m
+              </span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 tracking-wider">
+                Allocated Time
+              </span>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 text-center">
+              <span className="text-xl sm:text-2xl font-black block tabular-nums text-emerald-300">
+                {curriculum.targetAccuracy}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 tracking-wider">
+                Target Benchmark
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Subtle background flair */}
+        <div className="absolute -bottom-10 -right-10 w-64 h-64 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+      </section>
+
+      {/* ── 3. STREAM & SUBJECT SWITCHER BARS ── */}
+      <section className="bg-card border border-border/80 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xs">
+        {/* Stream Selector */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Department Stream:
+            </span>
+            <div className="flex items-center gap-1.5">
+              {(["science", "commercial", "arts"] as const).map((str) => (
+                <button
+                  key={str}
+                  type="button"
+                  onClick={() => handleSelectStream(str)}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer capitalize ${
+                    currentStream === str
+                      ? "bg-foreground text-background shadow-xs font-extrabold"
+                      : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {str}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-xs text-muted-foreground">
+            Switching stream shows relevant degree combinations &amp; subjects.
+          </div>
+        </div>
+
+        {/* Subject Pills for Current Stream */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+              Subjects in {curriculum.streamName}:
+            </span>
+            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+              {streamSubjects.length} Core Subjects Available
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
+            {streamSubjects.map((sub) => {
+              const isSelected = sub.id === currentSubject || sub.id === curriculum.id;
+              return (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => handleSelectSubject(sub.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 shrink-0 ${
+                    isSelected
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                      : "bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/50"
+                  }`}
+                >
+                  <span>{sub.name}</span>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full ${
+                      isSelected
+                        ? "bg-white/20 text-white font-black"
+                        : "bg-background text-muted-foreground"
+                    }`}
+                  >
+                    {sub.code}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. EXAMINATION STRUCTURE & RECOMMENDED TEXTS COLLAPSIBLE ── */}
+      <section className="bg-card border border-border/80 rounded-2xl overflow-hidden shadow-xs">
+        <button
+          type="button"
+          onClick={() => setShowExamDetails(!showExamDetails)}
+          className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-muted/30 transition-colors cursor-pointer"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <BookOpenIcon className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm sm:text-base text-foreground">
+                Official Examination Structure, Objectives &amp; Recommended Texts
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Click to {showExamDetails ? "hide" : "view"} question breakdown and approved JAMB textbooks.
+              </p>
+            </div>
+          </div>
+          <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+            {showExamDetails ? "▲ Hide Details" : "▼ View Details"}
+          </span>
+        </button>
+
+        {showExamDetails && (
+          <div className="p-5 border-t border-border/60 space-y-6 bg-muted/10 animate-fadeIn">
+            {/* General Objectives */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Official UTME General Objectives
+              </h4>
+              <ul className="space-y-1.5 text-xs text-foreground/90 pl-4 list-disc">
+                {curriculum.generalObjectives.map((obj, i) => (
+                  <li key={i} className="leading-relaxed">
+                    {obj}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Structure Table */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Question Distribution by Section ({curriculum.totalQuestions} Questions Total)
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {curriculum.examinationStructure.map((st, i) => (
+                  <div key={i} className="p-3.5 rounded-xl bg-background border border-border space-y-1">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-foreground">{st.section}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 font-extrabold">
+                        {st.questionCount} Qs
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      {st.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recommended Texts */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Recommended Textbooks
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {curriculum.recommendedTexts.map((txt, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1.5 rounded-xl bg-background border border-border text-xs text-foreground font-medium flex items-center gap-1.5"
+                  >
+                    <BookOpenIcon className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                    <span>{txt}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* ── 5. TOPIC MASTERY TRACKER & FILTER CONTROLS ── */}
+      <section className="bg-card border border-border/80 rounded-2xl p-5 space-y-5 shadow-xs">
+        {/* Progress bar */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-foreground flex items-center gap-1.5">
+              <TargetIcon className="w-4 h-4 text-blue-600" />
+              <span>{curriculum.subjectName} Mastery Progress</span>
+            </span>
+            <span className="font-extrabold text-foreground">
+              {masteredCount} of {allTopics.length} Topics Mastered ({masteryPercent}%)
+            </span>
+          </div>
+
+          <div className="w-full h-3 rounded-full bg-muted overflow-hidden border border-border">
+            <div
+              className="h-full bg-linear-to-r from-blue-600 to-emerald-500 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${masteryPercent}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Filter & Search Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2">
+          {/* Search box */}
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={`Search ${curriculum.subjectName} topics, concepts, or objectives...`}
+              className="w-full px-4 py-2.5 rounded-xl bg-muted/50 border border-border text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-blue-500/50"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <XIcon className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Section Selector */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+            <select
+              value={selectedSection}
+              onChange={(e) => setSelectedSection(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-muted/50 border border-border text-xs text-foreground font-semibold outline-none focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
+            >
+              <option value="all">All Sections ({curriculum.sections.length})</option>
+              {curriculum.sections.map((sec, i) => (
+                <option key={i} value={sec.sectionTitle}>
+                  {sec.sectionTitle.length > 35
+                    ? `${sec.sectionTitle.slice(0, 35)}…`
+                    : sec.sectionTitle}
+                </option>
+              ))}
+            </select>
+
+            {/* Mastery Filter */}
+            <div className="flex items-center gap-1 border border-border rounded-xl p-0.5 bg-muted/40 shrink-0">
+              <button
+                type="button"
+                onClick={() => setFilterMastery("all")}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterMastery === "all" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground"
+                }`}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterMastery("pending")}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterMastery === "pending" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground"
+                }`}
+              >
+                Pending
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterMastery("mastered")}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterMastery === "mastered" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground"
+                }`}
+              >
+                Mastered
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. ALL TOPICS ACCORDING TO JAMB CURRICULUM ── */}
+      <section className="space-y-8">
+        {filteredSections.length === 0 ? (
+          <div className="p-12 text-center rounded-2xl bg-card border border-border space-y-3">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+              <SearchIcon className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-foreground">No Topics Found</h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              No syllabus topics matched your search &quot;{searchQuery}&quot;. Clear your search query or reset section filters.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedSection("all");
+                setFilterMastery("all");
+              }}
+              className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs"
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          filteredSections.map((sec, secIdx) => (
+            <div key={secIdx} className="space-y-4">
+              {/* Section Header */}
+              <div className="flex items-center justify-between border-b border-border/80 pb-2">
+                <div className="space-y-0.5">
+                  <h2 className="text-base sm:text-lg font-black text-foreground tracking-tight">
+                    {sec.sectionTitle}
+                  </h2>
+                  <span className="text-xs text-muted-foreground">
+                    {sec.topics.length} Syllabus Topic{sec.topics.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+
+              {/* Topics Grid */}
+              <div className="space-y-4">
+                {sec.topics.map((topic) => {
+                  const topicKey = `${curriculum.id}-t${topic.topicNumber}`;
+                  const isMastered = !!masteredTopics[topicKey];
+                  const isExpanded = !!expandedTopics[topic.topicNumber];
+
+                  return (
+                    <div
+                      key={topic.topicNumber}
+                      className={`p-5 sm:p-6 rounded-2xl bg-card border transition-all duration-200 shadow-xs space-y-4 ${
+                        isMastered
+                          ? "border-emerald-500/40 bg-emerald-500/[0.02]"
+                          : "border-border hover:border-blue-400/50"
+                      }`}
+                    >
+                      {/* Topic Card Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2.5 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[11px] font-black uppercase tracking-wider">
+                              Topic {topic.topicNumber}
+                            </span>
+                            {topic.highYield && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[10px] font-extrabold uppercase tracking-wide">
+                                <FlameIcon className="w-3 h-3 text-amber-500" />
+                                <span>High Yield</span>
+                              </span>
+                            )}
+                            {isMastered && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold uppercase tracking-wide">
+                                <CheckIcon className="w-3 h-3 text-emerald-500" />
+                                <span>Mastered</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="text-base sm:text-lg font-extrabold text-foreground leading-snug">
+                            {topic.title}
+                          </h3>
+                        </div>
+
+                        {/* Mastery Action Button */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => toggleMastery(topicKey)}
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                              isMastered
+                                ? "bg-emerald-500 text-white shadow-xs"
+                                : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border"
+                            }`}
+                          >
+                            {isMastered ? (
+                              <CheckIcon className="w-3.5 h-3.5" />
+                            ) : (
+                              <span className="w-3.5 h-3.5 rounded-full border border-current" />
+                            )}
+                            <span>{isMastered ? "Mastered" : "Mark Mastered"}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Contents Breakdown */}
+                      <div className="space-y-2 pt-1 border-t border-border/50">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                          Syllabus Contents To Learn:
+                        </span>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-foreground/90 pl-4 list-disc">
+                          {topic.contents.map((item, cIdx) => (
+                            <li key={cIdx} className="leading-relaxed">
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Official Objectives Accordion / Preview */}
+                      <div className="space-y-2 pt-2 border-t border-border/50">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Official JAMB Objectives (Candidates should be able to):
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => toggleExpand(topic.topicNumber)}
+                            className="text-[11px] font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer"
+                          >
+                            {isExpanded ? "▲ Collapse Objectives" : `▼ View Objectives (${topic.objectives.length})`}
+                          </button>
+                        </div>
+
+                        {isExpanded && (
+                          <div className="p-4 rounded-xl bg-muted/40 border border-border/60 space-y-1.5 animate-fadeIn">
+                            <ul className="space-y-1 text-xs text-foreground/80 pl-4 list-disc">
+                              {topic.objectives.map((obj, oIdx) => (
+                                <li key={oIdx} className="leading-relaxed">
+                                  {obj}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Examiner Trap Tip if available */}
+                      {topic.trapAlert && (
+                        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-400 flex items-start gap-2">
+                          <AlertTriangleIcon className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                          <div>
+                            <strong className="font-bold">Examiner Trap: </strong>
+                            <span>{topic.trapAlert}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Quick Practice in CBT Drill Button */}
+                      <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                        <Link
+                          href={`/quiz/${topic.drillTopicId}?topic=${encodeURIComponent(topic.title)}`}
+                          className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <ZapIcon className="w-3.5 h-3.5" />
+                          <span>Practice Real Past Questions on this Topic</span>
+                          <ArrowRightIcon className="w-3.5 h-3.5" />
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleExpand(topic.topicNumber)}
+                          className="text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          {isExpanded ? "Hide Details" : "Show Full Examination Details"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        )}
+      </section>
+
+      {/* ── 7. FOOTER CALL TO ACTION ── */}
+      <section className="bg-card border border-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-xl font-black text-foreground">
+              Ready to Test Your {curriculum.subjectName} Accuracy Under Timed CBT Conditions?
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Launch an official 120-minute UTME simulation with authentic question grids, calculator, and AI diagnostic breakdown.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            {onSwitchToMockExam ? (
+              <button
+                type="button"
+                onClick={onSwitchToMockExam}
+                className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              >
+                Launch Mock Exam Simulation →
+              </button>
+            ) : (
+              <Link
+                href="/study?tab=mock-exam"
+                className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition-all"
+              >
+                Launch Mock Exam Simulation →
+              </Link>
+            )}
+            <Link
+              href="/dashboard"
+              className="px-5 py-3 rounded-2xl bg-card border border-border hover:bg-muted font-bold text-xs text-foreground transition-colors"
+            >
+              Return to Dashboard
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+

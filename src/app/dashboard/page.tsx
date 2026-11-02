@@ -5,17 +5,23 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { LEADERBOARD_KEY } from "@/lib/gamification";
+import { getCandidateProgressData } from "@/lib/progress";
+import type { RevisionQuestion } from "@/app/revision/RevisionHubClient";
 import DashboardView from "./DashboardView";
 
 export const metadata: Metadata = {
-  title: "Candidate Dashboard & Exam Command Center",
+  title: "Candidate Command Center — Dashboard, Readiness & Revision Hub | PrepSmart",
   description:
-    "Your personalized PrepSmart preparation dashboard. Track your UTME countdown, daily study routine, recommended syllabus materials, and study streaks.",
+    "Your unified PrepSmart candidate command center. Track your UTME countdown, daily study routine, Exam Readiness Index analytics, and spaced active recall Revision Hub all in one place.",
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+  searchParams?: Promise<{ tab?: string }>;
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   await connection();
   const { userId: clerkUserId } = await auth();
 
@@ -23,6 +29,9 @@ export default async function DashboardPage() {
   if (!clerkUserId) {
     redirect("/sign-in");
   }
+
+  const resolvedParams = searchParams ? await searchParams : {};
+  const activeTabParam = resolvedParams.tab || "overview";
 
   // Find user and their onboarding profile
   const user = await prisma.user.findUnique({
@@ -37,8 +46,33 @@ export default async function DashboardPage() {
     redirect("/onboarding");
   }
 
-  // Calculate current real-time leaderboard rank
-  const zeroRank = await redis.zrevrank(LEADERBOARD_KEY, clerkUserId);
+  // Fetch leaderboard rank, readiness analytics, and revision queue concurrently
+  const [zeroRank, progressData, [totalRevisionCount, failedRecords]] = await Promise.all([
+    redis.zrevrank(LEADERBOARD_KEY, clerkUserId),
+    getCandidateProgressData(user.id),
+    Promise.all([
+      prisma.failedQuestion.count({ where: { userId: user.id } }),
+      prisma.failedQuestion.findMany({
+        where: { userId: user.id },
+        orderBy: { lastFailedAt: "desc" },
+        take: 10,
+        include: {
+          question: {
+            select: {
+              id: true,
+              subject: true,
+              year: true,
+              text: true,
+              options: true,
+              topic: true,
+              concept: true,
+            },
+          },
+        },
+      }),
+    ]),
+  ]);
+
   const rank = zeroRank !== null ? zeroRank + 1 : null;
 
   let parsedSubjects: string[] = [];
@@ -48,10 +82,18 @@ export default async function DashboardPage() {
     parsedSubjects = ["Use of English", "Mathematics", "Physics", "Chemistry"];
   }
 
-  // Count user's questions in the revision queue
-  const reviewQuestionsCount = await prisma.failedQuestion.count({
-    where: { userId: user.id },
-  });
+  const initialRevisionQuestions: RevisionQuestion[] = failedRecords.map((r) => ({
+    failedRecordId: r.id,
+    questionId: r.question.id,
+    subject: r.question.subject,
+    year: r.question.year,
+    text: r.question.text.replace(/^\[?\s*variant\s*\d+\s*\]?:?\s*/i, "").trim(),
+    options: JSON.parse(r.question.options) as { id: string; text: string }[],
+    topic: r.question.topic,
+    concept: r.question.concept,
+    reviewCount: r.failedCount,
+    lastPracticedAt: r.lastFailedAt.toISOString(),
+  }));
 
   return (
     <DashboardView
@@ -74,7 +116,10 @@ export default async function DashboardPage() {
         preferredStudyTime: user.onboardingProfile.preferredStudyTime,
       }}
       rank={rank}
-      reviewQuestionsCount={reviewQuestionsCount}
+      reviewQuestionsCount={totalRevisionCount}
+      progressData={progressData}
+      revisionQuestions={initialRevisionQuestions}
+      initialActiveTab={activeTabParam}
     />
   );
 }

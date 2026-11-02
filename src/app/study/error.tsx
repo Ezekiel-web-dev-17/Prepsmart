@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { AlertTriangleIcon } from "@/components/ui/icons";
 
 export default function StudyError({
   error,
@@ -18,8 +19,8 @@ export default function StudyError({
   return (
     <div className="min-h-[50vh] flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-xs text-center space-y-6 transition-colors duration-200">
-        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 text-2xl">
-          ⚠️
+        <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+          <AlertTriangleIcon className="w-7 h-7 text-amber-500" />
         </div>
 
         <div className="space-y-2">

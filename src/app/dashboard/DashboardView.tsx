@@ -3,8 +3,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useGamification } from "@/components/gamification/XPToast";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { awardUserXPAction } from "@/actions/gamification";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { ProgressDashboardClient } from "@/app/progress/ProgressDashboardClient";
+import RevisionHubClient, { type RevisionQuestion } from "@/app/revision/RevisionHubClient";
+import type { CandidateProgressData } from "@/lib/progress";
+import {
+  ChartBarIcon,
+  TargetIcon,
+  RefreshCwIcon,
+  HourglassIcon,
+  FlameIcon,
+  BookOpenIcon,
+  RocketIcon,
+  SparklesIcon,
+  TrophyIcon,
+  CheckCircleIcon,
+  ArrowRightIcon,
+  BeakerIcon,
+  BriefcaseIcon,
+  PaletteIcon,
+  ClockIcon,
+} from "@/components/ui/icons";
 
 interface DashboardProfile {
   targetScore: number;
@@ -29,16 +49,31 @@ interface DashboardViewProps {
   profile: DashboardProfile | null;
   rank: number | null;
   reviewQuestionsCount?: number;
+  progressData?: CandidateProgressData | null;
+  revisionQuestions?: RevisionQuestion[];
+  initialActiveTab?: string;
 }
+
+type MainTab = "overview" | "readiness" | "revision";
 
 export default function DashboardView({
   user,
   profile,
   rank,
   reviewQuestionsCount = 0,
+  progressData,
+  revisionQuestions = [],
+  initialActiveTab = "overview",
 }: DashboardViewProps) {
   const { triggerXPToast } = useGamification();
   const { isSubscribed, subscribeToPush, sendTestNotification } = usePushNotifications();
+
+  const [mainTab, setMainTab] = useState<MainTab>(() => {
+    if (initialActiveTab === "readiness" || initialActiveTab === "progress") return "readiness";
+    if (initialActiveTab === "revision") return "revision";
+    return "overview";
+  });
+
   const [activeSubjectTab, setActiveSubjectTab] = useState<string>(
     profile?.selectedSubjects[0] || "Use of English"
   );
@@ -47,20 +82,15 @@ export default function DashboardView({
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [testSentSuccess, setTestSentSuccess] = useState(false);
 
-  const handleSendTestNotification = async () => {
-    if (isSendingTest) return;
-    setIsSendingTest(true);
+  // Sync tab with URL if changed
+  const handleTabChange = (tab: MainTab) => {
+    setMainTab(tab);
     try {
-      await sendTestNotification(
-        "PrepSmart Study Challenge 🔥",
-        "Keep your streak alive! 10 minutes of high-yield practice awaits."
-      );
-      setTestSentSuccess(true);
-      setTimeout(() => setTestSentSuccess(false), 3000);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsSendingTest(false);
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      window.history.replaceState({}, "", url.toString());
+    } catch {
+      // Ignore URL history errors
     }
   };
 
@@ -96,430 +126,489 @@ export default function DashboardView({
     }
   };
 
+  const streamIcon =
+    profile?.departmentStream === "commercial" ? (
+      <BriefcaseIcon className="w-3.5 h-3.5" />
+    ) : profile?.departmentStream === "arts" ? (
+      <PaletteIcon className="w-3.5 h-3.5" />
+    ) : (
+      <BeakerIcon className="w-3.5 h-3.5" />
+    );
+
   const streamLabel =
-    profile?.departmentStream === "science"
-      ? "Science Stream 🔬"
-      : profile?.departmentStream === "commercial"
-        ? "Commercial Stream 📊"
-        : "Arts Stream 🎨";
+    profile?.departmentStream === "commercial"
+      ? "Commercial Stream"
+      : profile?.departmentStream === "arts"
+      ? "Arts Stream"
+      : "Science Stream";
 
   return (
     <div className="space-y-8 pb-16">
-      {/* Top Banner / Candidate Welcome Card */}
-      <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-900 via-indigo-950 to-slate-950 text-white p-6 sm:p-8 border border-blue-800/40 shadow-xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{streamLabel}</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Welcome Back, {user.name?.split(" ")[0] || "Candidate"}!
-            </h1>
-
-            <p className="text-xs sm:text-sm text-blue-100/90 max-w-xl leading-relaxed">
-              Targeting <strong>{profile?.targetScore || 280} points</strong> in the
-              upcoming UTME. Your personalized study curriculum is calibrated for{" "}
-              <strong>{profile?.dailyStudyMinutes || 45} mins/day</strong>.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Link
-                href="/revision"
-                className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 transition-all flex items-center gap-2 active:scale-95"
-              >
-                <span>Revision Hub</span>
-                <span>🎯</span>
-              </Link>
-              <Link
-                href="/mock-exam"
-                className="px-4 py-2.5 rounded-xl bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-extrabold text-xs shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2 active:scale-95"
-              >
-                <span>Take Mock Exam</span>
-                <span>⏱️</span>
-              </Link>
-              <Link
-                href="/study"
-                className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-all"
-              >
-                Continue Syllabus →
-              </Link>
-            </div>
-          </div>
-
-          {/* Quick Exam Countdown & Push Status */}
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <div className="bg-white/10 dark:bg-black/30 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center min-w-30">
-              <span className="text-3xl font-black text-amber-400 tabular-nums block leading-none">
-                {daysRemaining}
-              </span>
-              <span className="text-[11px] font-bold text-blue-200 uppercase tracking-wider block mt-1">
-                Days to UTME
-              </span>
-            </div>
-
-            <div className="bg-white/10 dark:bg-black/30 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center min-w-30">
-              <span className="text-3xl font-black text-emerald-400 tabular-nums block leading-none">
-                {user.xp}
-              </span>
-              <span className="text-[11px] font-bold text-blue-200 uppercase tracking-wider block mt-1">
-                Accumulated XP
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Action Strip: Daily Streak + Last Lesson + Reminders */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Card 1: Streak Tracker */}
-        <div className="rounded-2xl bg-card border border-border/80 p-5 shadow-xs space-y-3 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Study Habit
-              </span>
-              <span className="text-xl">🔥</span>
-            </div>
-            <h3 className="font-extrabold text-base text-foreground">
-              Daily Streak: 3 Days
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Check in daily and complete at least one exercise to keep your streak intact.
-            </p>
-          </div>
+      {/* ── TOP UNIFIED COMMAND CENTER TABS ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => handleTabChange("overview")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              mainTab === "overview"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+            }`}
+          >
+            <ChartBarIcon className="w-4 h-4" />
+            <span>Dashboard Overview</span>
+          </button>
 
           <button
             type="button"
-            disabled={hasClaimedToday || isClaimingDaily}
-            onClick={handleClaimStreak}
-            className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${hasClaimedToday
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-default"
-                : "bg-amber-500 hover:bg-amber-600 text-white shadow-xs"
-              }`}
+            onClick={() => handleTabChange("readiness")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              mainTab === "readiness"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+            }`}
           >
-            {hasClaimedToday
-              ? "✓ Today's Streak Claimed (+25 XP)"
-              : isClaimingDaily
-                ? "Claiming..."
-                : "Claim Today's Streak (+25 XP)"}
+            <TargetIcon className="w-4 h-4" />
+            <span>Readiness (Progress)</span>
+            {progressData && (
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
+                {progressData.examReadinessScore}%
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange("revision")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              mainTab === "revision"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+            }`}
+          >
+            <RefreshCwIcon className="w-4 h-4" />
+            <span>Revision Hub</span>
+            {reviewQuestionsCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black">
+                {reviewQuestionsCount}
+              </span>
+            )}
           </button>
         </div>
 
-        {/* Card 2: Quick Resume Last Lesson */}
-        <div className="rounded-2xl bg-card border border-border/80 p-5 shadow-xs space-y-3 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Resume Preparation
-              </span>
-              <span className="text-xl">📖</span>
-            </div>
-            <h3 className="font-extrabold text-base text-foreground">
-              Calculus & Coordinate Geometry
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Mathematics • High-yield topic with 8 typical examiner traps.
-            </p>
-          </div>
-
-          <Link
-            href="/study"
-            className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold text-center shadow-xs transition-all flex items-center justify-center gap-1.5"
-          >
-            <span>Continue Lesson</span>
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
+        <div className="text-xs text-muted-foreground hidden lg:flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span>Unified Command Center • Real Data Engine</span>
         </div>
       </div>
 
-      {/* Featured: JAMB CBT Simulation Engine */}
-      <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-card via-card to-blue-500/5 border-2 border-blue-500/20 p-6 sm:p-8 shadow-md">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>OFFICIAL CBT SIMULATION ENGINE</span>
+      {/* ── TAB 2: READINESS & PROGRESS ANALYTICS ── */}
+      {mainTab === "readiness" && (
+        <section className="space-y-6 animate-fadeIn">
+          {progressData ? (
+            <ProgressDashboardClient data={progressData} />
+          ) : (
+            <div className="p-12 text-center rounded-2xl bg-card border border-border space-y-3">
+              <HourglassIcon className="w-10 h-10 text-blue-500 mx-auto" />
+              <h3 className="text-base font-bold text-foreground">Loading Real Recorded Readiness...</h3>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                Fetching candidate attempts, accuracy metrics, and subject breakdowns from database.
+              </p>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
-              JAMB Mock Exam & Timed Practice
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Experience the authentic UTME exam environment. Test yourself with live countdown timers, a 10-column question grid, keyboard-accessible BODMAS calculator, and post-exam AI diagnostics.
-            </p>
-            <div className="flex flex-wrap gap-4 text-xs font-bold text-muted-foreground pt-1">
-              <span className="flex items-center gap-1.5">
-                <span className="text-emerald-500">✓</span> Full 4-Subject Mock (120 Mins)
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="text-blue-500">✓</span> Single Subject Sprint (30 Mins)
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="text-purple-500">✓</span> AI Concept Mastery & Revision Insights
-              </span>
-            </div>
-          </div>
+          )}
+        </section>
+      )}
 
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
-            <Link
-              href="/mock-exam"
-              className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm text-center shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2 active:scale-98"
-            >
-              <span>Launch Mock Simulation</span>
-              <span>🚀</span>
-            </Link>
-            <div className="text-[11px] text-center text-muted-foreground font-medium">
-              Earn up to <strong className="text-foreground">+150 XP</strong> per completed simulation
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── TAB 3: REVISION HUB (SPACED ACTIVE RECALL) ── */}
+      {mainTab === "revision" && (
+        <section className="space-y-6 animate-fadeIn">
+          <RevisionHubClient
+            initialQuestions={revisionQuestions}
+            initialTotal={reviewQuestionsCount}
+          />
+        </section>
+      )}
 
-      {/* ── PROMINENT REVISION HUB FEATURE CARD ── */}
-      <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-amber-500/10 via-amber-500/5 to-indigo-500/10 border-2 border-amber-500/30 p-6 sm:p-8 shadow-md transition-all hover:border-amber-500/50">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-black">
-              <span>🎯 ACTIVE RECALL & MASTERY</span>
-              <span>•</span>
-              <span>
-                {reviewQuestionsCount && reviewQuestionsCount > 0
-                  ? `${reviewQuestionsCount} Question${reviewQuestionsCount === 1 ? "" : "s"} Ready for Review`
-                  : "Continuous Concept Reinforcement"}
-              </span>
-            </div>
-
-            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
-              Personalized Revision Hub
-            </h2>
-
-            <p className="text-sm sm:text-base text-foreground font-bold leading-relaxed">
-              Review your previous practice and master these concepts!
-            </p>
-
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Strengthen questions from previous mock exams and drills in targeted 10-question batches. Practice with active recall, review step-by-step examiner solutions, and convert every tricky topic into guaranteed UTME marks.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
-            <Link
-              href="/revision"
-              className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm text-center shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 active:scale-98"
-            >
-              <span>Launch Revision Hub</span>
-              <span>🎯</span>
-            </Link>
-            <div className="text-[11px] text-center text-muted-foreground font-medium">
-              Earn <strong className="text-foreground">+15 XP</strong> for every concept you master
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Recommended Study Materials Based On Onboarding */}
-      <section className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-foreground">
-              Recommended Curriculum Materials
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Personalized syllabus guides and practice modules for your 4 selected UTME subjects.
-            </p>
-          </div>
-
-          <Link
-            href="/study"
-            className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline self-start sm:self-auto"
-          >
-            Browse Full Syllabus →
-          </Link>
-        </div>
-
-        {/* Subject Filter Tabs */}
-        <div className="flex flex-wrap gap-2 border-b border-border/60 pb-3">
-          {subjects.map((subj) => (
-            <button
-              key={subj}
-              type="button"
-              onClick={() => setActiveSubjectTab(subj)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${activeSubjectTab === subj
-                  ? "bg-blue-600 text-white shadow-xs font-bold"
-                  : "bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground"
-                }`}
-            >
-              {subj}
-            </button>
-          ))}
-        </div>
-
-        {/* Materials Grid for Selected Subject */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-          <div className="p-5 rounded-2xl bg-muted/30 border border-border/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Core Module
-              </span>
-              <span className="text-xs font-bold text-muted-foreground">High Yield</span>
-            </div>
-            <h4 className="font-extrabold text-sm text-foreground">
-              Fundamental Principles of {activeSubjectTab}
-            </h4>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              Official JAMB syllabus breakdown covering key objectives and textbook references.
-            </p>
-            <Link
-              href="/study"
-              className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline pt-1"
-            >
-              <span>Explore Module</span>
-              <span>→</span>
-            </Link>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-muted/30 border border-border/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                Examiner Traps
-              </span>
-              <span className="text-xs font-bold text-muted-foreground">12 Traps</span>
-            </div>
-            <h4 className="font-extrabold text-sm text-foreground">
-              Most Repeated Traps in {activeSubjectTab}
-            </h4>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              Learn how JAMB examiners frame trick questions and how to identify them instantly.
-            </p>
-            <Link
-              href="/revision"
-              className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-bold hover:underline pt-1"
-            >
-              <span>Review Traps</span>
-              <span>→</span>
-            </Link>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-muted/30 border border-border/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Active Recall
-              </span>
-              <span className="text-xs font-bold text-muted-foreground">+50 XP</span>
-            </div>
-            <h4 className="font-extrabold text-sm text-foreground">
-              Timed Practice Test ({activeSubjectTab})
-            </h4>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              20 authentic past UTME questions with instant step-by-step solutions.
-            </p>
-            <Link
-              href="/study"
-              className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline pt-1"
-            >
-              <span>Start Practice</span>
-              <span>→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom Grid: Leaderboard Standings + University Target Quick Check */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Card 1: Leaderboard Standings */}
-        <div className="rounded-2xl bg-card border border-border/80 p-5 sm:p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Gamification Ranking
-              </span>
-              <h3 className="font-extrabold text-base text-foreground mt-0.5">
-                Global Leaderboard
-              </h3>
-            </div>
-            <Link
-              href="/leaderboard"
-              className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline"
-            >
-              View Top 50 →
-            </Link>
-          </div>
-
-          <div className="p-4 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center">
-                #{rank || "—"}
+      {/* ── TAB 1: DASHBOARD OVERVIEW ── */}
+      {mainTab === "overview" && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Header Banner: Countdown & Greeting */}
+          <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-6 sm:p-8 shadow-lg shadow-blue-500/10">
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold tracking-wide">
+                  <span className="flex items-center gap-1.5">
+                    {streamIcon}
+                    <span>{streamLabel}</span>
+                  </span>
+                  <span>•</span>
+                  <span>Target: {profile?.targetScore || 280} / 400</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+                  Welcome back, {user.name || "JAMB Candidate"}!
+                </h1>
+                <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                  Your daily study session is scheduled for <strong>{profile?.preferredStudyTime || "evening"}</strong>. Consistency beats cramming every single time.
+                </p>
               </div>
+
+              {/* Countdown Dial Badge */}
+              <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shrink-0">
+                <div className="text-center">
+                  <div className="text-3xl sm:text-4xl font-black tracking-tight">{daysRemaining}</div>
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-blue-200">
+                    Days to UTME
+                  </div>
+                </div>
+                <div className="h-10 w-px bg-white/20" />
+                <div className="text-center">
+                  <div className="text-xl sm:text-2xl font-bold">{user.xp}</div>
+                  <div className="text-[10px] uppercase font-bold tracking-wider text-blue-200">
+                    Total XP
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Subtle background decoration */}
+            <div className="absolute -bottom-10 -right-10 w-64 h-64 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+          </div>
+
+          {/* Core Daily Habit & Motivation Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Card 1: Streak Protector & Gamification */}
+            <div className="rounded-2xl bg-card border border-border/80 p-5 shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <span className="font-bold text-sm text-foreground block">
-                  Your Current Rank
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {user.xp} Total XP Accumulated
-                </span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Active Study Streak
+                  </span>
+                  <FlameIcon className="w-5 h-5 text-amber-500" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-foreground tabular-nums">
+                  {progressData?.activeStreak !== undefined ? `${progressData.activeStreak} Day Streak` : "0 Day Streak"}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {progressData?.activeStreak && progressData.activeStreak > 0
+                    ? `Consecutive days of real practice recorded in your learning log. Keep it active today!`
+                    : "Complete a CBT drill or mock exam today to activate your daily study streak."}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                disabled={hasClaimedToday || isClaimingDaily}
+                onClick={handleClaimStreak}
+                className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  hasClaimedToday
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-default"
+                    : "bg-amber-500 hover:bg-amber-600 text-white shadow-xs"
+                }`}
+              >
+                {hasClaimedToday ? (
+                  <>
+                    <CheckCircleIcon className="w-3.5 h-3.5" />
+                    <span>Today&apos;s Streak Protected (+25 XP)</span>
+                  </>
+                ) : isClaimingDaily ? (
+                  <span>Claiming...</span>
+                ) : (
+                  <>
+                    <FlameIcon className="w-3.5 h-3.5" />
+                    <span>Claim Today&apos;s Streak (+25 XP)</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Card 2: Quick Resume Last Lesson */}
+            <div className="rounded-2xl bg-card border border-border/80 p-5 shadow-xs space-y-3 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Curriculum &amp; Syllabus
+                  </span>
+                  <BookOpenIcon className="w-5 h-5 text-blue-500" />
+                </div>
+                <h3 className="font-extrabold text-base text-foreground">
+                  Unified Study &amp; CBT Simulator
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Explore 108+ official syllabus topics, 4-week roadmaps, and authentic CBT timed mocks.
+                </p>
+              </div>
+
+              <Link
+                href="/study"
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold text-center shadow-xs transition-all flex items-center justify-center gap-1.5"
+              >
+                <span>Open Study &amp; CBT Hub</span>
+                <ArrowRightIcon className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Featured: JAMB CBT Simulation Engine */}
+          <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-card via-card to-blue-500/5 border-2 border-blue-500/20 p-6 sm:p-8 shadow-md">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  <span>OFFICIAL CBT SIMULATION ENGINE</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+                  JAMB Mock Exam &amp; Timed Practice
+                </h2>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Experience the authentic UTME exam environment. Test yourself with live countdown timers, a 10-column question grid, keyboard-accessible BODMAS calculator, and post-exam AI diagnostics.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                <Link
+                  href="/study?tab=mock-exam"
+                  className="px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm text-center shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 active:scale-98"
+                >
+                  <RocketIcon className="w-4 h-4" />
+                  <span>Launch CBT Simulation</span>
+                </Link>
+                <div className="text-[11px] text-center text-muted-foreground font-medium">
+                  Standard 4-subject UTME (180 Qs, 120 mins) or single subject drill
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── PROMINENT REVISION HUB QUICK SWITCH CARD ── */}
+          <section className="relative overflow-hidden rounded-3xl bg-linear-to-r from-amber-500/10 via-amber-500/5 to-indigo-500/10 border-2 border-amber-500/30 p-6 sm:p-8 shadow-md transition-all hover:border-amber-500/50">
+            <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-black">
+                  <TargetIcon className="w-3.5 h-3.5" />
+                  <span>ACTIVE RECALL &amp; MASTERY</span>
+                  <span>•</span>
+                  <span>
+                    {reviewQuestionsCount && reviewQuestionsCount > 0
+                      ? `${reviewQuestionsCount} Question${reviewQuestionsCount === 1 ? "" : "s"} In Error Queue`
+                      : "Revision Queue Clear"}
+                  </span>
+                </div>
+
+                <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+                  Personalized Revision Hub
+                </h2>
+
+                <p className="text-sm sm:text-base text-foreground font-bold leading-relaxed">
+                  Review your previous practice and master these concepts right here!
+                </p>
+
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {reviewQuestionsCount && reviewQuestionsCount > 0
+                    ? `Strengthen questions from previous mock exams and drills in targeted 10-question batches with instant examiner rationale.`
+                    : `No questions in your error queue right now. Begin studying syllabus topics or attempt CBT mock exams to populate your revision hub.`}
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange("revision")}
+                  className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm text-center shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
+                >
+                  <RefreshCwIcon className="w-4 h-4" />
+                  <span>Open Revision Queue Tab</span>
+                </button>
+                <div className="text-[11px] text-center text-muted-foreground font-medium">
+                  Earn <strong className="text-foreground">+15 XP</strong> for every concept you master
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Recommended Study Materials Based On Onboarding */}
+          <section className="bg-card border border-border/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg sm:text-xl font-extrabold text-foreground">
+                  Recommended Curriculum Materials
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  High-yield modules matched to your selected department and targets.
+                </p>
+              </div>
+
+              {/* Subject switcher tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
+                {subjects.map((subj) => (
+                  <button
+                    key={subj}
+                    type="button"
+                    onClick={() => setActiveSubjectTab(subj)}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                      activeSubjectTab === subj
+                        ? "bg-blue-600 text-white shadow-xs font-bold"
+                        : "bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {subj}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <Link
-              href="/leaderboard"
-              className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-xs hover:bg-blue-700 transition-all"
-            >
-              Climb Ranks
-            </Link>
+            {/* Content for the selected active subject */}
+            {(() => {
+              const normalizeSubjectToSlug = (sub: string) => {
+                const s = sub.toLowerCase().trim();
+                if (s.includes("english")) return "english";
+                if (s.includes("math")) return "mathematics";
+                if (s.includes("physic")) return "physics";
+                if (s.includes("chem")) return "chemistry";
+                if (s.includes("bio")) return "biology";
+                if (s.includes("econ")) return "economics";
+                if (s.includes("gov")) return "government";
+                if (s.includes("lit")) return "literature";
+                if (s.includes("com")) return "commerce";
+                if (s.includes("acc")) return "accounts";
+                if (s.includes("geo")) return "geography";
+                return s.replace(/\s+/g, "-");
+              };
+
+              const currentStreamSlug = (profile?.departmentStream || "science").toLowerCase();
+              const currentSubjectSlug = normalizeSubjectToSlug(activeSubjectTab);
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="p-5 rounded-2xl border border-border/70 bg-background/50 space-y-3 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
+                        <span>Week 1 • Core Foundations</span>
+                        <span>High Yield</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-foreground">
+                        {activeSubjectTab} Fundamental Principles
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        Review foundational concepts and definitions frequently tested in the opening 15 questions of UTME.
+                      </p>
+                    </div>
+                    <Link
+                      href={`/study?stream=${currentStreamSlug}&subject=${currentSubjectSlug}`}
+                      className="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1 pt-2"
+                    >
+                      <span>Explore Syllabus</span>
+                      <ArrowRightIcon className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+
+                  <div className="p-5 rounded-2xl border border-border/70 bg-background/50 space-y-3 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">
+                        <span>Examiner Trap Alert</span>
+                        <span>Critical</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-foreground">
+                        Common Pitfalls in {activeSubjectTab}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        Learn how JAMB examiners frame trick questions and how to identify them instantly.
+                      </p>
+                    </div>
+                    <Link
+                      href={`/study?stream=${currentStreamSlug}&subject=${currentSubjectSlug}`}
+                      className="text-xs font-bold text-amber-600 hover:text-amber-500 flex items-center gap-1 pt-2"
+                    >
+                      <span>View Examiner Traps</span>
+                      <ArrowRightIcon className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+
+                  <div className="p-5 rounded-2xl border border-border/70 bg-background/50 space-y-3 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
+                        <span>Active Recall</span>
+                        <span>Practice</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-foreground">
+                        Targeted Past Questions Drill
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        20 authentic past UTME questions with instant step-by-step solutions.
+                      </p>
+                    </div>
+                    <Link
+                      href={`/study?tab=mock-exam&stream=${currentStreamSlug}&subject=${currentSubjectSlug}`}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-500 flex items-center gap-1 pt-2"
+                    >
+                      <span>Start Practice Drill</span>
+                      <ArrowRightIcon className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })()}
+          </section>
+
+          {/* Real Recorded Data Summary Footer */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                Target Score
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-foreground tabular-nums">
+                {profile?.targetScore || 280}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                Active Streak
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-amber-500 tabular-nums">
+                {progressData?.activeStreak ?? 0}d
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                Questions / Week
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums">
+                {progressData?.weeklyQuestionsCount ?? 0}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                Total XP
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
+                {user.xp}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                Leaderboard Rank
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">
+                {rank ? `#${rank}` : "Unranked"}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                Review Queue
+              </span>
+              <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 tabular-nums">
+                {reviewQuestionsCount}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Card 2: Universities Counsellor Quick Link */}
-        <div className="rounded-2xl bg-card border border-border/80 p-5 sm:p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Target Verification
-              </span>
-              <h3 className="font-extrabold text-base text-foreground mt-0.5">
-                Admission Cut-Offs
-              </h3>
-            </div>
-            <Link
-              href="/universities"
-              className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline"
-            >
-              All Universities →
-            </Link>
-          </div>
-
-          <div className="p-4 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
-            <div>
-              <span className="font-bold text-sm text-foreground block">
-                Target Score: {profile?.targetScore || 280} pts
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Compare departmental requirements & screening documents.
-              </span>
-            </div>
-
-            <Link
-              href="/universities"
-              className="px-3 py-1.5 rounded-lg bg-card border border-border text-foreground hover:bg-muted text-xs font-bold transition-all"
-            >
-              Check Cut-Offs
-            </Link>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

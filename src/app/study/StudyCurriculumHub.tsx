@@ -10,8 +10,26 @@ import {
   EXAM_TIMING_STRATEGY,
   NormalizedTopic,
 } from "./study-data";
+import {
+  TargetIcon,
+  ClockIcon,
+  LightbulbIcon,
+  SearchIcon,
+  CheckIcon,
+  CheckCircleIcon,
+  ZapIcon,
+  BookOpenIcon,
+  AlertTriangleIcon,
+  ShieldIcon,
+  StarIcon,
+  XIcon,
+} from "@/components/ui/icons";
 
-export default function StudyCurriculumHub() {
+export interface StudyCurriculumHubProps {
+  onSwitchToMockExam?: () => void;
+}
+
+export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurriculumHubProps = {}) {
   // Navigation / active section state
   const [activeTab, setActiveTab] = useState<
     "streams" | "roadmap" | "syllabus" | "blueprint" | "traps"
@@ -127,8 +145,9 @@ export default function StudyCurriculumHub() {
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-card/80 backdrop-blur-xs border border-border text-muted-foreground shadow-2xs">
               4-Week Structured Sprints
             </span>
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-card/80 backdrop-blur-xs border border-border text-emerald-600 dark:text-emerald-400 shadow-2xs">
-              🎯 300+ Target Score Framework
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-card/80 backdrop-blur-xs border border-border text-emerald-600 dark:text-emerald-400 shadow-2xs inline-flex items-center gap-1.5">
+              <TargetIcon className="w-3.5 h-3.5 text-emerald-500" />
+              <span>300+ Target Score Framework</span>
             </span>
           </div>
 
@@ -232,6 +251,16 @@ export default function StudyCurriculumHub() {
             >
               Examiner Traps Alert
             </button>
+            {onSwitchToMockExam && (
+              <button
+                type="button"
+                onClick={onSwitchToMockExam}
+                className="px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs shadow-emerald-500/20 flex items-center gap-1.5"
+              >
+                <TargetIcon className="w-4 h-4" />
+                <span>Launch CBT Mock Exam</span>
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -283,7 +312,8 @@ export default function StudyCurriculumHub() {
 
                   {/* Daily Study Time Pill */}
                   <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-card border border-border text-muted-foreground">
-                    <span>⏱ Recommended Pace:</span>
+                    <ClockIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Recommended Pace:</span>
                     <span className="text-foreground font-bold">{stream.studyTime}</span>
                   </div>
 
@@ -293,20 +323,39 @@ export default function StudyCurriculumHub() {
                       Core Registered Subjects (UTME Combos):
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                      {stream.subjects.map((sub) => (
-                        <span
-                          key={sub.code}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-card border border-border text-foreground shadow-2xs"
-                        >
-                          <span className="font-bold text-[10px] text-muted-foreground">
-                            {sub.code}
-                          </span>
-                          <span>{sub.name}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            ({sub.questionsCount}Q)
-                          </span>
-                        </span>
-                      ))}
+                      {stream.subjects.map((sub) => {
+                        const subSlug =
+                          sub.code === "ENG"
+                            ? "english"
+                            : sub.code === "MTH"
+                            ? "mathematics"
+                            : sub.code === "PHY"
+                            ? "physics"
+                            : sub.code === "CHM"
+                            ? "chemistry"
+                            : sub.code === "BIO"
+                            ? "biology"
+                            : sub.code === "ECO"
+                            ? "economics"
+                            : sub.name.toLowerCase().replace(/\s+/g, "-");
+
+                        return (
+                          <Link
+                            key={sub.code}
+                            href={`/study?stream=${stream.id}&subject=${subSlug}`}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-card hover:bg-muted border border-border text-foreground shadow-2xs hover:border-blue-500/50 transition-all cursor-pointer"
+                            title={`Explore ${sub.name} JAMB Curriculum & Topics`}
+                          >
+                            <span className="font-bold text-[10px] text-muted-foreground">
+                              {sub.code}
+                            </span>
+                            <span>{sub.name}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              ({sub.questionsCount}Q)
+                            </span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -429,7 +478,8 @@ export default function StudyCurriculumHub() {
               {/* Daily Schedule Breakdown */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                  <span>⏱ Daily 2.5-Hour Breakdown (Week {selectedWeek}):</span>
+                  <ClockIcon className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Daily 2.5-Hour Breakdown (Week {selectedWeek}):</span>
                 </h4>
                 <div className="space-y-2.5">
                   {currentWeekPlan.dailyRoutine.map((block, idx) => (
@@ -456,8 +506,9 @@ export default function StudyCurriculumHub() {
               {/* Interactive Milestone Checklist */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    🎯 Interactive Deliverables Checklist:
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <TargetIcon className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Interactive Deliverables Checklist:</span>
                   </h4>
                   <span className="text-[11px] text-muted-foreground">
                     Click to check off
@@ -516,7 +567,8 @@ export default function StudyCurriculumHub() {
             {/* High-Yield Examiner Tip for the Week */}
             <div className="p-4 rounded-2xl bg-amber-500/8 dark:bg-amber-950/20 border border-amber-500/30 space-y-1.5">
               <span className="text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                <span>💡 High-Yield Examiner Insights for Week {selectedWeek}:</span>
+                <LightbulbIcon className="w-3.5 h-3.5 text-amber-500" />
+                <span>High-Yield Examiner Insights for Week {selectedWeek}:</span>
               </span>
               <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc">
                 {currentWeekPlan.highYieldTips.map((tip, idx) => (
@@ -573,9 +625,10 @@ export default function StudyCurriculumHub() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3.5 top-3.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer px-1.5 py-0.5 rounded-md hover:bg-muted"
+                  className="absolute right-3.5 top-3.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer px-1.5 py-0.5 rounded-md hover:bg-muted flex items-center gap-1"
                 >
-                  ✕ Clear
+                  <XIcon className="w-3.5 h-3.5" />
+                  <span>Clear</span>
                 </button>
               )}
             </div>
@@ -625,7 +678,9 @@ export default function StudyCurriculumHub() {
           <div className="space-y-3">
             {filteredTopics.length === 0 ? (
               <div className="bg-card border border-border rounded-3xl p-12 text-center space-y-3">
-                <span className="text-3xl">🔍</span>
+                <div className="w-12 h-12 mx-auto rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+                  <SearchIcon className="w-6 h-6" />
+                </div>
                 <h3 className="text-lg font-bold text-foreground">No syllabus topics found</h3>
                 <p className="text-xs text-muted-foreground max-w-sm mx-auto">
                   No topics matched your search for &quot;{searchQuery}&quot;. Try searching for general terms like
@@ -671,8 +726,9 @@ export default function StudyCurriculumHub() {
                             </span>
                           )}
                           {isMastered && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              ✓ Mastered
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              <CheckIcon className="w-3 h-3 text-emerald-500" />
+                              <span>Mastered</span>
                             </span>
                           )}
                         </div>
@@ -695,12 +751,17 @@ export default function StudyCurriculumHub() {
                           type="button"
                           onClick={() => toggleMasteredTopic(topic.id)}
                           title={isMastered ? "Mark as needing review" : "Mark as mastered"}
-                          className={`p-2 rounded-xl text-xs border transition-colors cursor-pointer ${isMastered
+                          className={`inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${isMastered
                               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                               : "bg-muted border-border text-muted-foreground hover:text-foreground"
                             }`}
                         >
-                          {isMastered ? "★ Mastered" : "☆ Mark Mastered"}
+                          {isMastered ? (
+                            <CheckIcon className="w-3.5 h-3.5 text-emerald-500" />
+                          ) : (
+                            <StarIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                          )}
+                          <span>{isMastered ? "Mastered" : "Mark Mastered"}</span>
                         </button>
 
                         <button
@@ -722,7 +783,7 @@ export default function StudyCurriculumHub() {
                           title={`Start CBT Drill for ${topic.title}`}
                         >
                           <span>CBT Drill</span>
-                          <span aria-hidden="true">⚡</span>
+                          <ZapIcon className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     </div>
@@ -733,7 +794,8 @@ export default function StudyCurriculumHub() {
                         {/* Objectives List */}
                         <div className="space-y-2">
                           <span className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
-                            <span>🎯 Official JAMB Learning Objectives (Candidates should be able to):</span>
+                            <TargetIcon className="w-3.5 h-3.5 text-blue-500" />
+                            <span>Official JAMB Learning Objectives (Candidates should be able to):</span>
                           </span>
                           <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-muted-foreground">
                             {topic.objectives.map((obj, i) => (
@@ -741,9 +803,7 @@ export default function StudyCurriculumHub() {
                                 key={i}
                                 className="flex items-start gap-2 p-2.5 rounded-xl bg-card border border-border"
                               >
-                                <span className="text-blue-600 dark:text-blue-400 font-bold shrink-0 mt-0.5">
-                                  ✓
-                                </span>
+                                <CheckIcon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 font-bold shrink-0 mt-0.5" />
                                 <span className="leading-relaxed">{obj}</span>
                               </li>
                             ))}
@@ -753,8 +813,9 @@ export default function StudyCurriculumHub() {
                         {/* Contents List */}
                         {topic.contents.length > 0 && (
                           <div className="space-y-2 pt-2">
-                            <span className="text-xs font-bold text-foreground uppercase tracking-wider block">
-                              📚 Detailed Syllabus Content:
+                            <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                              <BookOpenIcon className="w-3.5 h-3.5 text-blue-500" />
+                              <span>Detailed Syllabus Content:</span>
                             </span>
                             <div className="p-3 rounded-xl bg-card border border-border space-y-1">
                               {topic.contents.map((item, idx) => (
@@ -776,7 +837,7 @@ export default function StudyCurriculumHub() {
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white shadow-2xs transition-all hover:scale-[1.02] active:scale-[0.98]"
                           >
                             <span>Launch CBT Drill for {topic.title}</span>
-                            <span aria-hidden="true">⚡</span>
+                            <ZapIcon className="w-3.5 h-3.5" />
                           </Link>
                         </div>
                       </div>
@@ -996,7 +1057,8 @@ export default function StudyCurriculumHub() {
               {/* Examiner Technique */}
               <div className="p-5 rounded-2xl bg-rose-500/5 dark:bg-rose-950/20 border border-rose-500/20 space-y-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
-                  <span>⚠️ How The Examiner Sets The Trap:</span>
+                  <AlertTriangleIcon className="w-3.5 h-3.5 text-rose-500" />
+                  <span>How The Examiner Sets The Trap:</span>
                 </span>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {activeTrap.examinerTechnique}
@@ -1006,7 +1068,8 @@ export default function StudyCurriculumHub() {
               {/* Student Counter-Tactic */}
               <div className="p-5 rounded-2xl bg-emerald-500/5 dark:bg-emerald-950/20 border border-emerald-500/20 space-y-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                  <span>🛡️ Your Winning Counter-Strategy:</span>
+                  <ShieldIcon className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Your Winning Counter-Strategy:</span>
                 </span>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {activeTrap.studentSolution}
@@ -1016,7 +1079,7 @@ export default function StudyCurriculumHub() {
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               <Link
-                href="/revision"
+                href="/dashboard?tab=revision"
                 className="px-4 py-2.5 rounded-xl bg-card border border-border hover:bg-muted text-xs font-bold text-foreground transition-colors"
               >
                 Go to Revision Hub &amp; Flashcards →
@@ -1045,6 +1108,23 @@ export default function StudyCurriculumHub() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
+            {onSwitchToMockExam ? (
+              <button
+                type="button"
+                onClick={onSwitchToMockExam}
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <TargetIcon className="w-4 h-4" />
+                <span>Launch Mock Exam</span>
+              </button>
+            ) : (
+              <Link
+                href="/study?tab=mock-exam"
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-xs transition-all"
+              >
+                Launch Mock Exam
+              </Link>
+            )}
             <Link
               href="/onboarding"
               className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold text-xs shadow-xs transition-all"
@@ -1058,7 +1138,7 @@ export default function StudyCurriculumHub() {
               View Class Timetable
             </Link>
             <Link
-              href="/progress"
+              href="/dashboard?tab=readiness"
               className="px-4 py-2.5 rounded-xl bg-card border border-border hover:bg-muted font-bold text-xs text-foreground transition-colors"
             >
               My Readiness Analytics

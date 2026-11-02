@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ClockIcon } from "@/components/ui/icons";
 import {
   mathematicsSyllabus,
   physicsSyllabus,
@@ -591,8 +592,9 @@ export default async function DepartmentStudyPage({ params }: PageProps) {
             <span className="text-xs font-bold px-3 py-1 rounded-full bg-card border border-border text-foreground shadow-2xs">
               {deptData.targetScore}
             </span>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-card border border-border text-muted-foreground shadow-2xs">
-              ⏱ {deptData.studyTime}
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-card border border-border text-muted-foreground shadow-2xs inline-flex items-center gap-1.5">
+              <ClockIcon className="w-3.5 h-3.5" />
+              <span>{deptData.studyTime}</span>
             </span>
           </div>
 
@@ -855,7 +857,7 @@ export default async function DepartmentStudyPage({ params }: PageProps) {
             Take 15-Min Diagnostic Pre-Test
           </Link>
           <Link
-            href="/progress"
+            href="/dashboard?tab=readiness"
             className="px-4 py-2.5 rounded-xl border border-border bg-card hover:bg-muted font-bold text-xs text-foreground transition-colors text-center"
           >
             My Progress
