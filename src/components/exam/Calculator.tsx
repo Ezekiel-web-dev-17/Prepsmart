@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { XIcon, ArrowLeftIcon } from "@/components/ui/icons";
 
 // Safe BODMAS calculator — no eval(), no Function(), pure state machine
 type CalcOp = "+" | "-" | "×" | "÷" | null;
@@ -149,7 +150,7 @@ export default function Calculator({ onClose }: CalculatorProps) {
             onClick={onClose}
             className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer text-xs"
           >
-            ✕
+            <XIcon className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -194,7 +195,10 @@ export default function Calculator({ onClose }: CalculatorProps) {
           <button type="button" onClick={() => inputOperator("+")} className={`${btnBase} bg-blue-600 hover:bg-blue-700 text-white`}>+</button>
 
           {/* Row 6 */}
-          <button type="button" onClick={handleBackspace} className={`${btnBase} col-span-2 bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25`}>⌫ DEL</button>
+          <button type="button" onClick={handleBackspace} className={`${btnBase} col-span-2 bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25 flex items-center justify-center gap-1`}>
+            <ArrowLeftIcon className="w-3.5 h-3.5" />
+            <span>DEL</span>
+          </button>
           <button type="button" onClick={handleEquals} className={`${btnBase} col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white`}>=</button>
         </div>
       </div>

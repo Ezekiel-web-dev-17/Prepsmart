@@ -5,6 +5,15 @@ import { useRouter } from "next/navigation";
 import { useExam } from "@/context/ExamContext";
 import QuestionGrid from "./QuestionGrid";
 import Calculator from "./Calculator";
+import {
+  ClockIcon,
+  CalculatorIcon,
+  AlertTriangleIcon,
+  FileTextIcon,
+  CheckIcon,
+  XIcon,
+  DiceIcon,
+} from "@/components/ui/icons";
 
 function pad(n: number) {
   return n.toString().padStart(2, "0");
@@ -168,7 +177,7 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
               className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-muted-foreground hover:text-destructive hover:bg-destructive/10 border border-border/80 transition-all cursor-pointer active:scale-95"
               title="Exit and cancel exam simulation"
             >
-              <span className="text-sm leading-none font-bold">✕</span>
+              <XIcon className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Exit Exam</span>
             </button>
             <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
@@ -223,7 +232,11 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
                   : "bg-muted text-foreground border-border"
               }`}
             >
-              <span>{isCritical ? "⚠️" : "⏱"}</span>
+              {isCritical ? (
+                <AlertTriangleIcon className="w-4 h-4 text-rose-500" />
+              ) : (
+                <ClockIcon className="w-4 h-4 text-muted-foreground" />
+              )}
               <span>{formatTime(state.timeRemainingSeconds)}</span>
             </div>
 
@@ -234,7 +247,7 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
               title="Open calculator (BODMAS)"
               className="p-2 rounded-xl bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground transition-all cursor-pointer text-sm"
             >
-              🧮
+              <CalculatorIcon className="w-4 h-4" />
             </button>
 
             {/* Submit */}
@@ -330,7 +343,7 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
                       className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition-all cursor-pointer active:scale-95 shadow-xs flex items-center gap-1.5"
                     >
                       <span>Review & Submit</span>
-                      <span>📝</span>
+                      <FileTextIcon className="w-4 h-4" />
                     </button>
                   ) : (
                     <button
@@ -359,8 +372,16 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
                       : "bg-muted text-muted-foreground border-border hover:text-foreground"
                   }`}
                 >
-                  🎲
-                  <span>{currentIsGuessed ? "Guessed ✓" : "Mark as Guessed"}</span>
+                  <DiceIcon className="w-3.5 h-3.5" />
+                  <span>
+                    {currentIsGuessed ? (
+                      <span className="inline-flex items-center gap-1">
+                        Guessed <CheckIcon className="w-3 h-3" />
+                      </span>
+                    ) : (
+                      "Mark as Guessed"
+                    )}
+                  </span>
                 </button>
               </div>
             </>
@@ -423,7 +444,9 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-card border border-border rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
             <div className="text-center space-y-2">
-              <div className="text-4xl mb-2">📝</div>
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center mx-auto mb-2">
+                <FileTextIcon className="w-6 h-6" />
+              </div>
               <h2 className="text-lg font-black text-foreground">
                 Submit Your Exam?
               </h2>
@@ -440,8 +463,9 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
                 )}{" "}
                 This action cannot be undone.
               </p>
-              <div className="text-xs text-muted-foreground bg-muted rounded-xl p-3">
-                ⏱ Time remaining:{" "}
+              <div className="text-xs text-muted-foreground bg-muted rounded-xl p-3 flex items-center justify-center gap-1.5">
+                <ClockIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Time remaining:</span>
                 <span className="font-black text-foreground tabular-nums">
                   {formatTime(state.timeRemainingSeconds)}
                 </span>
@@ -455,7 +479,7 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
                 className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5 text-left space-y-1"
               >
                 <div className="flex items-center gap-1.5 text-destructive font-bold text-xs">
-                  <span>⚠️</span>
+                  <AlertTriangleIcon className="w-4 h-4 text-destructive shrink-0" />
                   <span>{submitError.title}</span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
@@ -519,7 +543,9 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
       {state.isTimedOut && !state.isComplete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card border border-border rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
-            <div className="text-4xl animate-bounce">⏱️</div>
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mx-auto mb-2 animate-bounce">
+              <ClockIcon className="w-8 h-8" />
+            </div>
             <div className="space-y-1">
               <h2 className="text-lg font-black text-foreground">
                 Time is Up!
@@ -542,7 +568,7 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
                 className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5 text-left space-y-1.5"
               >
                 <div className="flex items-center gap-1.5 text-destructive font-bold text-xs">
-                  <span>⚠️</span>
+                  <AlertTriangleIcon className="w-4 h-4 text-destructive shrink-0" />
                   <span>{submitError.title}</span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
@@ -577,8 +603,8 @@ export default function ExamShell({ onSubmitSuccess }: ExamShellProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="bg-card border border-border rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
             <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto text-2xl font-black mb-1">
-                ⚠️
+              <div className="w-12 h-12 rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-1">
+                <AlertTriangleIcon className="w-6 h-6 text-destructive" />
               </div>
               <h2 className="text-lg font-black text-foreground">
                 Exit Mock Exam?

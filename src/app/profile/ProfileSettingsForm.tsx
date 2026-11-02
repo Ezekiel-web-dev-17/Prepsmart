@@ -4,6 +4,14 @@ import React, { useState } from "react";
 import { updateProfileSettingsAction } from "@/actions/profile";
 import { useGamification } from "@/components/gamification/XPToast";
 import type { Department } from "@/actions/profile";
+import {
+  CheckIcon,
+  AlertTriangleIcon,
+  SparklesIcon,
+  BeakerIcon,
+  BriefcaseIcon,
+  PaletteIcon,
+} from "@/components/ui/icons";
 
 export interface ProfileSettingsFormProps {
   initialData: {
@@ -104,7 +112,7 @@ export function ProfileSettingsForm({
       if (res.success) {
         setStatusMessage({
           type: "success",
-          text: "Profile & academic settings updated successfully! ✨",
+          text: "Profile & academic settings updated successfully!",
         });
         triggerXPToast({
           points: 10,
@@ -170,34 +178,48 @@ export function ProfileSettingsForm({
             const isSelected = department === dept;
             const label =
               dept === "SCIENCE"
-                ? "Science 🔬"
+                ? "Science"
                 : dept === "COMMERCIAL"
-                ? "Commercial 📊"
-                : "Arts & Humanities 🎨";
+                ? "Commercial"
+                : "Arts & Humanities";
             const desc =
               dept === "SCIENCE"
                 ? "Engineering, Medicine, Computing, Sciences"
                 : dept === "COMMERCIAL"
                 ? "Accounting, Business, Finance, Economics"
                 : "Law, Mass Communication, Arts, Languages";
+            const DeptIcon =
+              dept === "SCIENCE"
+                ? BeakerIcon
+                : dept === "COMMERCIAL"
+                ? BriefcaseIcon
+                : PaletteIcon;
 
             return (
               <button
                 key={dept}
                 type="button"
                 onClick={() => handleDepartmentChange(dept)}
-                className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer ${
-                  isSelected
-                    ? "bg-blue-500/15 border-blue-500 dark:border-blue-400 shadow-sm"
-                    : "bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/10 hover:border-blue-400/30"
-                }`}
+                className={`
+                  p-4 rounded-2xl text-left border transition-all duration-200 cursor-pointer
+                  ${
+                    isSelected
+                      ? "bg-blue-500/10 border-blue-500 ring-2 ring-blue-500/20 shadow-xs"
+                      : "bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/10 hover:border-blue-400/30"
+                  }
+                `}
               >
-                <span className="font-extrabold text-sm block text-[#1D1D1F] dark:text-[#F5F5F7]">
-                  {label}
-                </span>
-                <span className="text-[11px] text-neutral-500 dark:text-neutral-400 block mt-1 leading-snug">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                    <DeptIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <h4 className="font-extrabold text-sm text-neutral-900 dark:text-neutral-100">
+                    {label}
+                  </h4>
+                </div>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
                   {desc}
-                </span>
+                </p>
               </button>
             );
           })}
@@ -306,10 +328,10 @@ export function ProfileSettingsForm({
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { id: "morning", label: "Morning 🌅" },
-              { id: "afternoon", label: "Noon ☀️" },
-              { id: "evening", label: "Evening 🌆" },
-              { id: "night", label: "Night 🌙" },
+              { id: "morning", label: "Morning" },
+              { id: "afternoon", label: "Noon" },
+              { id: "evening", label: "Evening" },
+              { id: "night", label: "Night" },
             ].map((slot) => (
               <button
                 key={slot.id}
@@ -337,7 +359,11 @@ export function ProfileSettingsForm({
               : "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300"
           }`}
         >
-          <span>{statusMessage.type === "success" ? "✓" : "⚠️"}</span>
+          {statusMessage.type === "success" ? (
+            <CheckIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          ) : (
+            <AlertTriangleIcon className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+          )}
           <span>{statusMessage.text}</span>
         </div>
       )}
@@ -358,7 +384,7 @@ export function ProfileSettingsForm({
             disabled:opacity-50 cursor-pointer
           "
         >
-          {isSaving ? "Saving Settings..." : "Save Profile Settings ✨"}
+          {isSaving ? "Saving Settings..." : "Save Profile Settings"}
         </button>
       </div>
     </form>

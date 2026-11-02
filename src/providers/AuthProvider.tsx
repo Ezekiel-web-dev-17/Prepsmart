@@ -10,7 +10,7 @@ import {
 const IS_CLERK_ENABLED =
   process.env.NEXT_PUBLIC_CLERK_ENABLED !== "false" &&
   Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
-  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("placeholder");
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes("placeholder");
 
 interface AuthContextValue {
   isSignedIn: boolean;

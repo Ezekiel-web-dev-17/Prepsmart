@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DrillInterface, { type DrillQuestion } from "./DrillInterface";
+import { BookOpenIcon } from "@/components/ui/icons";
 
 type Props = {
   params: Promise<{ subject: string }>;
@@ -216,8 +217,8 @@ export default async function QuizSubjectPage({
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative w-full max-w-xl rounded-3xl bg-card/80 dark:bg-card/65 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-8 sm:p-12 text-center shadow-2xl space-y-6 animate-in fade-in-50 zoom-in-95 duration-300">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-500/10 border border-blue-500/20 text-3xl shadow-inner">
-            📚
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-500/10 border border-blue-500/20 shadow-inner">
+            <BookOpenIcon className="w-10 h-10 text-blue-500" />
           </div>
 
           <div className="space-y-3">

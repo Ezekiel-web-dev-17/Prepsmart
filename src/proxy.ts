@@ -9,7 +9,7 @@ import {
 const IS_CLERK_ENABLED =
   process.env.NEXT_PUBLIC_CLERK_ENABLED !== "false" &&
   Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
-  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("placeholder");
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes("placeholder");
 
 // Secure-by-Design: Explicit CORS origin whitelist (No wildcard allowed)
 const ALLOWED_ORIGINS = new Set([
@@ -244,7 +244,9 @@ async function handleCommonMiddleware(
 export default IS_CLERK_ENABLED
   ? clerkMiddleware(async (auth, req) => {
       const { userId } = await auth();
-      return handleCommonMiddleware(req, userId, () => auth.protect());
+      return handleCommonMiddleware(req, userId, async () => {
+        await auth.protect();
+      });
     })
   : async function proxy(req: NextRequest) {
       return handleCommonMiddleware(req, "demo-user-1");

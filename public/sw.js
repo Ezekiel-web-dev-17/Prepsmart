@@ -12,7 +12,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("push", (event) => {
   let data = {
-    title: "PrepSmart Study Reminder 🔥",
+    title: "PrepSmart Study Reminder",
     body: "Keep your streak alive! 10 minutes of high-yield practice awaits.",
     icon: "/favicon.ico",
     badge: "/favicon.ico",

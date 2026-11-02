@@ -3,6 +3,15 @@
 import { useEffect, useState, useCallback, createContext, useContext } from "react";
 import type { XpEventType } from "@/lib/gamification";
 import { getRandomMotivation } from "./MotivationToast";
+import {
+  ZapIcon,
+  TrophyIcon,
+  FlameIcon,
+  TargetIcon,
+  StarIcon,
+  SparklesIcon,
+  XIcon,
+} from "@/components/ui/icons";
 
 export interface XPToastEvent {
   id: string;
@@ -104,31 +113,34 @@ export function GamificationProvider({
   );
 }
 
-const EVENT_LABELS: Record<XpEventType, { title: string; subtitle: string; icon: string }> = {
+const EVENT_LABELS: Record<
+  XpEventType,
+  { title: string; subtitle: string; icon: (props: { className?: string }) => React.JSX.Element }
+> = {
   QUESTION_ANSWERED: {
     title: "Correct Answer!",
     subtitle: "Speed & accuracy bonus awarded",
-    icon: "⚡",
+    icon: ZapIcon,
   },
   TOPIC_COMPLETED: {
     title: "Topic Mastered!",
     subtitle: "Syllabus progress unlocked",
-    icon: "🏆",
+    icon: TrophyIcon,
   },
   DAILY_STREAK: {
     title: "Streak Kept Alive!",
     subtitle: "Consistency bonus earned",
-    icon: "🔥",
+    icon: FlameIcon,
   },
   DIAGNOSTIC_COMPLETED: {
     title: "Diagnostic Completed!",
     subtitle: "Readiness benchmark established",
-    icon: "🎯",
+    icon: TargetIcon,
   },
   MOCK_EXAM_COMPLETED: {
     title: "Mock Exam Completed!",
     subtitle: "High-yield simulation bonus",
-    icon: "⭐",
+    icon: StarIcon,
   },
 };
 
@@ -147,8 +159,9 @@ function XPToastContainer({
         const meta = EVENT_LABELS[toast.eventType] || {
           title: "XP Earned!",
           subtitle: "Keep up the momentum",
-          icon: "✨",
+          icon: SparklesIcon,
         };
+        const IconComponent = meta.icon;
 
         return (
           <div
@@ -161,7 +174,7 @@ function XPToastContainer({
             <div className="flex items-start gap-3.5">
               {/* Badge Icon */}
               <div className="w-11 h-11 rounded-xl bg-linear-to-br from-amber-400 to-amber-600 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md shadow-amber-500/30">
-                {meta.icon}
+                <IconComponent className="w-6 h-6 text-white" />
               </div>
 
               {/* Text Information */}
@@ -175,7 +188,7 @@ function XPToastContainer({
                     onClick={() => onDismiss(toast.id)}
                     className="text-muted-foreground hover:text-foreground text-xs p-1"
                   >
-                    ✕
+                    <XIcon className="w-3.5 h-3.5" />
                   </button>
                 </div>
 

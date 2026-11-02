@@ -5,6 +5,7 @@ import { connection } from "next/server";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { getExamResult } from "@/lib/exam";
+import { TargetIcon, LightbulbIcon, CheckIcon, DiceIcon } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
   title: "Mock Exam Scorecard & Performance Analysis | PrepSmart",
@@ -77,7 +78,7 @@ async function ResultContent({ params }: ResultPageProps) {
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
-              {passed ? "Mastery in Motion! 🎉" : "Great Practice Attempt! Every Step Builds Confidence 🚀"}
+              {passed ? "Mastery in Motion!" : "Great Practice Attempt! Every Step Builds Confidence"}
             </h1>
 
             <p className="text-xs sm:text-sm text-blue-100/80 max-w-lg leading-relaxed">
@@ -86,14 +87,14 @@ async function ResultContent({ params }: ResultPageProps) {
 
             <div className="pt-2 flex flex-wrap gap-3 justify-center md:justify-start">
               <Link
-                href="/revision"
+                href="/dashboard?tab=revision"
                 className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/25 transition-all flex items-center gap-1.5"
               >
-                <span>🎯</span>
+                <TargetIcon className="w-4 h-4" />
                 <span>Open Revision Hub</span>
               </Link>
               <Link
-                href="/mock-exam"
+                href="/study?tab=mock-exam"
                 className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-md shadow-blue-500/25 transition-all"
               >
                 Take Another Mock Exam
@@ -198,13 +199,24 @@ async function ResultContent({ params }: ResultPageProps) {
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`px-2.5 py-1 rounded-xl text-xs font-black ${
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-black ${
                       q.isCorrect
                         ? "bg-emerald-600 text-white"
                         : "bg-amber-500 text-slate-950 font-black"
                     }`}
                   >
-                    Question {idx + 1} • {q.isCorrect ? "Mastered ✓" : "Needs Practice 💡"}
+                    <span>Question {idx + 1} • </span>
+                    {q.isCorrect ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span>Mastered</span>
+                        <CheckIcon className="w-3.5 h-3.5" />
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1">
+                        <span>Needs Practice</span>
+                        <LightbulbIcon className="w-3.5 h-3.5" />
+                      </span>
+                    )}
                   </span>
                   <span className="text-xs font-bold text-muted-foreground">
                     {q.subject}
@@ -215,8 +227,9 @@ async function ResultContent({ params }: ResultPageProps) {
                 </div>
 
                 {q.wasGuessed && (
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-600 border border-purple-500/20">
-                    🎲 Marked as Guessed
+                  <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-600 border border-purple-500/20">
+                    <DiceIcon className="w-3 h-3" />
+                    <span>Marked as Guessed</span>
                   </span>
                 )}
               </div>
@@ -256,8 +269,8 @@ async function ResultContent({ params }: ResultPageProps) {
               {/* Examiner Solution */}
               <div className="rounded-2xl bg-muted/50 p-4 border border-border/80 text-xs space-y-1.5">
                 <div className="font-bold text-foreground flex items-center gap-1.5">
-                  <span>💡</span>
-                  <span>Examiner Solution & Concept:</span>
+                  <LightbulbIcon className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>Examiner Solution &amp; Concept:</span>
                   <span className="text-blue-600 dark:text-blue-400 font-extrabold">{q.concept}</span>
                 </div>
                 <p className="text-muted-foreground leading-relaxed">

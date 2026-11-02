@@ -1,20 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { SparklesIcon, XIcon } from "@/components/ui/icons";
 
 export const MOTIVATION_MESSAGES = [
-  "Way to go! 🚀",
-  "I knew you could do it! 🌟",
-  "Keep practicing, mastery is loading! 🧠",
-  "You're on fire! 🔥",
-  "Genius at work! ✨",
-  "One step closer to your target score! 🎯",
-  "Consistency beats talent every single day! 💪",
-  "Unstoppable momentum! ⚡",
-  "Future university scholar in the making! 🎓",
-  "Examiner traps don't stand a chance against you! 🛡️",
-  "Crushing milestones like a pro! 🏆",
-  "Sharp focus, real progress! 📈",
+  "Way to go!",
+  "I knew you could do it!",
+  "Keep practicing, mastery is loading!",
+  "You're on fire!",
+  "Genius at work!",
+  "One step closer to your target score!",
+  "Consistency beats talent every single day!",
+  "Unstoppable momentum!",
+  "Future university scholar in the making!",
+  "Examiner traps don't stand a chance against you!",
+  "Crushing milestones like a pro!",
+  "Sharp focus, real progress!",
 ];
 
 export function getRandomMotivation(): string {
@@ -51,8 +52,8 @@ export default function MotivationToast({
   return (
     <div className="fixed top-20 right-6 z-50 pointer-events-auto transition-all animate-bounce-short">
       <div className="rounded-2xl bg-card/95 backdrop-blur-md border border-amber-500/40 p-4 shadow-xl shadow-amber-500/10 flex items-center gap-3.5 max-w-sm">
-        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-amber-400 via-amber-500 to-yellow-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md shadow-amber-500/30">
-          🎉
+        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-amber-400 via-amber-500 to-yellow-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/30">
+          <SparklesIcon className="w-5 h-5 text-white" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -75,7 +76,7 @@ export default function MotivationToast({
           }}
           className="text-muted-foreground hover:text-foreground text-xs p-1"
         >
-          ✕
+          <XIcon className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>

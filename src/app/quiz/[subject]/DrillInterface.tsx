@@ -4,6 +4,19 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { awardUserXPAction } from "@/actions/gamification";
 import { useGamification } from "@/components/gamification/XPToast";
+import {
+  TrophyIcon,
+  TargetIcon,
+  RefreshCwIcon,
+  ZapIcon,
+  LightbulbIcon,
+  ClockIcon,
+  EyeIcon,
+  CheckIcon,
+  SparklesIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+} from "@/components/ui/icons";
 
 export interface DrillOption {
   id: string; // "A" | "B" | "C" | "D"
@@ -114,7 +127,7 @@ export default function DrillInterface({
       triggerXPToast({
         points: 5,
         eventType: "QUESTION_ANSWERED",
-        message: "Conceptual Precision! +5 XP 🎯",
+        message: "Conceptual Precision! +5 XP",
       });
       if (userId) {
         awardUserXPAction(userId, "QUESTION_ANSWERED").catch(() => {});
@@ -142,7 +155,7 @@ export default function DrillInterface({
     triggerXPToast({
       points: 50,
       eventType: "TOPIC_COMPLETED",
-      message: "CBT Drill Completed! +50 XP 🏆",
+      message: "CBT Drill Completed! +50 XP",
     });
     if (userId) {
       awardUserXPAction(userId, "TOPIC_COMPLETED").catch(() => {});
@@ -176,8 +189,8 @@ export default function DrillInterface({
 
         {/* Celebratory Hero Card - Apple Liquid Glass */}
         <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-card/60 backdrop-blur-2xl border border-white/20 dark:border-white/10 p-6 sm:p-10 shadow-2xl text-center space-y-6">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-tr from-amber-400/20 via-blue-500/20 to-emerald-400/20 border border-white/30 dark:border-white/10 shadow-inner text-4xl animate-bounce-short">
-            🏆
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-tr from-amber-400/20 via-blue-500/20 to-emerald-400/20 border border-white/30 dark:border-white/10 shadow-inner animate-bounce-short">
+            <TrophyIcon className="w-10 h-10 text-amber-500" />
           </div>
 
           <div className="space-y-2">
@@ -187,8 +200,8 @@ export default function DrillInterface({
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
               {isHighMastery
-                ? "Drill Completed! Exceptional Mastery! 🎉"
-                : "Drill Completed! Tremendous Effort! 🌟"}
+                ? "Drill Completed! Exceptional Mastery!"
+                : "Drill Completed! Tremendous Effort!"}
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
               {isHighMastery
@@ -264,16 +277,18 @@ export default function DrillInterface({
                 setCurrentIndex(0);
                 setIsCompleted(false);
               }}
-              className="px-5 py-3 rounded-2xl bg-card hover:bg-muted text-foreground text-xs sm:text-sm font-bold border border-border shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="px-5 py-3 rounded-2xl bg-card hover:bg-muted text-foreground text-xs sm:text-sm font-bold border border-border shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
-              🔄 Practice Drill Again
+              <RefreshCwIcon className="w-4 h-4" />
+              <span>Practice Drill Again</span>
             </button>
 
             <Link
-              href="/mock-exam"
-              className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              href="/study?tab=mock-exam"
+              className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
-              ⚡ Take Full CBT Mock Exam →
+              <span>Take Full CBT Mock Exam</span>
+              <ArrowRightIcon className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -350,13 +365,23 @@ export default function DrillInterface({
                     </div>
 
                     <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
+                      className={`text-xs font-bold px-2.5 py-1 rounded-full border inline-flex items-center gap-1 ${
                         isCorrect
                           ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                           : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                       }`}
                     >
-                      {isCorrect ? "✓ Mastered" : "💡 Learning Step"}
+                      {isCorrect ? (
+                        <>
+                          <CheckIcon className="w-3.5 h-3.5" />
+                          <span>Mastered</span>
+                        </>
+                      ) : (
+                        <>
+                          <LightbulbIcon className="w-3.5 h-3.5" />
+                          <span>Learning Step</span>
+                        </>
+                      )}
                     </span>
                   </div>
 
@@ -407,7 +432,8 @@ export default function DrillInterface({
                   {q.explanation && (
                     <div className="p-3.5 rounded-xl bg-blue-500/5 dark:bg-blue-950/20 border border-blue-500/20 text-xs space-y-1">
                       <div className="font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
-                        <span>💡 Examiner Step-by-Step Solution:</span>
+                        <LightbulbIcon className="w-4 h-4 text-blue-500 shrink-0" />
+                        <span>Examiner Step-by-Step Solution:</span>
                       </div>
                       <p className="text-muted-foreground leading-relaxed">
                         {q.explanation}
@@ -445,7 +471,7 @@ export default function DrillInterface({
             href="/study"
             className="px-3 py-1.5 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted border border-border/80 transition-colors flex items-center gap-1 cursor-pointer"
           >
-            <span>←</span>
+            <ArrowLeftIcon className="w-3.5 h-3.5" />
             <span>Study Hub</span>
           </Link>
 
@@ -460,8 +486,9 @@ export default function DrillInterface({
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="px-3 py-1 rounded-xl bg-muted/60 border border-border/80 text-xs font-bold text-foreground">
-            ⏱️ {formatDuration(elapsedSeconds)}
+          <div className="px-3 py-1 rounded-xl bg-muted/60 border border-border/80 text-xs font-bold text-foreground flex items-center gap-1.5">
+            <ClockIcon className="w-3.5 h-3.5 text-muted-foreground" />
+            <span>{formatDuration(elapsedSeconds)}</span>
           </div>
 
           <button
@@ -474,7 +501,8 @@ export default function DrillInterface({
                 : "bg-muted/50 hover:bg-muted border-border/80 text-muted-foreground hover:text-foreground"
             }`}
           >
-            <span>{focusMode ? "✨ Focus On" : "👓 Focus Mode"}</span>
+            <EyeIcon className="w-3.5 h-3.5" />
+            <span>{focusMode ? "Focus On" : "Focus Mode"}</span>
           </button>
         </div>
       </header>
@@ -508,13 +536,23 @@ export default function DrillInterface({
 
             {currentAnswer?.isChecked && (
               <span
-                className={`text-xs font-extrabold px-3 py-1 rounded-full border animate-in fade-in-50 duration-200 flex items-center gap-1.5 ${
+                className={`text-xs font-extrabold px-3 py-1 rounded-full border animate-in fade-in-50 duration-200 inline-flex items-center gap-1.5 ${
                   currentAnswer.isCorrect
                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
                     : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
                 }`}
               >
-                <span>{currentAnswer.isCorrect ? "✓ Mastered" : "💡 Learning Step"}</span>
+                {currentAnswer.isCorrect ? (
+                  <>
+                    <CheckIcon className="w-3.5 h-3.5" />
+                    <span>Mastered</span>
+                  </>
+                ) : (
+                  <>
+                    <LightbulbIcon className="w-3.5 h-3.5" />
+                    <span>Learning Step</span>
+                  </>
+                )}
               </span>
             )}
           </div>
@@ -565,7 +603,11 @@ export default function DrillInterface({
                 <span
                   className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${circleStyles}`}
                 >
-                  {isChecked && isCorrectOption ? "✓" : option.id}
+                  {isChecked && isCorrectOption ? (
+                    <CheckIcon className="w-4 h-4" />
+                  ) : (
+                    option.id
+                  )}
                 </span>
 
                 <span className="text-sm sm:text-base font-medium flex-1">
@@ -592,13 +634,17 @@ export default function DrillInterface({
             }`}
           >
             <div className="flex items-center gap-2">
-              <span className="text-xl">
-                {currentAnswer.isCorrect ? "🎯" : "💡"}
-              </span>
+              <div className="shrink-0">
+                {currentAnswer.isCorrect ? (
+                  <TargetIcon className="w-5 h-5 text-emerald-500" />
+                ) : (
+                  <LightbulbIcon className="w-5 h-5 text-amber-500" />
+                )}
+              </div>
               <h3 className="font-extrabold text-sm sm:text-base">
                 {currentAnswer.isCorrect
-                  ? "Outstanding! That's precisely right! ✨"
-                  : `Not quite! The correct answer is Option ${currentQ.correctOption}. Keep going! 💡`}
+                  ? "Outstanding! That's precisely right!"
+                  : `Not quite! The correct answer is Option ${currentQ.correctOption}. Keep going!`}
               </h3>
             </div>
 

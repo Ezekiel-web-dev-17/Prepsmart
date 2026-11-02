@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
+import { AlertTriangleIcon } from "@/components/ui/icons";
 
 export interface ErrorBoundaryFallbackProps {
   error: Error & { digest?: string };
@@ -73,8 +74,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       // Default clean fallback UI matching Next.js styling
       return (
         <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-center space-y-4">
-          <div className="w-12 h-12 mx-auto rounded-xl bg-destructive/10 text-destructive flex items-center justify-center text-xl">
-            ⚠️
+          <div className="w-12 h-12 mx-auto rounded-xl bg-destructive/10 text-destructive flex items-center justify-center">
+            <AlertTriangleIcon className="w-6 h-6 text-destructive" />
           </div>
           <div className="space-y-1">
             <h3 className="text-base font-bold text-foreground">Let&apos;s Get You Back on Track!</h3>

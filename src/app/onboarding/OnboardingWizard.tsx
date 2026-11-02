@@ -5,23 +5,34 @@ import { useRouter } from "next/navigation";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useGamification } from "@/components/gamification/XPToast";
 import { saveOnboardingProfile } from "@/actions/onboarding";
+import {
+  BeakerIcon,
+  BriefcaseIcon,
+  PaletteIcon,
+  FlameIcon,
+  TargetIcon,
+  CheckIcon,
+  ClockIcon,
+  GiftIcon,
+  RocketIcon,
+} from "@/components/ui/icons";
 
 const STREAMS_CONFIG = {
   science: {
     label: "Science Stream",
-    icon: "🔬",
+    icon: BeakerIcon,
     description: "Medicine, Engineering, Computing, Pharmacy & Pure Sciences",
     defaultSubjects: ["Use of English", "Mathematics", "Physics", "Chemistry"],
   },
   commercial: {
     label: "Commercial Stream",
-    icon: "📊",
+    icon: BriefcaseIcon,
     description: "Accounting, Economics, Business Admin, Banking & Finance",
     defaultSubjects: ["Use of English", "Mathematics", "Economics", "Principles of Accounts"],
   },
   arts: {
     label: "Arts & Humanities",
-    icon: "🎨",
+    icon: PaletteIcon,
     description: "Law, Mass Communication, Literature, Linguistics & Political Science",
     defaultSubjects: ["Use of English", "Literature in English", "Government", "CRS/IRS"],
   },
@@ -95,7 +106,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
       const success = await subscribeToPush();
       setPushOptIn(success);
       if (success) {
-        sendTestNotification("Duolingo-style Streak Enabled 🔥", "You'll receive lesson reminders!");
+        sendTestNotification("Duolingo-style Streak Enabled", "You'll receive lesson reminders!");
       }
     } else {
       setPushOptIn(false);
@@ -177,10 +188,10 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
                 </span>
                 <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
                   {targetScore >= 300
-                    ? "🌟 Top 1% Competitive (Medicine / Software / Top Law)"
+                    ? "Top 1% Competitive (Medicine / Software / Top Law)"
                     : targetScore >= 250
-                    ? "🚀 Highly Competitive (Engineering / Pharmacy / Finance)"
-                    : "🎯 Standard Admission Target"}
+                    ? "Highly Competitive (Engineering / Pharmacy / Finance)"
+                    : "Standard Admission Target"}
                 </p>
               </div>
 
@@ -238,6 +249,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {(Object.keys(STREAMS_CONFIG) as Array<keyof typeof STREAMS_CONFIG>).map((key) => {
                 const conf = STREAMS_CONFIG[key];
+                const StreamIcon = conf.icon;
                 const isSelected = stream === key;
 
                 return (
@@ -251,7 +263,9 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
                         : "border-border bg-card hover:bg-muted/50"
                     }`}
                   >
-                    <span className="text-2xl mb-1 block">{conf.icon}</span>
+                    <span className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2">
+                      <StreamIcon className="w-4 h-4" />
+                    </span>
                     <h4 className="font-extrabold text-sm text-foreground">{conf.label}</h4>
                     <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 leading-tight">
                       {conf.description}
@@ -370,10 +384,10 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
               </label>
               <div className="grid grid-cols-4 gap-2">
                 {[
-                  { id: "morning", label: "Morning 🌅" },
-                  { id: "afternoon", label: "Afternoon ☀️" },
-                  { id: "evening", label: "Evening 🌆" },
-                  { id: "night", label: "Late Night 🌙" },
+                  { id: "morning", label: "Morning" },
+                  { id: "afternoon", label: "Afternoon" },
+                  { id: "evening", label: "Evening" },
+                  { id: "night", label: "Late Night" },
                 ].map((time) => (
                   <button
                     key={time.id}
@@ -412,7 +426,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
             {/* Duolingo Streak Box */}
             <div className="p-6 rounded-2xl bg-linear-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
               <div className="flex items-center gap-3">
-                <span className="text-3xl">🔥</span>
+                <FlameIcon className="w-8 h-8 text-amber-500 shrink-0" />
                 <div>
                   <h4 className="font-extrabold text-base text-foreground">
                     PrepSmart Streak Guardian
@@ -426,7 +440,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
 
               <div className="flex items-center justify-between p-3.5 rounded-xl bg-card border border-border">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-lg">🔔</span>
+                  <ClockIcon className="w-4 h-4 text-blue-500" />
                   <div className="text-xs font-bold text-foreground">
                     Enable Daily Push Notifications
                   </div>
@@ -441,7 +455,14 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
                       : "bg-blue-600 hover:bg-blue-700 text-white"
                   }`}
                 >
-                  {pushOptIn ? "Subscribed ✓" : "Allow Reminders"}
+                  {pushOptIn ? (
+                    <span className="inline-flex items-center gap-1">
+                      <span>Subscribed</span>
+                      <CheckIcon className="w-3.5 h-3.5" />
+                    </span>
+                  ) : (
+                    "Allow Reminders"
+                  )}
                 </button>
               </div>
 
@@ -462,7 +483,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
             {/* Bonus Reward Teaser */}
             <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 flex items-center justify-between">
               <div className="flex items-center gap-2.5 text-xs text-blue-900 dark:text-blue-200">
-                <span className="text-lg">🎁</span>
+                <GiftIcon className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>
                   Completing onboarding unlocks <strong>+100 Gamification XP</strong>!
                 </span>
@@ -501,7 +522,8 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
               onClick={handleSubmit}
               className="px-6 py-2.5 rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-blue-700 hover:opacity-95 text-white text-xs font-extrabold shadow-md shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
             >
-              {isSaving ? "Finalizing Plan..." : "Complete & Enter Dashboard 🚀"}
+              <span>{isSaving ? "Finalizing Plan..." : "Complete & Enter Dashboard"}</span>
+              <RocketIcon className="w-4 h-4" />
             </button>
           )}
         </div>

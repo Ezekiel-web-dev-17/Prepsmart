@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ExamProvider } from "@/context/ExamContext";
 import ExamShell from "@/components/exam/ExamShell";
 import type { ExamSessionClientData } from "@/lib/exam";
+import { CheckIcon, AlertTriangleIcon, RocketIcon } from "@/components/ui/icons";
 
 const ALL_AVAILABLE_SUBJECTS = [
   "Use of English",
@@ -31,9 +32,13 @@ const ACTIVE_QUESTION_BANK_SUBJECTS = new Set([
 
 interface MockExamClientProps {
   userSubjects: string[];
+  isAuthenticated?: boolean;
 }
 
-export default function MockExamClient({ userSubjects }: MockExamClientProps) {
+export default function MockExamClient({
+  userSubjects,
+  isAuthenticated = true,
+}: MockExamClientProps) {
   const router = useRouter();
   const [examSession, setExamSession] = useState<ExamSessionClientData | null>(null);
 
@@ -89,6 +94,11 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
   };
 
   const handleStartExam = async () => {
+    if (!isAuthenticated) {
+      router.push("/sign-in");
+      return;
+    }
+
     if (selectedSubjects.length < 1 || selectedSubjects.length > 4) {
       setErrorMessage("Please select between 1 and 4 subjects.");
       return;
@@ -304,27 +314,28 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
         {/* Features Checklist */}
         <div className="border-t border-border/60 pt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <CheckIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span>Real-time countdown timer with auto-submit on timeout</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <CheckIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span>Keyboard-accessible scientific BODMAS calculator</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <CheckIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span>10-column status navigation grid (Gray / Yellow / Green)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <CheckIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span>Guess-marking feature to unlock AI diagnostic breakdown</span>
           </div>
         </div>
 
         {/* Error message */}
         {errorMessage && (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive font-semibold">
-            ⚠️ {errorMessage}
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive font-semibold flex items-center gap-1.5">
+            <AlertTriangleIcon className="w-4 h-4 text-destructive shrink-0" />
+            <span>{errorMessage}</span>
           </div>
         )}
 
@@ -351,7 +362,7 @@ export default function MockExamClient({ userSubjects }: MockExamClientProps) {
             ) : (
               <>
                 <span>Start Simulation ({selectedSubjects.length} Subject{selectedSubjects.length !== 1 ? "s" : ""} • {durationMins}m)</span>
-                <span>🚀</span>
+                <RocketIcon className="w-4 h-4" />
               </>
             )}
           </button>

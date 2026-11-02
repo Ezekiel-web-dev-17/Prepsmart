@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { CAREERS_DATA, CAREER_FACULTIES, type Career } from "@/data/careers";
+import { LightbulbIcon, XIcon } from "@/components/ui/icons";
 
 export default function CareersPage() {
   const [selectedFaculty, setSelectedFaculty] = useState<string>("All Disciplines");
@@ -180,7 +181,7 @@ export default function CareersPage() {
                 className="absolute right-3 top-2.5 text-xs text-muted-foreground hover:text-foreground p-1"
                 aria-label="Clear search"
               >
-                ✕
+                <XIcon className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -355,7 +356,7 @@ export default function CareersPage() {
       <section className="bg-card border border-blue-200 dark:border-blue-900/60 rounded-3xl p-6 sm:p-8 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-            💡
+            <LightbulbIcon className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-extrabold text-foreground">
@@ -418,7 +419,7 @@ export default function CareersPage() {
                 className="w-8 h-8 rounded-full bg-muted text-foreground flex items-center justify-center hover:bg-muted/80 text-sm font-bold"
                 aria-label="Close dialog"
               >
-                ✕
+                <XIcon className="w-4 h-4" />
               </button>
             </div>
 

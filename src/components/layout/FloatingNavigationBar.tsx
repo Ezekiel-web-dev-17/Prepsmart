@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { FlameIcon } from "@/components/ui/icons";
 
 export interface NavItem {
   id: string;
@@ -42,7 +43,7 @@ export function FloatingNavigationBar({
     },
     {
       id: "courses",
-      label: "Courses",
+      label: "Study",
       href: "/study",
       icon: (props) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -53,21 +54,9 @@ export function FloatingNavigationBar({
       ),
     },
     {
-      id: "revision",
-      label: "Revision",
-      href: "/revision",
-      badge: "3 Due",
-      icon: (props) => (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-          <path d="m12 14 4-4" />
-          <path d="M3.34 19a10 10 0 1 1 17.32 0" />
-        </svg>
-      ),
-    },
-    {
       id: "mock-exam",
       label: "Mock Exam",
-      href: "/mock-exam",
+      href: "/study?tab=mock-exam",
       icon: (props) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -79,9 +68,21 @@ export function FloatingNavigationBar({
       ),
     },
     {
+      id: "revision",
+      label: "Revision",
+      href: "/dashboard?tab=revision",
+      badge: "Due",
+      icon: (props) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+          <path d="m12 14 4-4" />
+          <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+        </svg>
+      ),
+    },
+    {
       id: "progress",
-      label: "Analytics",
-      href: "/progress",
+      label: "Readiness",
+      href: "/dashboard?tab=readiness",
       icon: (props) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
           <path d="M3 3v18h18" />
@@ -163,7 +164,7 @@ export function FloatingNavigationBar({
           className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 text-xs font-medium shrink-0"
           title={`${userStreakCount} Day Active Study Streak`}
         >
-          <span className="animate-pulse">🔥</span>
+          <FlameIcon className="w-3.5 h-3.5 text-amber-500 shrink-0 animate-pulse" />
           <span className="font-semibold">{userStreakCount}d</span>
         </div>
 
