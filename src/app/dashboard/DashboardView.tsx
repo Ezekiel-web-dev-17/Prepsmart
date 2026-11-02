@@ -100,8 +100,8 @@ export default function DashboardView({
     profile?.departmentStream === "science"
       ? "Science Stream 🔬"
       : profile?.departmentStream === "commercial"
-      ? "Commercial Stream 📊"
-      : "Arts Stream 🎨";
+        ? "Commercial Stream 📊"
+        : "Arts Stream 🎨";
 
   return (
     <div className="space-y-8 pb-16">
@@ -197,17 +197,16 @@ export default function DashboardView({
             type="button"
             disabled={hasClaimedToday || isClaimingDaily}
             onClick={handleClaimStreak}
-            className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              hasClaimedToday
+            className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${hasClaimedToday
                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-default"
                 : "bg-amber-500 hover:bg-amber-600 text-white shadow-xs"
-            }`}
+              }`}
           >
             {hasClaimedToday
               ? "✓ Today's Streak Claimed (+25 XP)"
               : isClaimingDaily
-              ? "Claiming..."
-              : "Claim Today's Streak (+25 XP)"}
+                ? "Claiming..."
+                : "Claim Today's Streak (+25 XP)"}
           </button>
         </div>
 
@@ -243,72 +242,6 @@ export default function DashboardView({
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </Link>
-        </div>
-
-        {/* Card 3: Push Notification Status */}
-        <div className="rounded-2xl bg-card border border-border/80 p-5 shadow-xs space-y-3 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Browser Reminders
-              </span>
-              <span className="text-xl">🔔</span>
-            </div>
-            <h3 className="font-extrabold text-base text-foreground">
-              Duolingo-Style Reminders
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              {isSubscribed
-                ? "Active! Native alerts scheduled for your preferred study routine."
-                : "Turn on browser alerts to protect your streak and receive high-yield study cues."}
-            </p>
-          </div>
-
-          <div className="space-y-2 pt-1">
-            <button
-              type="button"
-              disabled={isSendingTest}
-              onClick={handleSendTestNotification}
-              className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 ${
-                testSentSuccess
-                  ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-extrabold"
-                  : "bg-muted hover:bg-muted/80 text-foreground border-border hover:border-blue-500/40"
-              }`}
-            >
-              {isSendingTest ? (
-                <>
-                  <span className="animate-spin inline-block">⏳</span>
-                  <span>Sending Alert...</span>
-                </>
-              ) : testSentSuccess ? (
-                <>
-                  <span>✓</span>
-                  <span>Test Notification Sent! 🚀</span>
-                </>
-              ) : (
-                <>
-                  <span>Send Test Notification</span>
-                  <span>🚀</span>
-                </>
-              )}
-            </button>
-
-            {!isSubscribed && (
-              <button
-                type="button"
-                onClick={async () => {
-                  const success = await subscribeToPush();
-                  if (success) {
-                    await handleSendTestNotification();
-                  }
-                }}
-                className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
-              >
-                <span>Enable Native Push</span>
-                <span>🔔</span>
-              </button>
-            )}
-          </div>
         </div>
       </div>
 
@@ -424,11 +357,10 @@ export default function DashboardView({
               key={subj}
               type="button"
               onClick={() => setActiveSubjectTab(subj)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                activeSubjectTab === subj
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${activeSubjectTab === subj
                   ? "bg-blue-600 text-white shadow-xs font-bold"
                   : "bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {subj}
             </button>

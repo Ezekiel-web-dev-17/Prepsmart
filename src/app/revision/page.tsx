@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import RevisionHubClient, { type RevisionQuestion } from "./RevisionHubClient";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Review your previous practice and master these concepts! Spaced active recall and step-by-step examiner solutions for JAMB CBT.",
 };
 
-export const instant = false;
+export const dynamic = "force-dynamic";
 
 export default async function RevisionPage() {
   await connection();

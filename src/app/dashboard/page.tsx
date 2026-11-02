@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { LEADERBOARD_KEY } from "@/lib/gamification";
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Your personalized PrepSmart preparation dashboard. Track your UTME countdown, daily study routine, recommended syllabus materials, and study streaks.",
 };
 
-export const instant = false;
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   await connection();

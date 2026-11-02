@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import type { User, UserListItem } from '@/lib/validations/user';
 import UserManagementClient from './UserManagementClient';
 
-export const instant = false;
+export const dynamic = "force-dynamic";
 
 export default async function UsersPage() {
     // Direct database query on the server (Server Component pattern)

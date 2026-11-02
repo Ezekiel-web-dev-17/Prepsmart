@@ -1,10 +1,15 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import {
   getClientIdentifier,
   rateLimitRequest,
   getRateLimitHeaders,
 } from "@/lib/ratelimit";
+
+const IS_CLERK_ENABLED =
+  process.env.NEXT_PUBLIC_CLERK_ENABLED !== "false" &&
+  Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) &&
+  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes("placeholder");
 
 // Secure-by-Design: Explicit CORS origin whitelist (No wildcard allowed)
 const ALLOWED_ORIGINS = new Set([
@@ -40,7 +45,11 @@ const isProtectedRoute = createRouteMatcher([
   "/users(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+async function handleCommonMiddleware(
+  req: NextRequest,
+  userId: string | null = null,
+  protectAuth?: () => Promise<void>
+) {
   // Reject unsafe HTTP methods at the perimeter
   if (["TRACE", "TRACK"].includes(req.method.toUpperCase())) {
     return new NextResponse("Method Not Allowed", { status: 405 });
@@ -58,7 +67,6 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // 1. Identify client (authenticated user or IP address)
-  const { userId } = await auth();
   const identifier = getClientIdentifier(req.headers, userId);
 
   // 2. Enforce tiered rate limiting based on route and HTTP method
@@ -215,9 +223,9 @@ export default clerkMiddleware(async (auth, req) => {
     });
   }
 
-  // 4. Authenticate protected routes
-  if (isProtectedRoute(req)) {
-    await auth.protect();
+  // 4. Authenticate protected routes (when Clerk is active)
+  if (protectAuth && isProtectedRoute(req)) {
+    await protectAuth();
   }
 
   // 5. Attach Rate Limit metrics and CORS headers to the response
@@ -231,7 +239,16 @@ export default clerkMiddleware(async (auth, req) => {
   });
 
   return response;
-});
+}
+
+export default IS_CLERK_ENABLED
+  ? clerkMiddleware(async (auth, req) => {
+      const { userId } = await auth();
+      return handleCommonMiddleware(req, userId, () => auth.protect());
+    })
+  : async function proxy(req: NextRequest) {
+      return handleCommonMiddleware(req, "demo-user-1");
+    };
 
 export const config = {
   matcher: [
@@ -241,3 +258,4 @@ export const config = {
     "/(api|trpc)(.*)",
   ],
 };
+

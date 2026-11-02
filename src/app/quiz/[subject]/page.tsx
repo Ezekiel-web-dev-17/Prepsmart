@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import DrillInterface, { type DrillQuestion } from "./DrillInterface";
 
@@ -79,7 +79,7 @@ export async function generateMetadata({
   };
 }
 
-export const instant = false;
+export const dynamic = "force-dynamic";
 
 export default async function QuizSubjectPage({
   params,

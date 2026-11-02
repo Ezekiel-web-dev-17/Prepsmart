@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser, UserButton } from "@clerk/nextjs";
+import { useCurrentUser, AppUserButton } from "@/providers/AuthProvider";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded } = useCurrentUser();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -343,13 +343,7 @@ export default function Navbar() {
                 </Link>
 
                 <div className="ml-1 flex items-center">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-8 h-8 rounded-xl",
-                      },
-                    }}
-                  />
+                  <AppUserButton />
                 </div>
               </div>
             )}
@@ -517,7 +511,7 @@ export default function Navbar() {
           {mounted && isLoaded && isSignedIn && (
             <div className="flex items-center justify-between p-2 rounded-xl bg-card border border-border">
               <div className="flex items-center gap-2.5">
-                <UserButton />
+                <AppUserButton />
                 <div className="text-xs font-semibold text-foreground">
                   Candidate Session
                 </div>

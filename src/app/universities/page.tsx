@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   ],
 };
 
-export const instant = false;
+export const dynamic = "force-dynamic";
 
 export default async function UniversitiesPage() {
   const rawUniversities = await prisma.university.findMany({

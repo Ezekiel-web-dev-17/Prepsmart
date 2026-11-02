@@ -1518,6 +1518,34 @@ async function main() {
     data: allQuestions,
   });
 
+  // Seed default Demo Candidate for offline and local testing
+  await prisma.user.upsert({
+    where: { id: "demo-user-1" },
+    update: {},
+    create: {
+      id: "demo-user-1",
+      email: "demo@prepsmart.ng",
+      name: "Demo Candidate",
+      xp: 250,
+      onboardingProfile: {
+        create: {
+          targetScore: 290,
+          departmentStream: "science",
+          selectedSubjects: JSON.stringify([
+            "Use of English",
+            "Mathematics",
+            "Physics",
+            "Chemistry",
+          ]),
+          proficiencyLevel: "intermediate",
+          dailyStudyMinutes: 45,
+          preferredStudyTime: "evening",
+          completed: true,
+        },
+      },
+    },
+  });
+
   // Verify breakdown
   const subjectCounts = await Promise.all([
     prisma.question.count({ where: { subject: "Use of English" } }),

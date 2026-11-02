@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { submitExamSession, type ExamSubmissionPayload } from "@/lib/exam";
 
 /**

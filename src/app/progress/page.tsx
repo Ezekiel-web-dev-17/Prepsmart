@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { getCandidateProgressData } from "@/lib/progress";
 import { ProgressDashboardClient } from "./ProgressDashboardClient";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Track your JAMB UTME readiness index, subject mastery scores, active study streak, and high-yield concepts to review.",
 };
 
-export const instant = false;
+export const dynamic = "force-dynamic";
 
 export default async function ProgressPage() {
   await connection();

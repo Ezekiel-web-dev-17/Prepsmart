@@ -9,8 +9,6 @@ import {
   useOfEnglishSyllabus,
 } from "@/data/syllabuses";
 
-export const instant = false;
-
 export function generateStaticParams() {
   return [
     { department: "science" },
