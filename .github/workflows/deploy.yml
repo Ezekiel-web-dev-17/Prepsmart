@@ -94,6 +94,9 @@ jobs:
             git pull origin main
             docker compose build app
             docker compose up -d app
+            docker compose exec -T app npx prisma db push
+            docker compose exec -T app npx tsx prisma/seed-all-universities.ts || true
+            docker compose exec -T app npx tsx prisma/seed-leaderboard-users.ts || true
             echo "Deployment completed successfully."
 
       - name: Post-Deployment Smoke & Health Verification
