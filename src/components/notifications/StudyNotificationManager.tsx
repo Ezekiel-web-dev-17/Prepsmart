@@ -12,6 +12,7 @@ import StudyNotificationBanner from "./StudyNotificationBanner";
 
 const LAST_RANK_STORAGE_KEY = "prepsmart_last_known_rank";
 const LAST_STREAK_NOTIFIED_KEY = "prepsmart_last_streak_notified";
+const LAST_WEEKLY_REVISION_NOTIFIED_KEY = "prepsmart_last_weekly_revision_notified";
 
 export default function StudyNotificationManager() {
   const { isSignedIn, user } = useCurrentUser();
@@ -64,7 +65,8 @@ export default function StudyNotificationManager() {
         }
       }
 
-      // Prioritize leaderboard overtake alerts, then streak alerts
+      // Prioritize weekly revision alerts, leaderboard overtake alerts, then streak alerts
+      const weeklyRevisionAlert = notifications.find((n) => n.type === "WEEKLY_UNRESOLVED_REVISION");
       const overtakeAlert = notifications.find((n) => n.type === "LEADERBOARD_OVERTAKEN");
       const streakAlert = notifications.find(
         (n) => n.type === "STREAK_MOTIVATIONAL" || n.type === "PRACTICE_MILD"
@@ -72,7 +74,21 @@ export default function StudyNotificationManager() {
 
       let chosenNotification: NotificationPayload | null = null;
 
-      if (overtakeAlert) {
+      // Check whether weekly revision notification was already shown today
+      let alreadyNotifiedRevisionToday = false;
+      if (typeof window !== "undefined") {
+        const lastNotifiedRev = window.localStorage.getItem(LAST_WEEKLY_REVISION_NOTIFIED_KEY);
+        if (lastNotifiedRev === todayDateStr) {
+          alreadyNotifiedRevisionToday = true;
+        }
+      }
+
+      if (weeklyRevisionAlert && !alreadyNotifiedRevisionToday) {
+        chosenNotification = weeklyRevisionAlert;
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(LAST_WEEKLY_REVISION_NOTIFIED_KEY, todayDateStr);
+        }
+      } else if (overtakeAlert) {
         chosenNotification = overtakeAlert;
       } else if (streakAlert && !alreadyNotifiedToday) {
         chosenNotification = streakAlert;

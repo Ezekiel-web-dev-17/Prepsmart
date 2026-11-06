@@ -20,7 +20,8 @@ export interface UserNotificationState {
 export type NotificationType =
   | "STREAK_MOTIVATIONAL"
   | "PRACTICE_MILD"
-  | "LEADERBOARD_OVERTAKEN";
+  | "LEADERBOARD_OVERTAKEN"
+  | "WEEKLY_UNRESOLVED_REVISION";
 
 export interface NotificationPayload {
   type: NotificationType;
@@ -232,6 +233,35 @@ export async function checkStudyNotifications({
         newRank: status.currentRank,
       },
     });
+  }
+
+  // 3. End-of-Week Unresolved Revision Check (Thursday, Friday, Saturday, Sunday)
+  const currentDayOfWeek = new Date().getDay(); // 0 is Sunday, 4 is Thursday, 5 is Friday, 6 is Saturday
+  const isEndOfWeek = currentDayOfWeek === 4 || currentDayOfWeek === 5 || currentDayOfWeek === 6 || currentDayOfWeek === 0;
+
+  if (isEndOfWeek) {
+    try {
+      const unresolvedRevisionCount = await prisma.failedQuestion.count({
+        where: { userId: status.userId },
+      });
+
+      if (unresolvedRevisionCount > 0) {
+        notifications.push({
+          type: "WEEKLY_UNRESOLVED_REVISION",
+          title: "Weekly Revision: Unresolved Weak Topics!",
+          message: `You have ${unresolvedRevisionCount} weak topic error${unresolvedRevisionCount === 1 ? "" : "s"} waiting in your Revision Hub from this week. Master your 3-question drills before the week closes to boost your Readiness Index!`,
+          actionUrl: "/dashboard?tab=revision",
+          actionText: "Practice Weak Topics",
+          priority: "high",
+          metadata: {
+            unresolvedCount: unresolvedRevisionCount,
+            dayOfWeek: currentDayOfWeek,
+          },
+        });
+      }
+    } catch (revisionErr) {
+      console.warn("Could not check unresolved revision count:", revisionErr);
+    }
   }
 
   return { status, notifications };

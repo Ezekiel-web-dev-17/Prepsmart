@@ -33,6 +33,8 @@ export function ProgressDashboardClient({ data }: ProgressDashboardClientProps) 
             <ReadinessRing
               score={data.examReadinessScore}
               targetScore={data.targetScore}
+              completedTopicsCount={data.completedTopicsCount}
+              unresolvedRevisionCount={data.unresolvedRevisionCount}
             />
           </div>
 

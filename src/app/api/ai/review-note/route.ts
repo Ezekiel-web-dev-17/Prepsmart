@@ -208,3 +208,4 @@ Return ONLY a valid JSON object with the following schema, and no extra markdown
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+

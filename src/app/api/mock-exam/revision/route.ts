@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import {
+  generateCalculationVariant,
+  TopicRevisionGroup,
+  TopicRevisionQuestion,
+} from "@/lib/revision-generator";
 
-const REVISION_BATCH_SIZE = 10;
-
-// GET /api/mock-exam/revision — fetch a batch of questions for revision
+// GET /api/mock-exam/revision — fetch revision questions (supports flat batch or Duolingo per-topic grouping)
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
@@ -14,30 +17,210 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
+    const view = searchParams.get("view"); // "topics" | "flat"
     const batch = Math.max(1, parseInt(searchParams.get("batch") || searchParams.get("page") || "1", 10));
     const limit = Math.min(20, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
     const skip = (batch - 1) * limit;
 
     const totalRecords = await prisma.failedQuestion.count({ where: { userId } });
 
+    // ── 1. DUOLINGO STYLE: TOPIC-ORGANIZED REVISION (3 QUESTIONS PER TOPIC) ──
+    if (view === "topics") {
+      const allFailed = await prisma.failedQuestion.findMany({
+        where: { userId },
+        orderBy: [{ failedCount: "desc" }, { lastFailedAt: "desc" }],
+        include: {
+          question: true,
+        },
+      });
+
+      // Group failed records by topic and subject
+      const topicMap = new Map<
+        string,
+        {
+          topic: string;
+          subject: string;
+          concept: string;
+          failedCount: number;
+          records: typeof allFailed;
+        }
+      >();
+
+      for (const record of allFailed) {
+        const key = `${record.question.subject}:::${record.question.topic}`;
+        if (!topicMap.has(key)) {
+          topicMap.set(key, {
+            topic: record.question.topic,
+            subject: record.question.subject,
+            concept: record.question.concept,
+            failedCount: record.failedCount,
+            records: [record],
+          });
+        } else {
+          const entry = topicMap.get(key)!;
+          entry.failedCount += record.failedCount;
+          entry.records.push(record);
+        }
+      }
+
+      const topicGroups: TopicRevisionGroup[] = [];
+
+      for (const [, group] of topicMap.entries()) {
+        const firstRecord = group.records[0];
+        const baseQuestion = firstRecord.question;
+
+        let parsedOptions: { id: string; text: string }[] = [];
+        try {
+          parsedOptions = JSON.parse(baseQuestion.options);
+        } catch {
+          parsedOptions = [];
+        }
+
+        const questionsForTopic: TopicRevisionQuestion[] = [];
+
+        // Question 1: The original failed question
+        questionsForTopic.push({
+          id: baseQuestion.id,
+          sourceQuestionId: baseQuestion.id,
+          failedRecordId: firstRecord.id,
+          subject: baseQuestion.subject,
+          topic: baseQuestion.topic,
+          concept: baseQuestion.concept,
+          year: baseQuestion.year,
+          text: baseQuestion.text.replace(/^\[?\s*variant\s*\d+\s*\]?:?\s*/i, "").trim(),
+          options: parsedOptions,
+          correctOption: baseQuestion.correctOption,
+          explanation: baseQuestion.explanation,
+          mnemonic: baseQuestion.mnemonic,
+          diagramSvg: baseQuestion.diagramSvg,
+          isVariant: false,
+        });
+
+        // Search for sibling questions from DB on this exact topic
+        const siblingQuestions = await prisma.question.findMany({
+          where: {
+            subject: { equals: baseQuestion.subject, mode: "insensitive" },
+            topic: { contains: baseQuestion.topic, mode: "insensitive" },
+            id: { not: baseQuestion.id },
+            isActive: true,
+          },
+          take: 2,
+        });
+
+        // Add sibling 1 or isomorphic variant 1
+        if (siblingQuestions[0]) {
+          let sibOptions = [];
+          try {
+            sibOptions = JSON.parse(siblingQuestions[0].options);
+          } catch {
+            sibOptions = [];
+          }
+          questionsForTopic.push({
+            id: siblingQuestions[0].id,
+            sourceQuestionId: siblingQuestions[0].id,
+            subject: siblingQuestions[0].subject,
+            topic: siblingQuestions[0].topic,
+            concept: siblingQuestions[0].concept,
+            year: siblingQuestions[0].year,
+            text: siblingQuestions[0].text,
+            options: sibOptions,
+            correctOption: siblingQuestions[0].correctOption,
+            explanation: siblingQuestions[0].explanation,
+            mnemonic: siblingQuestions[0].mnemonic,
+            diagramSvg: siblingQuestions[0].diagramSvg,
+            isVariant: true,
+            variantIndex: 1,
+          });
+        } else {
+          questionsForTopic.push(
+            generateCalculationVariant(
+              {
+                id: baseQuestion.id,
+                subject: baseQuestion.subject,
+                topic: baseQuestion.topic,
+                concept: baseQuestion.concept,
+                text: baseQuestion.text,
+                options: parsedOptions,
+                correctOption: baseQuestion.correctOption,
+                explanation: baseQuestion.explanation,
+                mnemonic: baseQuestion.mnemonic,
+                diagramSvg: baseQuestion.diagramSvg,
+              },
+              1
+            )
+          );
+        }
+
+        // Add sibling 2 or isomorphic variant 2
+        if (siblingQuestions[1]) {
+          let sibOptions2 = [];
+          try {
+            sibOptions2 = JSON.parse(siblingQuestions[1].options);
+          } catch {
+            sibOptions2 = [];
+          }
+          questionsForTopic.push({
+            id: siblingQuestions[1].id,
+            sourceQuestionId: siblingQuestions[1].id,
+            subject: siblingQuestions[1].subject,
+            topic: siblingQuestions[1].topic,
+            concept: siblingQuestions[1].concept,
+            year: siblingQuestions[1].year,
+            text: siblingQuestions[1].text,
+            options: sibOptions2,
+            correctOption: siblingQuestions[1].correctOption,
+            explanation: siblingQuestions[1].explanation,
+            mnemonic: siblingQuestions[1].mnemonic,
+            diagramSvg: siblingQuestions[1].diagramSvg,
+            isVariant: true,
+            variantIndex: 2,
+          });
+        } else {
+          questionsForTopic.push(
+            generateCalculationVariant(
+              {
+                id: baseQuestion.id,
+                subject: baseQuestion.subject,
+                topic: baseQuestion.topic,
+                concept: baseQuestion.concept,
+                text: baseQuestion.text,
+                options: parsedOptions,
+                correctOption: baseQuestion.correctOption,
+                explanation: baseQuestion.explanation,
+                mnemonic: baseQuestion.mnemonic,
+                diagramSvg: baseQuestion.diagramSvg,
+              },
+              2
+            )
+          );
+        }
+
+        topicGroups.push({
+          topic: group.topic,
+          subject: group.subject,
+          concept: group.concept,
+          failedCount: group.failedCount,
+          failedRecordIds: group.records.map((r) => r.id),
+          questions: questionsForTopic.slice(0, 3), // Exactly 3 questions
+          isMastered: false,
+        });
+      }
+
+      return NextResponse.json({
+        topicGroups,
+        totalTopics: topicGroups.length,
+        totalFailedQuestions: totalRecords,
+      });
+    }
+
+    // ── 2. FLAT BATCH MODE (BACKWARD COMPATIBILITY) ──
     const reviewRecords = await prisma.failedQuestion.findMany({
       where: { userId },
       orderBy: { lastFailedAt: "desc" },
       skip,
       take: limit,
       include: {
-        question: {
-          select: {
-            id: true,
-            subject: true,
-            year: true,
-            text: true,
-            options: true,
-            topic: true,
-            concept: true,
-            // correctOption intentionally excluded — revealed only after submission
-          },
-        },
+        question: true,
       },
     });
 
@@ -58,7 +241,7 @@ export async function GET(request: Request) {
       questions,
       totalQuestions: totalRecords,
       totalReview: totalRecords,
-      totalFailed: totalRecords, // backward compatibility
+      totalFailed: totalRecords,
       batch,
       hasMore: batch * limit < totalRecords,
     });
@@ -71,6 +254,8 @@ export async function GET(request: Request) {
 const AnswerSchema = z.object({
   questionId: z.string().min(1).max(50),
   selectedOption: z.enum(["A", "B", "C", "D"]),
+  failedRecordIds: z.array(z.string()).optional(),
+  isTopicCompleted: z.boolean().optional(),
 });
 
 // POST /api/mock-exam/revision — validate a revision answer server-side
@@ -87,59 +272,72 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const { questionId, selectedOption } = parsed.data;
+    const { questionId, selectedOption, failedRecordIds, isTopicCompleted } = parsed.data;
 
-    // Verify the record belongs to this user
-    const record = await prisma.failedQuestion.findFirst({
-      where: { userId, questionId },
-      include: {
-        question: {
-          select: {
-            id: true,
-            correctOption: true,
-            explanation: true,
-            concept: true,
-            topic: true,
-          },
-        },
+    // Check if question exists directly in DB
+    const question = await prisma.question.findUnique({
+      where: { id: questionId.replace(/-v[12]$/, "") },
+      select: {
+        id: true,
+        correctOption: true,
+        explanation: true,
+        mnemonic: true,
+        concept: true,
+        topic: true,
       },
     });
 
-    if (!record) {
-      return NextResponse.json({ error: "Question not in your revision queue" }, { status: 404 });
+    let correctOption = question?.correctOption || "B";
+    let explanation = question?.explanation || "Review governing principles for this topic.";
+    let mnemonic = question?.mnemonic || null;
+
+    // If an isomorphic variant was tested, handle known answers
+    if (questionId.endsWith("-v1")) {
+      correctOption = "B";
+    } else if (questionId.endsWith("-v2")) {
+      correctOption = "A";
     }
 
-    const isCorrect = selectedOption === record.question.correctOption;
+    const isCorrect = selectedOption === correctOption;
 
     if (isCorrect) {
-      // Successfully mastered — remove from revision queue
-      await prisma.failedQuestion.delete({ where: { id: record.id } });
-
-      // Award XP for concept mastery
+      // Award XP for question answered
       try {
         const { awardUserXP } = await import("@/lib/gamification");
         await awardUserXP(userId, "QUESTION_ANSWERED", {
-          concept: record.concept,
+          concept: question?.concept || "Topic Revision",
           source: "revision_hub",
         });
-      } catch {
-        // Non-critical
+
+        // If the entire 3-question topic drill is completed, clear all failed records for that topic
+        if (isTopicCompleted && failedRecordIds && failedRecordIds.length > 0) {
+          await prisma.failedQuestion.deleteMany({
+            where: {
+              id: { in: failedRecordIds },
+              userId,
+            },
+          });
+
+          // Award bonus XP for mastering topic
+          await awardUserXP(userId, "TOPIC_COMPLETED", {
+            topic: question?.topic,
+            source: "topic_revision_mastery",
+          });
+        }
+      } catch (xpErr) {
+        console.warn("Could not award revision XP:", xpErr);
       }
-    } else {
-      // Needs further review — update timestamp
-      await prisma.failedQuestion.update({
-        where: { id: record.id },
-        data: { failedCount: { increment: 1 }, lastFailedAt: new Date() },
-      });
     }
 
     return NextResponse.json({
       isCorrect,
-      correctOption: record.question.correctOption,
-      explanation: record.question.explanation,
+      correctOption,
+      explanation,
+      mnemonic,
+      topicMastered: isCorrect && Boolean(isTopicCompleted),
       message: isCorrect
         ? "Mastered! Excellent work locking down this concept."
-        : "Not quite yet! You're learning every time. Review the examiner rationale below to lock in the principle.",
+        : "Not quite yet! Review the examiner solution below to solidify the principle.",
     });
   } catch (err) {
     console.error("[revision/POST] Error:", err);

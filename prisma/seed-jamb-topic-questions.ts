@@ -419,3 +419,4 @@ seedJambQuestions()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

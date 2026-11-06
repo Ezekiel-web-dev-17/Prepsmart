@@ -9,6 +9,7 @@ import {
   XIcon,
   ArrowRightIcon,
   SparklesIcon,
+  RefreshCwIcon,
 } from "@/components/ui/icons";
 
 interface StudyNotificationBannerProps {
@@ -23,6 +24,7 @@ export default function StudyNotificationBanner({
   const isStreak = notification.type === "STREAK_MOTIVATIONAL";
   const isMild = notification.type === "PRACTICE_MILD";
   const isLeaderboard = notification.type === "LEADERBOARD_OVERTAKEN";
+  const isWeeklyRevision = notification.type === "WEEKLY_UNRESOLVED_REVISION";
 
   // Visual styling based on notification category
   let badgeText = "Study Reminder";
@@ -30,7 +32,12 @@ export default function StudyNotificationBanner({
   let iconContainer = "bg-linear-to-br from-blue-500 to-indigo-600 text-white shadow-blue-500/20";
   let borderClasses = "border-blue-500/40 bg-card/95";
 
-  if (isStreak) {
+  if (isWeeklyRevision) {
+    badgeText = "Weekly Revision Alert";
+    badgeClasses = "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30";
+    iconContainer = "bg-linear-to-br from-amber-500 to-rose-600 text-white shadow-amber-500/25";
+    borderClasses = "border-amber-500/45 bg-linear-to-br from-amber-500/10 via-card/95 to-card/95";
+  } else if (isStreak) {
     badgeText = "Streak Guardian";
     badgeClasses = "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30";
     iconContainer = "bg-linear-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/25";
@@ -57,6 +64,7 @@ export default function StudyNotificationBanner({
           <div
             className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-md ${iconContainer}`}
           >
+            {isWeeklyRevision && <RefreshCwIcon className="w-5 h-5 text-white" />}
             {isStreak && <FlameIcon className="w-5 h-5 text-white" />}
             {isMild && <TargetIcon className="w-5 h-5 text-white" />}
             {isLeaderboard && <TrophyIcon className="w-5 h-5 text-white" />}

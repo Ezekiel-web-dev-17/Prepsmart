@@ -5,9 +5,16 @@ import React, { useEffect, useState } from "react";
 export interface ReadinessRingProps {
   score: number; // 0 - 100
   targetScore: number;
+  completedTopicsCount?: number;
+  unresolvedRevisionCount?: number;
 }
 
-export function ReadinessRing({ score, targetScore }: ReadinessRingProps) {
+export function ReadinessRing({
+  score,
+  targetScore,
+  completedTopicsCount = 0,
+  unresolvedRevisionCount = 0,
+}: ReadinessRingProps) {
   const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
@@ -157,6 +164,31 @@ export function ReadinessRing({ score, targetScore }: ReadinessRingProps) {
           </span>
           <span className="text-sm sm:text-base font-extrabold text-blue-600 dark:text-blue-400 tabular-nums">
             ~{projectedJambRange}
+          </span>
+        </div>
+      </div>
+
+      {/* Topics & Revision Health Metrics */}
+      <div className="mt-3 w-full grid grid-cols-2 gap-2 text-center text-xs">
+        <div className="p-2 rounded-xl bg-primary/5 border border-primary/15">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            Roadmap Mastered
+          </span>
+          <span className="font-black text-foreground">
+            {completedTopicsCount} Topic{completedTopicsCount === 1 ? "" : "s"}
+          </span>
+        </div>
+
+        <div className={`p-2 rounded-xl border ${
+          unresolvedRevisionCount === 0
+            ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-400"
+            : "bg-amber-500/10 border-amber-500/25 text-amber-600 dark:text-amber-400"
+        }`}>
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+            Revision Health
+          </span>
+          <span className="font-black">
+            {unresolvedRevisionCount === 0 ? "100% Cleared" : `${unresolvedRevisionCount} In Queue`}
           </span>
         </div>
       </div>

@@ -50,3 +50,4 @@ describe("Visual Learning Roadmap & Syllabus Architecture", () => {
     assert.ok(enrichment.diagramSvg?.includes("<svg"));
   });
 });
+
