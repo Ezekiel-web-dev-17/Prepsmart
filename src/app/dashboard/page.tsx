@@ -46,8 +46,16 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     redirect("/onboarding");
   }
 
-  // Fetch leaderboard rank, readiness analytics, and revision queue concurrently
-  const [zeroRank, progressData, [totalRevisionCount, failedRecords]] = await Promise.all([
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  // Fetch leaderboard rank, readiness analytics, revision queue, and today's streak claim concurrently
+  const [
+    zeroRank,
+    progressData,
+    [totalRevisionCount, failedRecords],
+    streakClaimToday,
+  ] = await Promise.all([
     redis.zrevrank(LEADERBOARD_KEY, clerkUserId),
     getCandidateProgressData(user.id),
     Promise.all([
@@ -71,6 +79,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         },
       }),
     ]),
+    prisma.xpHistory.findFirst({
+      where: {
+        userId: user.id,
+        eventType: "DAILY_STREAK",
+        createdAt: { gte: startOfToday },
+      },
+      select: { id: true },
+    }),
   ]);
 
   const rank = zeroRank !== null ? zeroRank + 1 : null;
@@ -120,6 +136,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       progressData={progressData}
       revisionQuestions={initialRevisionQuestions}
       initialActiveTab={activeTabParam}
+      initialStreakClaimedToday={streakClaimToday !== null}
     />
   );
 }

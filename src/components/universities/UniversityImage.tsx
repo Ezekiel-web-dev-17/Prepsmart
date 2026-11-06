@@ -13,6 +13,12 @@ interface UniversityImageProps {
   showLandmarkBadge?: boolean;
   priority?: boolean;
   overlayGradient?: boolean;
+  // DB-sourced fields (preferred when provided)
+  dbImageUrl?: string | null;
+  dbLandmark?: string | null;
+  dbCaption?: string | null;
+  dbBrandColor?: string | null;
+  dbSecondaryColor?: string | null;
 }
 
 export default function UniversityImage({
@@ -23,12 +29,24 @@ export default function UniversityImage({
   aspectRatio = "card",
   showLandmarkBadge = false,
   overlayGradient = true,
+  dbImageUrl,
+  dbLandmark,
+  dbCaption,
+  dbBrandColor,
+  dbSecondaryColor,
 }: UniversityImageProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const imageMeta = getUniversityImageMeta(slug, acronym);
-  const logoMeta = getUniversityLogoMeta(slug, acronym);
+  // Prefer DB-stored values; fall back to static data lookup
+  const staticImageMeta = getUniversityImageMeta(slug, acronym);
+  const staticLogoMeta = getUniversityLogoMeta(slug, acronym);
+
+  const imageUrl = (!hasError && (dbImageUrl || staticImageMeta.imageUrl)) || null;
+  const landmark = dbLandmark || staticImageMeta.landmark;
+  const caption = dbCaption || staticImageMeta.caption;
+  const brandColor = dbBrandColor || staticLogoMeta.brandColor;
+  const secondaryColor = dbSecondaryColor || staticLogoMeta.secondaryColor;
 
   const initials =
     acronym ||
@@ -52,14 +70,14 @@ export default function UniversityImage({
       : "h-36 sm:h-44 w-full"; // "card"
 
   // Architectural fallback if offline or failed network request
-  if (hasError || !imageMeta.imageUrl) {
+  if (!imageUrl) {
     return (
       <div
         className={`relative overflow-hidden flex flex-col justify-between p-4 ${aspectClasses} ${className}`}
         style={{
-          background: `linear-gradient(135deg, ${logoMeta.brandColor}E6 0%, #0F172A 100%)`,
+          background: `linear-gradient(135deg, ${brandColor}E6 0%, #0F172A 100%)`,
         }}
-        title={`${name} — ${imageMeta.landmark}`}
+        title={`${name} — ${landmark}`}
       >
         {/* Subtle Architectural Columns Graphic Pattern */}
         <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-around px-8">
@@ -74,7 +92,7 @@ export default function UniversityImage({
           <span
             className="text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md uppercase"
             style={{
-              backgroundColor: logoMeta.secondaryColor,
+              backgroundColor: secondaryColor,
               color: "#000000",
             }}
           >
@@ -85,7 +103,7 @@ export default function UniversityImage({
         {/* Bottom Landmark title */}
         <div className="relative z-10 space-y-0.5">
           <div className="text-white font-extrabold text-xs sm:text-sm tracking-tight drop-shadow-sm">
-            {imageMeta.landmark}
+            {landmark}
           </div>
           <div className="text-white/75 text-[10px] truncate max-w-full">
             {name}
@@ -107,8 +125,8 @@ export default function UniversityImage({
       {/* Real Campus Image */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={imageMeta.imageUrl}
-        alt={imageMeta.altText || `${name} Campus`}
+        src={imageUrl}
+        alt={`${name} Campus — ${landmark}`}
         loading="lazy"
         onLoad={() => setIsLoaded(true)}
         onError={() => setHasError(true)}
@@ -139,7 +157,7 @@ export default function UniversityImage({
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
               />
             </svg>
-            <span className="truncate">{imageMeta.landmark}</span>
+            <span className="truncate">{landmark}</span>
           </span>
         </div>
       )}

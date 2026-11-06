@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "seed": "npx tsx prisma/seed.ts",
+    "seed:leaderboard": "npx tsx prisma/seed-leaderboard-users.ts",
+    "seed:universities": "npx tsx prisma/seed-all-universities.ts",
     "seed:questions": "npx tsx --env-file=.env.local prisma/seed-unique-questions.ts",
     "lint": "eslint",
     "test": "npx tsx --test 'src/__tests__/**/*.test.ts'"

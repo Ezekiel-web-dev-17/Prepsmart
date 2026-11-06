@@ -290,6 +290,278 @@ export const UNIVERSITY_IMAGES: Record<string, UniversityImageMeta> = {
     caption: "Catholic University permanent site campus, Bwari, Abuja",
     altText: "Veritas University Campus in Bwari, Abuja",
   },
+
+  // Additional Federal Universities
+  uniuyo: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/University_of_Uyo_Town_Campus.jpg/800px-University_of_Uyo_Town_Campus.jpg",
+    landmark: "Town Campus Central Senate Complex",
+    caption: "Historic Town Campus administrative quadrangle, Ikpa Road, Uyo",
+    altText: "University of Uyo Town Campus administrative complex",
+  },
+  unimaid: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/University_of_Maiduguri_Senate_Building.jpg/800px-University_of_Maiduguri_Senate_Building.jpg",
+    landmark: "Kanem Senate Building",
+    caption: "Central administration Kanem Senate complex, Bama Road, Maiduguri",
+    altText: "University of Maiduguri Main Administrative Senate Complex",
+  },
+  udus: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Usmanu_Danfodiyo_University_Senate_Building.jpg/800px-Usmanu_Danfodiyo_University_Senate_Building.jpg",
+    landmark: "Sultan Muhammadu Maccido Senate Complex",
+    caption: "Permanent campus administrative block and solar installation, Sokoto",
+    altText: "Usmanu Danfodiyo University Sokoto permanent site landmark",
+  },
+  atbu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/ATBU_Gubi_Campus.jpg/800px-ATBU_Gubi_Campus.jpg",
+    landmark: "Gubi Permanent Site Senate Complex",
+    caption: "Gubi permanent site technology complex and administrative centre, Bauchi",
+    altText: "Abubakar Tafawa Balewa University Gubi Campus",
+  },
+  fuoye: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/FUOYE_Administrative_Building.jpg/800px-FUOYE_Administrative_Building.jpg",
+    landmark: "Oye Central Senate Building",
+    caption: "Main administrative complex along Ikole Road, Oye-Ekiti",
+    altText: "Federal University Oye-Ekiti Central Administrative Building",
+  },
+  fupre: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/FUPRE_Main_Gate.jpg/800px-FUPRE_Main_Gate.jpg",
+    landmark: "Petroleum Valley Technology Complex",
+    caption: "Main campus petroleum engineering complex, Ugbomro, Effurun",
+    altText: "Federal University of Petroleum Resources Effurun campus",
+  },
+  funai: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/AE_FUNAI_Campus_Gate.jpg/800px-AE_FUNAI_Campus_Gate.jpg",
+    landmark: "Ndufu-Alike Administrative Quadrangle",
+    caption: "Permanent site solar-powered central administration building, Ikwo, Ebonyi",
+    altText: "Alex Ekwueme Federal University Ndufu-Alike campus landmark",
+  },
+  fulokoja: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Federal_University_Lokoja_Felele.jpg/800px-Federal_University_Lokoja_Felele.jpg",
+    landmark: "Felele Permanent Campus Complex",
+    caption: "Permanent campus overlooking Mount Patti and the Niger-Benue confluence, Lokoja",
+    altText: "Federal University Lokoja Felele Campus Complex",
+  },
+  fudma: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/FUDMA_Campus_Main_Gate.jpg/800px-FUDMA_Campus_Main_Gate.jpg",
+    landmark: "Take-Off Campus Senate Building",
+    caption: "Main administrative complex and ICT research hub, Dutsin-Ma, Katsina",
+    altText: "Federal University Dutsin-Ma administrative center",
+  },
+  mau: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Modibbo_Adama_University_Campus.jpg/800px-Modibbo_Adama_University_Campus.jpg",
+    landmark: "Yola Central Administration Building",
+    caption: "Central campus along Mubi road with teaching hospital quadrangle, Yola",
+    altText: "Modibbo Adama University Yola Campus",
+  },
+  nda: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Nigerian_Defence_Academy_Afaka.jpg/800px-Nigerian_Defence_Academy_Afaka.jpg",
+    landmark: "Afaka Permanent Site Academy Headquarters",
+    caption: "Permanent site academy headquarters and ceremonial parade grounds, Afaka, Kaduna",
+    altText: "Nigerian Defence Academy Afaka Permanent Site",
+  },
+
+  // Additional State Universities
+  imsu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Imo_State_University_Main_Gate.jpg/800px-Imo_State_University_Main_Gate.jpg",
+    landmark: "Owerri Central Administration Building",
+    caption: "Main campus administrative centre along Okigwe Road, Owerri",
+    altText: "Imo State University Main Administrative Complex",
+  },
+  esut: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/ESUT_Agbani_Permanent_Site.jpg/800px-ESUT_Agbani_Permanent_Site.jpg",
+    landmark: "Agbani Permanent Site Complex",
+    caption: "Permanent site faculty quadrangles and central administration, Agbani, Enugu",
+    altText: "Enugu State University of Science and Technology Agbani Campus",
+  },
+  ebsu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Ebonyi_State_University_Ishieke.jpg/800px-Ebonyi_State_University_Ishieke.jpg",
+    landmark: "Ishieke Main Campus Senate Complex",
+    caption: "Ishieke campus central administrative council chambers, Abakaliki",
+    altText: "Ebonyi State University Ishieke Campus",
+  },
+  bsu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Benue_State_University_Makurdi.jpg/800px-Benue_State_University_Makurdi.jpg",
+    landmark: "River Benue Senate Complex",
+    caption: "Main campus along Gboko road near River Benue waterfront, Makurdi",
+    altText: "Benue State University Senate Complex Makurdi",
+  },
+  paau: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Kogi_State_University_Anyigba.jpg/800px-Kogi_State_University_Anyigba.jpg",
+    landmark: "Prince Abubakar Audu Senate Building",
+    caption: "Main campus central administration complex, Anyigba, Kogi State",
+    altText: "Prince Abubakar Audu University Anyigba Campus",
+  },
+  basug: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Bauchi_State_University_Gadau.jpg/800px-Bauchi_State_University_Gadau.jpg",
+    landmark: "Gadau Permanent Site Gate & Senate",
+    caption: "Main campus administrative quadrangle, Gadau, Bauchi State",
+    altText: "Bauchi State University Gadau Permanent Site",
+  },
+  ysu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Yobe_State_University_Damaturu.jpg/800px-Yobe_State_University_Damaturu.jpg",
+    landmark: "Damaturu Central Administrative Complex",
+    caption: "Main campus central administration along Gujba road, Damaturu",
+    altText: "Yobe State University Damaturu Campus",
+  },
+  unicross: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/CRUTECH_Calabar_Campus.jpg/800px-CRUTECH_Calabar_Campus.jpg",
+    landmark: "Calabar Central Technology Complex",
+    caption: "Ekpo Abasi main campus engineering workshops and senate block, Calabar",
+    altText: "University of Cross River State Calabar Campus",
+  },
+  aksu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/AKSU_Ikot_Akpaden_Campus.jpg/800px-AKSU_Ikot_Akpaden_Campus.jpg",
+    landmark: "Ikot Akpaden Senate Building",
+    caption: "Main coastal campus central administrative complex, Mkpat Enin, Akwa Ibom",
+    altText: "Akwa Ibom State University Ikot Akpaden Campus",
+  },
+  tasued: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/TASUED_Ijagun_Campus.jpg/800px-TASUED_Ijagun_Campus.jpg",
+    landmark: "Otunba Gbenga Daniel Senate Building",
+    caption: "Ijagun permanent site administrative high-rise, Ijebu-Ode, Ogun State",
+    altText: "Tai Solarin University of Education Senate Building",
+  },
+  plasu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Plateau_State_University_Bokkos.jpg/800px-Plateau_State_University_Bokkos.jpg",
+    landmark: "Bokkos Hillside Administrative Quadrangle",
+    caption: "Scenic highland campus administration building, Bokkos, Plateau State",
+    altText: "Plateau State University Bokkos Campus",
+  },
+  umyu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/UMYU_Katsina_Senate_Building.jpg/800px-UMYU_Katsina_Senate_Building.jpg",
+    landmark: "Umaru Musa Yar'adua Senate Complex",
+    caption: "Modern Islamic and arid architectural senate complex, Dutsin-Ma Road, Katsina",
+    altText: "Umaru Musa Yar'adua University Senate Building",
+  },
+  adustech: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/KUST_Wudil_Campus.jpg/800px-KUST_Wudil_Campus.jpg",
+    landmark: "Aliko Dangote Senate Building",
+    caption: "Main engineering and technology quadrangle, Wudil, Kano State",
+    altText: "Aliko Dangote University of Science and Technology Wudil",
+  },
+  aau: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Ambrose_Alli_University_Ekpoma.jpg/800px-Ambrose_Alli_University_Ekpoma.jpg",
+    landmark: "Ambrose Alli Senate High-rise",
+    caption: "Central administration high-rise along Benin-Auchi expressway, Ekpoma",
+    altText: "Ambrose Alli University Senate Building Ekpoma",
+  },
+  ndu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Niger_Delta_University_Island.jpg/800px-Niger_Delta_University_Island.jpg",
+    landmark: "Wilberforce Island Administrative Quadrangle",
+    caption: "Mangrove waterfront administrative complex, Wilberforce Island, Bayelsa",
+    altText: "Niger Delta University Wilberforce Island Campus",
+  },
+  coou: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/COOU_Igbariam_Campus.jpg/800px-COOU_Igbariam_Campus.jpg",
+    landmark: "Igbariam Administrative Council Chambers",
+    caption: "Permanent site administrative complex, Igbariam, Anambra State",
+    altText: "Chukwuemeka Odumegwu Ojukwu University Igbariam Campus",
+  },
+
+  // Additional Private Universities
+  aun: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/American_University_of_Nigeria_Library.jpg/800px-American_University_of_Nigeria_Library.jpg",
+    landmark: "Robert A. Pastor E-Library Complex",
+    caption: "Award-winning green digital library and American collegiate campus, Yola",
+    altText: "American University of Nigeria Campus in Yola",
+  },
+  bells: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Bells_University_Ota.jpg/800px-Bells_University_Ota.jpg",
+    landmark: "Ota Technology Senate Complex",
+    caption: "Main campus engineering block and ICT innovations centre, Ota, Ogun State",
+    altText: "Bells University of Technology Campus in Ota",
+  },
+  alhikmah: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Al_Hikmah_University_Ilorin.jpg/800px-Al_Hikmah_University_Ilorin.jpg",
+    landmark: "Adeta Central Administrative Block",
+    caption: "Adeta campus administrative complex and faculty of law, Ilorin, Kwara",
+    altText: "Al-Hikmah University Campus in Ilorin",
+  },
+  ajayi: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ajayi_Crowther_University_Oyo.jpg/800px-Ajayi_Crowther_University_Oyo.jpg",
+    landmark: "Bishop Ajayi Crowther Senate Complex",
+    caption: "Historic St. Andrew's college grounds and central senate complex, Oyo town",
+    altText: "Ajayi Crowther University Campus in Oyo",
+  },
+  godfrey: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Godfrey_Okoye_University_Enugu.jpg/800px-Godfrey_Okoye_University_Enugu.jpg",
+    landmark: "Ugwuomu-Nike Main Campus Complex",
+    caption: "Permanent site administrative centre and DNA learning centre, Enugu",
+    altText: "Godfrey Okoye University Campus in Enugu",
+  },
+  madonna: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Madonna_University_Elele.jpg/800px-Madonna_University_Elele.jpg",
+    landmark: "Elele Medical City & Senate",
+    caption: "Elele main campus administrative building and medical centre, Rivers State",
+    altText: "Madonna University Elele Campus",
+  },
+  bingham: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bingham_University_Karu.jpg/800px-Bingham_University_Karu.jpg",
+    landmark: "Karu Expressway Senate Building",
+    caption: "Main campus administrative high-rise along Abuja-Keffi expressway, Karu",
+    altText: "Bingham University Campus in Karu, Nasarawa State",
+  },
+  caleb: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Caleb_University_Imota.jpg/800px-Caleb_University_Imota.jpg",
+    landmark: "Imota Serene Campus Complex",
+    caption: "Main campus architecture pavilion and administrative block, Imota, Lagos",
+    altText: "Caleb University Campus in Imota, Lagos",
+  },
+  adeleke: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Adeleke_University_Ede.jpg/800px-Adeleke_University_Ede.jpg",
+    landmark: "Springtime Senate High-rise",
+    caption: "Central administrative high-rise and manicured collegiate gardens, Ede, Osun",
+    altText: "Adeleke University Campus in Ede, Osun State",
+  },
+  elizade: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Elizade_University_Ilara_Mokin.jpg/800px-Elizade_University_Ilara_Mokin.jpg",
+    landmark: "Automotive Technology Complex",
+    caption: "Modern enterprise-style campus and engineering laboratories, Ilara-Mokin, Ondo",
+    altText: "Elizade University Campus in Ilara-Mokin",
+  },
+  igbinedion: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Igbinedion_University_Okada.jpg/800px-Igbinedion_University_Okada.jpg",
+    landmark: "Okada Heritage Senate Building",
+    caption: "Crown Hill main campus administrative quadrangle and library, Okada, Edo",
+    altText: "Igbinedion University Campus in Okada, Edo State",
+  },
 };
 
 /**

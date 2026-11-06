@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCurrentUser, AppUserButton } from "@/providers/AuthProvider";
+import { useUserContext } from "@/context/UserContext";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useCurrentUser();
+  const { user, department, targetScore, xp } = useUserContext();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -373,13 +375,26 @@ export default function Navbar() {
             {/* Authenticated: Show Quick Link and Profile Avatar */}
             {mounted && isLoaded && isSignedIn && (
               <div className="flex items-center gap-2">
-                <Link
-                  scroll={false}
-                  href="/onboarding"
-                  className="hidden sm:flex px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground items-center gap-1.5 transition-colors"
-                >
-                  <span>Onboarding Profile</span>
-                </Link>
+                {user ? (
+                  <Link
+                    scroll={false}
+                    href={`/study?stream=${department}`}
+                    className="hidden sm:flex px-2.5 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground items-center gap-1.5 transition-colors"
+                    title={`Your Stream: ${department.toUpperCase()} • Target: ${targetScore} pts`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="capitalize">{department}</span>
+                    <span className="text-muted-foreground font-medium">({targetScore})</span>
+                  </Link>
+                ) : (
+                  <Link
+                    scroll={false}
+                    href="/onboarding"
+                    className="hidden sm:flex px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground items-center gap-1.5 transition-colors"
+                  >
+                    <span>Onboarding</span>
+                  </Link>
+                )}
 
                 <div className="ml-1 flex items-center">
                   <AppUserButton />
@@ -545,11 +560,18 @@ export default function Navbar() {
 
           {/* User Status if authenticated */}
           {mounted && isLoaded && isSignedIn && (
-            <div className="flex items-center justify-between p-2 rounded-xl bg-card border border-border">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-card border border-border">
               <div className="flex items-center gap-2.5">
                 <AppUserButton />
-                <div className="text-xs font-semibold text-foreground">
-                  Candidate Session
+                <div>
+                  <div className="text-xs font-bold text-foreground">
+                    {user?.name || "Candidate"}
+                  </div>
+                  {user && (
+                    <div className="text-[11px] text-muted-foreground capitalize">
+                      {department} • {targetScore} pts
+                    </div>
+                  )}
                 </div>
               </div>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">

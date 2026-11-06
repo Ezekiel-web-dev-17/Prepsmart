@@ -26,6 +26,7 @@ export interface CandidateProgressData {
   targetScore: number;
   examReadinessScore: number;
   activeStreak: number;
+  hasActivityToday?: boolean;
   subjectMastery: SubjectMasteryItem[];
   conceptsToReview: ConceptToReviewItem[];
   weeklyQuestionsCount: number;
@@ -111,9 +112,18 @@ export async function getCandidateProgressData(
   }
 
   // 3. Compute Active Study Streak (consecutive days of practice)
+  const allActivityDates = [
+    ...xpLogs.map((log) => log.createdAt),
+    ...examAttempts.map((attempt) => attempt.createdAt),
+  ];
   const activeStreak = calculateActiveStreak(
     xpLogs.map((log) => log.createdAt),
     examAttempts.map((attempt) => attempt.createdAt)
+  );
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const hasActivityToday = allActivityDates.some(
+    (d) => d.toISOString().split("T")[0] === todayStr
   );
 
   // 4. Calculate Subject Mastery Breakdown
@@ -258,6 +268,7 @@ export async function getCandidateProgressData(
     targetScore: user.onboardingProfile?.targetScore || 280,
     examReadinessScore,
     activeStreak,
+    hasActivityToday,
     subjectMastery,
     conceptsToReview,
     weeklyQuestionsCount,

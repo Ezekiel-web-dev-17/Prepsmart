@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { UNIVERSITIES_DATA } from "../src/data/universities";
+import { getUniversityImageMeta } from "../src/data/university-images";
+import { getUniversityLogoMeta } from "../src/data/university-logos";
 
 const prisma = new PrismaClient();
 
@@ -1443,6 +1445,9 @@ async function main() {
       uni.screeningType.toLowerCase().includes("post-utme") ||
       uni.screeningType.toLowerCase().includes("exam");
 
+    const imgMeta = getUniversityImageMeta(uni.id, uni.acronym);
+    const logoMeta = getUniversityLogoMeta(uni.id, uni.acronym);
+
     const createdUniversity = await prisma.university.create({
       data: {
         slug: uni.id,
@@ -1459,6 +1464,12 @@ async function main() {
         estYear: uni.estYear || null,
         website: uni.website || null,
         campusHighlights: uni.campusHighlights || null,
+        imageUrl: imgMeta.imageUrl,
+        logoUrl: logoMeta.logoUrl,
+        imageLandmark: imgMeta.landmark,
+        imageCaption: imgMeta.caption,
+        brandColor: logoMeta.brandColor,
+        secondaryColor: logoMeta.secondaryColor,
       },
     });
 

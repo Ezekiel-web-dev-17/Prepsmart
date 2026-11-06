@@ -122,6 +122,10 @@ export default function UniversityDetailView({
 
   const imageMeta = getUniversityImageMeta(university.slug, university.acronym);
 
+  // Prefer DB-stored values; fall back to static lookup
+  const landmark = university.imageLandmark || imageMeta.landmark;
+  const caption = university.imageCaption || imageMeta.caption;
+
   return (
     <div className="space-y-8 pb-16">
       {/* Breadcrumb Navigation */}
@@ -148,6 +152,11 @@ export default function UniversityDetailView({
           aspectRatio="hero"
           className="h-full w-full object-cover"
           overlayGradient={true}
+          dbImageUrl={university.imageUrl}
+          dbLandmark={university.imageLandmark}
+          dbCaption={university.imageCaption}
+          dbBrandColor={university.brandColor}
+          dbSecondaryColor={university.secondaryColor}
         />
 
         {/* Floating Verified Landmark Badge */}
@@ -156,7 +165,7 @@ export default function UniversityDetailView({
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <div className="text-[11px] leading-tight">
               <span className="text-white/60 text-[9px] uppercase font-bold block">Campus Landmark</span>
-              <span className="font-extrabold text-white">{imageMeta.landmark}</span>
+              <span className="font-extrabold text-white">{landmark}</span>
             </div>
           </div>
         </div>
@@ -194,6 +203,9 @@ export default function UniversityDetailView({
               acronym={university.acronym}
               size="lg"
               className="sm:w-20 sm:h-20"
+              dbLogoUrl={university.logoUrl}
+              dbBrandColor={university.brandColor}
+              dbSecondaryColor={university.secondaryColor}
             />
 
             <div className="space-y-1.5 flex-1 min-w-0">
@@ -713,6 +725,11 @@ export default function UniversityDetailView({
                 aspectRatio="square"
                 className="h-full w-full object-cover"
                 showLandmarkBadge={true}
+                dbImageUrl={university.imageUrl}
+                dbLandmark={university.imageLandmark}
+                dbCaption={university.imageCaption}
+                dbBrandColor={university.brandColor}
+                dbSecondaryColor={university.secondaryColor}
               />
             </div>
             <div className="p-6 flex flex-col justify-between space-y-4">
@@ -721,10 +738,10 @@ export default function UniversityDetailView({
                   Physical Campus &amp; Landmarks
                 </span>
                 <h4 className="text-xl font-extrabold text-foreground tracking-tight">
-                  {imageMeta.landmark}
+                  {landmark}
                 </h4>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {imageMeta.caption}
+                  {caption}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {university.campusHighlights || `${university.name} provides accredited learning spaces, laboratories, lecture theatres, and departmental complexes in ${university.city}, ${university.state} State.`}

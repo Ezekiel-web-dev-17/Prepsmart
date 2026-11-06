@@ -2,24 +2,25 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import type { LeaderboardEntry } from "@/lib/leaderboard";
-import { useGamification } from "@/components/gamification/XPToast";
-import { awardUserXPAction } from "@/actions/gamification";
+import type { LeaderboardEntry, DuolingoLeagueTier } from "@/lib/leaderboard";
 import {
   TrophyIcon,
   CrownIcon,
   AwardIcon,
-  RocketIcon,
-  ShieldIcon,
-  AlertTriangleIcon,
-  ClockIcon,
   SparklesIcon,
-  ChartBarIcon,
-  SearchIcon,
-  ZapIcon,
-  GiftIcon,
+  FlameIcon,
+  ClockIcon,
+  TrendingUpIcon,
   TrendingDownIcon,
+  ShieldIcon,
+  ZapIcon,
+  SearchIcon,
   XIcon,
+  ArrowRightIcon,
+  CheckCircleIcon,
+  BeakerIcon,
+  BriefcaseIcon,
+  PaletteIcon,
 } from "@/components/ui/icons";
 
 interface LeaderboardViewProps {
@@ -27,36 +28,175 @@ interface LeaderboardViewProps {
   currentUserId?: string;
 }
 
-// Duolingo League Hierarchy
-const LEAGUES = [
-  { name: "Bronze", minXp: 0, next: "Silver", prev: null, icon: AwardIcon, color: "from-amber-700 to-orange-800", badge: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/30" },
-  { name: "Silver", minXp: 150, next: "Gold", prev: "Bronze", icon: AwardIcon, color: "from-slate-400 to-slate-600", badge: "bg-slate-500/15 text-slate-600 dark:text-slate-300 border-slate-500/30" },
-  { name: "Gold", minXp: 350, next: "Diamond", prev: "Silver", icon: AwardIcon, color: "from-amber-400 to-yellow-600", badge: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30" },
-  { name: "Diamond", minXp: 600, next: "Emerald", prev: "Gold", icon: SparklesIcon, color: "from-cyan-400 to-blue-600", badge: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30" },
-  { name: "Emerald", minXp: 1000, next: "Obsidian", prev: "Diamond", icon: CrownIcon, color: "from-emerald-400 to-teal-700", badge: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
+export interface LeagueConfig {
+  id: DuolingoLeagueTier;
+  name: string;
+  minXp: number;
+  color: string;
+  badge: string;
+  iconBg: string;
+  textColor: string;
+  gem: string;
+  rewardText: string;
+}
+
+export const DUOLINGO_LEAGUES: LeagueConfig[] = [
+  {
+    id: "Diamond",
+    name: "Diamond League",
+    minXp: 2800,
+    color: "from-cyan-400 via-sky-500 to-blue-600",
+    badge: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border-cyan-500/40",
+    iconBg: "bg-cyan-500 text-white shadow-cyan-500/30",
+    textColor: "text-cyan-600 dark:text-cyan-400",
+    gem: "💎",
+    rewardText: "Top Tier League • Champions of Nigeria",
+  },
+  {
+    id: "Obsidian",
+    name: "Obsidian League",
+    minXp: 2250,
+    color: "from-indigo-600 via-purple-700 to-slate-900",
+    badge: "bg-indigo-900/20 text-indigo-400 border-indigo-700/40",
+    iconBg: "bg-indigo-700 text-white shadow-indigo-600/30",
+    textColor: "text-indigo-400",
+    gem: "⚫",
+    rewardText: "Top 7 promote to Diamond League",
+  },
+  {
+    id: "Pearl",
+    name: "Pearl League",
+    minXp: 1750,
+    color: "from-pink-400 via-rose-400 to-purple-500",
+    badge: "bg-pink-500/15 text-pink-600 dark:text-pink-300 border-pink-400/40",
+    iconBg: "bg-pink-500 text-white shadow-pink-500/30",
+    textColor: "text-pink-600 dark:text-pink-400",
+    gem: "⚪",
+    rewardText: "Top 7 promote to Obsidian League",
+  },
+  {
+    id: "Amethyst",
+    name: "Amethyst League",
+    minXp: 1350,
+    color: "from-purple-500 via-fuchsia-600 to-indigo-700",
+    badge: "bg-purple-500/15 text-purple-600 dark:text-purple-300 border-purple-400/40",
+    iconBg: "bg-purple-600 text-white shadow-purple-600/30",
+    textColor: "text-purple-600 dark:text-purple-400",
+    gem: "🟣",
+    rewardText: "Top 7 promote to Pearl League",
+  },
+  {
+    id: "Emerald",
+    name: "Emerald League",
+    minXp: 1000,
+    color: "from-emerald-400 via-teal-500 to-green-600",
+    badge: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/40",
+    iconBg: "bg-emerald-600 text-white shadow-emerald-500/30",
+    textColor: "text-emerald-600 dark:text-emerald-400",
+    gem: "🟢",
+    rewardText: "Top 7 promote to Amethyst League",
+  },
+  {
+    id: "Ruby",
+    name: "Ruby League",
+    minXp: 750,
+    color: "from-rose-500 via-red-600 to-amber-600",
+    badge: "bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/40",
+    iconBg: "bg-rose-600 text-white shadow-rose-500/30",
+    textColor: "text-rose-600 dark:text-rose-400",
+    gem: "🔻",
+    rewardText: "Top 7 promote to Emerald League",
+  },
+  {
+    id: "Sapphire",
+    name: "Sapphire League",
+    minXp: 500,
+    color: "from-blue-500 via-indigo-500 to-sky-600",
+    badge: "bg-blue-500/15 text-blue-600 dark:text-blue-300 border-blue-500/40",
+    iconBg: "bg-blue-600 text-white shadow-blue-500/30",
+    textColor: "text-blue-600 dark:text-blue-400",
+    gem: "🔷",
+    rewardText: "Top 7 promote to Ruby League",
+  },
+  {
+    id: "Gold",
+    name: "Gold League",
+    minXp: 300,
+    color: "from-amber-400 via-yellow-500 to-amber-600",
+    badge: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-400/40",
+    iconBg: "bg-amber-500 text-white shadow-amber-500/30",
+    textColor: "text-amber-600 dark:text-amber-400",
+    gem: "🥇",
+    rewardText: "Top 7 promote to Sapphire League",
+  },
+  {
+    id: "Silver",
+    name: "Silver League",
+    minXp: 150,
+    color: "from-slate-400 via-gray-400 to-zinc-500",
+    badge: "bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-400/40",
+    iconBg: "bg-slate-500 text-white shadow-slate-500/30",
+    textColor: "text-slate-600 dark:text-slate-400",
+    gem: "🥈",
+    rewardText: "Top 7 promote to Gold League",
+  },
+  {
+    id: "Bronze",
+    name: "Bronze League",
+    minXp: 0,
+    color: "from-amber-700 via-orange-700 to-yellow-800",
+    badge: "bg-amber-800/15 text-amber-800 dark:text-amber-300 border-amber-700/40",
+    iconBg: "bg-amber-700 text-white shadow-amber-700/30",
+    textColor: "text-amber-700 dark:text-amber-400",
+    gem: "🥉",
+    rewardText: "Top 7 promote to Silver League",
+  },
 ];
+
+const AVATAR_BG_GRADIENTS = [
+  "from-blue-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-amber-500 to-orange-600",
+  "from-purple-500 to-pink-600",
+  "from-rose-500 to-red-600",
+  "from-cyan-500 to-sky-600",
+];
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(" ");
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+function getAvatarColor(userId: string): string {
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    hash = (hash + userId.charCodeAt(i)) % AVATAR_BG_GRADIENTS.length;
+  }
+  return AVATAR_BG_GRADIENTS[hash];
+}
 
 export default function LeaderboardView({
   initialEntries,
   currentUserId = "demo-user-1",
 }: LeaderboardViewProps) {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>(initialEntries);
+  const [entries] = useState<LeaderboardEntry[]>(initialEntries);
   const [selectedLeague, setSelectedLeague] = useState<string>("All");
+  const [selectedStream, setSelectedStream] = useState<"all" | "science" | "commercial" | "arts">("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [showResolutionModal, setShowResolutionModal] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
 
-  // Weekly league timer state (countdown to Sunday midnight)
+  // Weekly tournament countdown to Sunday midnight WAT
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 14, minutes: 22, seconds: 40 });
 
-  const { triggerXPToast } = useGamification();
-
-  // Ticking countdown timer to Sunday 23:59:59
   useEffect(() => {
-    const calculateTimeUntilSunday = () => {
+    const calculateSundayCountdown = () => {
       const now = new Date();
       const nextSunday = new Date();
-      const daysUntilSunday = (7 - now.getDay()) % 7;
+      const dayOfWeek = now.getDay(); // 0 is Sunday
+      const daysUntilSunday = (7 - dayOfWeek) % 7;
       nextSunday.setDate(now.getDate() + (daysUntilSunday === 0 ? 7 : daysUntilSunday));
       nextSunday.setHours(23, 59, 59, 999);
 
@@ -69,925 +209,667 @@ export default function LeaderboardView({
       return { days, hours, minutes, seconds };
     };
 
-    setTimeLeft(calculateTimeUntilSunday());
-    const interval = setInterval(() => {
-      setTimeLeft(calculateTimeUntilSunday());
+    setTimeLeft(calculateSundayCountdown());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateSundayCountdown());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, []);
 
-  // Filter entries based on League/Tier and Search Query
+  // Filter entries based on search, stream, and league
   const filteredEntries = useMemo(() => {
     return entries.filter((entry) => {
-      const matchesLeague = selectedLeague === "All" || entry.tier === selectedLeague;
+      const matchesLeague =
+        selectedLeague === "All" || entry.tier === selectedLeague;
+      const matchesStream =
+        selectedStream === "all" || entry.stream === selectedStream;
       const matchesSearch =
         searchQuery.trim() === "" ||
         entry.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
-      return matchesLeague && matchesSearch;
+      return matchesLeague && matchesStream && matchesSearch;
     });
-  }, [entries, selectedLeague, searchQuery]);
+  }, [entries, selectedLeague, selectedStream, searchQuery]);
 
-  // Separate Top 3 for Card Layout and Remaining Users for Table View
-  const topThree = useMemo(() => filteredEntries.slice(0, 3), [filteredEntries]);
-  const otherUsers = useMemo(() => filteredEntries.slice(3), [filteredEntries]);
+  // Identify current candidate standing
+  const currentCandidate = useMemo(() => {
+    return entries.find((e) => e.userId === currentUserId || e.isCurrentUser);
+  }, [entries, currentUserId]);
 
-  // Demotion Zone calculation:
-  // "the demotion zone users are the users starting from the 5th to the last to the least weekly point user"
-  // For total N entries, the bottom 5 users are in the demotion zone.
-  const totalCount = filteredEntries.length;
-  const demotionThresholdRank = Math.max(4, totalCount - 4); // Ranks >= this are in demotion zone
+  const currentCandidateRankInFiltered = useMemo(() => {
+    if (!currentCandidate) return null;
+    const idx = filteredEntries.findIndex((e) => e.userId === currentCandidate.userId);
+    return idx !== -1 ? idx + 1 : null;
+  }, [filteredEntries, currentCandidate]);
 
-  // Promotion Zone: Top 5 candidates promote (with Top 3 getting the prizes)
-  const promotionThresholdRank = Math.min(5, Math.max(1, totalCount - 5));
+  // Duolingo Zone Bracket definitions for standard 30-candidate league:
+  // Top 7: Promotion Zone
+  // Bottom 5 (ranks >= 24 in a 28+ list): Demotion Zone
+  const PROMOTION_CUTOFF = 7;
+  const DEMOTION_START = Math.max(8, filteredEntries.length - 4);
 
-  // Find current user's entry and status
-  const currentUserEntry = entries.find((e) => e.userId === currentUserId);
-  const currentUserRank = currentUserEntry?.rank ?? null;
+  const top3 = useMemo(() => filteredEntries.slice(0, 3), [filteredEntries]);
+  const rank1 = top3[0];
+  const rank2 = top3[1];
+  const rank3 = top3[2];
 
-  // Determine user's zone
-  const currentUserZone = useMemo(() => {
-    if (!currentUserRank) return "none";
-    if (currentUserRank <= 3) return "podium";
-    if (currentUserRank <= promotionThresholdRank) return "promotion";
-    if (currentUserRank >= demotionThresholdRank && totalCount > 5) return "demotion";
-    return "safe";
-  }, [currentUserRank, promotionThresholdRank, demotionThresholdRank, totalCount]);
-
-  // Quick Action simulator to demonstrate XPToast and real-time dual updates
-  const handleSimulateAward = async (
-    eventType: "TOPIC_COMPLETED" | "QUESTION_ANSWERED"
-  ) => {
-    setIsSimulating(true);
-    try {
-      const result = await awardUserXPAction(currentUserId, eventType);
-      triggerXPToast({
-        points: result.pointsAwarded,
-        eventType: result.eventType,
-        newTotalXp: result.newTotalXp,
-      });
-
-      // Update local state rank/score
-      setEntries((prev) => {
-        const existingIdx = prev.findIndex((e) => e.userId === currentUserId);
-        let updated: LeaderboardEntry[];
-        if (existingIdx >= 0) {
-          updated = [...prev];
-          updated[existingIdx] = {
-            ...updated[existingIdx],
-            xp: result.newTotalXp,
-          };
-        } else {
-          updated = [
-            ...prev,
-            {
-              rank: result.rank ?? prev.length + 1,
-              userId: currentUserId,
-              name: "You (Active Candidate)",
-              image: null,
-              xp: result.newTotalXp,
-              tier: "Bronze",
-            },
-          ];
-        }
-        return updated
-          .sort((a, b) => b.xp - a.xp)
-          .map((item, idx) => ({
-            ...item,
-            rank: idx + 1,
-          }));
-      });
-    } catch (err) {
-      console.error("Simulation failed:", err);
-    } finally {
-      setIsSimulating(false);
-    }
-  };
-
-  // Simulates a competitor overtaking the candidate in the top 3 (1st, 2nd, or 3rd place)
-  const handleSimulateCompetitorOvertake = () => {
-    const userEntry = entries.find((e) => e.userId === currentUserId);
-    const initialRank = userEntry?.rank && userEntry.rank <= 3 ? userEntry.rank : 2;
-
-    const competitorNames = ["Chinedu O.", "Amina Bello", "Emeka K.", "Fatima Sanusi"];
-    const randomCompetitor = competitorNames[Math.floor(Math.random() * competitorNames.length)];
-    const newRank = Math.min(entries.length + 1, initialRank + 1);
-
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(
-        new CustomEvent("prepsmart:leaderboard_overtaken", {
-          detail: {
-            previousRank: initialRank,
-            newRank,
-            competitorName: randomCompetitor,
-          },
-        })
+  // Active league metadata
+  const currentLeagueConfig = useMemo(() => {
+    if (selectedLeague === "All") {
+      return (
+        DUOLINGO_LEAGUES.find((l) => l.id === (currentCandidate?.tier || "Diamond")) ||
+        DUOLINGO_LEAGUES[0]
       );
     }
-
-    setEntries((prev) => {
-      const copy = [...prev];
-      const uIdx = copy.findIndex((e) => e.userId === currentUserId);
-      const userXp = uIdx >= 0 ? copy[uIdx].xp : 400;
-
-      const competitorIdx = copy.findIndex((e) => e.name === randomCompetitor);
-      if (competitorIdx >= 0) {
-        copy[competitorIdx] = {
-          ...copy[competitorIdx],
-          xp: userXp + 45,
-        };
-      } else {
-        copy.push({
-          rank: 1,
-          userId: `comp-${Date.now()}`,
-          name: randomCompetitor,
-          image: null,
-          xp: userXp + 45,
-          tier: "Gold",
-        });
-      }
-
-      return copy
-        .sort((a, b) => b.xp - a.xp)
-        .map((item, idx) => ({
-          ...item,
-          rank: idx + 1,
-        }));
-    });
-  };
-
-  const getTierBadge = (tier: LeaderboardEntry["tier"]) => {
-    const league = LEAGUES.find((l) => l.name === tier);
-    return league ? league.badge : "bg-muted text-muted-foreground border-border";
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
-  };
-
-  // Safe zone XP cutoff point (XP of the first safe user above demotion zone)
-  const safeZoneCutoffEntry = filteredEntries[demotionThresholdRank - 2];
-  const safeZoneCutoffXp = safeZoneCutoffEntry?.xp ?? 0;
+    return DUOLINGO_LEAGUES.find((l) => l.id === selectedLeague) || DUOLINGO_LEAGUES[0];
+  }, [selectedLeague, currentCandidate?.tier]);
 
   return (
-    <div className="space-y-8 pb-16">
-      {/* Duolingo League Hero Banner with Countdown Timer */}
-      <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-indigo-950 via-slate-900 to-blue-950 text-white p-6 sm:p-8 border border-indigo-800/40 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="space-y-8 pb-24">
+      {/* ── 1. DUOLINGO TOURNAMENT HEADER ── */}
+      <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-card via-card/90 to-blue-900/10 border border-border p-6 sm:p-8 shadow-sm">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-black uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                Duolingo Weekly League
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1.5">
+                <TrophyIcon className="w-3.5 h-3.5 text-amber-500" />
+                <span>Duolingo-Style League Cohort</span>
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-xs text-blue-200 font-bold">
-                Week #42 Cohort
+
+              <span className={`text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border ${currentLeagueConfig.badge} flex items-center gap-1.5`}>
+                <span>{currentLeagueConfig.gem}</span>
+                <span>{currentLeagueConfig.name}</span>
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight text-white">
-              Weekly League & Promotion Arena
+            <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">
+              Weekly UTME League Leaderboard
             </h1>
-
-            <p className="text-blue-100/90 text-xs sm:text-sm leading-relaxed">
-              Top 3 winners claim weekly prizes and promote to the higher league. Keep your study streak alive
-              to remain above the <strong>Demotion Zone</strong> (bottom 5 candidates drop down every Sunday)!
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
+              Compete against 30 candidates in your weekly league bracket.
+              Finish in the <strong className="text-emerald-500">Top 7</strong> to advance to the next league, or avoid the <strong className="text-rose-500">Bottom 5</strong> to escape demotion!
             </p>
-
-            {/* Quick Action Simulator */}
-            <div className="pt-2 flex flex-wrap items-center gap-2">
-              <span className="text-xs text-blue-200 font-semibold mr-1">Earn Study XP:</span>
-              <button
-                type="button"
-                disabled={isSimulating}
-                onClick={() => handleSimulateAward("TOPIC_COMPLETED")}
-                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-              >
-                +50 XP (Topic)
-              </button>
-              <button
-                type="button"
-                disabled={isSimulating}
-                onClick={() => handleSimulateAward("QUESTION_ANSWERED")}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-              >
-                +5 XP (Question)
-              </button>
-              <button
-                type="button"
-                onClick={handleSimulateCompetitorOvertake}
-                className="px-3 py-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white border border-rose-500/40 text-xs font-bold shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <TrophyIcon className="w-3.5 h-3.5" />
-                <span>Simulate Podium Overtake</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowResolutionModal(true)}
-                className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <SparklesIcon className="w-3.5 h-3.5" />
-                <span>Simulate Sunday Reset</span>
-              </button>
-            </div>
           </div>
 
-          {/* Weekly Countdown Box */}
-          <div className="bg-white/10 dark:bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-white/15 text-center shrink-0 min-w-[260px] shadow-lg">
-            <span className="text-[11px] uppercase tracking-wider text-amber-300 font-black flex items-center justify-center gap-1.5 mb-2">
-              <ClockIcon className="w-3.5 h-3.5 text-amber-300" />
-              <span>League Closes In</span>
-            </span>
-            <div className="grid grid-cols-4 gap-2 text-center">
-              <div className="bg-black/30 rounded-xl p-2 border border-white/10">
-                <span className="text-xl sm:text-2xl font-black text-white tabular-nums block">
-                  {timeLeft.days}
+          {/* Weekly Countdown Clock */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+            <div className="rounded-2xl bg-card/80 border border-border p-3.5 sm:p-4 shadow-2xs space-y-1 min-w-[200px]">
+              <div className="flex items-center justify-between text-xs font-bold text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <ClockIcon className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Tournament Ends</span>
                 </span>
-                <span className="text-[10px] text-blue-200 uppercase font-bold">Days</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-500">
+                  Sunday 23:59
+                </span>
               </div>
-              <div className="bg-black/30 rounded-xl p-2 border border-white/10">
-                <span className="text-xl sm:text-2xl font-black text-white tabular-nums block">
-                  {timeLeft.hours}
+              <div className="flex items-center gap-2 pt-1 font-mono text-lg sm:text-xl font-black text-foreground">
+                <span className="px-2 py-1 rounded-lg bg-muted text-foreground">
+                  {timeLeft.days}d
                 </span>
-                <span className="text-[10px] text-blue-200 uppercase font-bold">Hours</span>
-              </div>
-              <div className="bg-black/30 rounded-xl p-2 border border-white/10">
-                <span className="text-xl sm:text-2xl font-black text-white tabular-nums block">
-                  {timeLeft.minutes}
+                <span>:</span>
+                <span className="px-2 py-1 rounded-lg bg-muted text-foreground">
+                  {String(timeLeft.hours).padStart(2, "0")}h
                 </span>
-                <span className="text-[10px] text-blue-200 uppercase font-bold">Mins</span>
-              </div>
-              <div className="bg-black/30 rounded-xl p-2 border border-white/10">
-                <span className="text-xl sm:text-2xl font-black text-amber-400 tabular-nums block">
-                  {timeLeft.seconds}
+                <span>:</span>
+                <span className="px-2 py-1 rounded-lg bg-muted text-foreground">
+                  {String(timeLeft.minutes).padStart(2, "0")}m
                 </span>
-                <span className="text-[10px] text-blue-200 uppercase font-bold">Secs</span>
+                <span>:</span>
+                <span className="px-2 py-1 rounded-lg bg-muted text-amber-500">
+                  {String(timeLeft.seconds).padStart(2, "0")}s
+                </span>
               </div>
             </div>
-            <span className="text-[10px] text-blue-200/80 block mt-2">
-              Sunday 23:59 UTC • Upgrades & Demotions applied
-            </span>
+
+            <button
+              type="button"
+              onClick={() => setShowRulesModal(true)}
+              className="text-xs font-bold px-3.5 py-3 rounded-2xl border border-border bg-card hover:bg-muted text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs self-stretch sm:self-auto justify-center"
+            >
+              <ShieldIcon className="w-4 h-4 text-purple-500" />
+              <span>League Rules</span>
+            </button>
           </div>
+        </div>
+
+        {/* Ambient Gradient Glow */}
+        <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+      </section>
+
+      {/* ── 2. DUOLINGO 10-TIER LEAGUE SELECTOR PILLS ── */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">
+            Explore Duolingo Leagues (10 Tiers)
+          </span>
+          <span className="text-xs text-muted-foreground font-semibold">
+            {selectedLeague === "All" ? "Viewing Entire Cohort" : `Viewing ${selectedLeague} Tier`}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setSelectedLeague("All")}
+            className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all shrink-0 cursor-pointer border ${
+              selectedLeague === "All"
+                ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border-border"
+            }`}
+          >
+            🏆 All Leagues ({entries.length})
+          </button>
+
+          {DUOLINGO_LEAGUES.map((league) => {
+            const isSelected = selectedLeague === league.id;
+            const countInLeague = entries.filter((e) => e.tier === league.id).length;
+            return (
+              <button
+                key={league.id}
+                type="button"
+                onClick={() => setSelectedLeague(league.id)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all shrink-0 cursor-pointer border flex items-center gap-1.5 ${
+                  isSelected
+                    ? "bg-foreground text-background border-foreground shadow-xs"
+                    : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border-border"
+                }`}
+              >
+                <span>{league.gem}</span>
+                <span>{league.id}</span>
+                <span className="text-[10px] opacity-75 font-bold">({countInLeague})</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      {/* User Current Standing & Zone Status Banner */}
-      {currentUserEntry && (
-        <section
-          className={`rounded-2xl p-4 sm:p-5 border transition-all ${
-            currentUserZone === "podium"
-              ? "bg-amber-500/10 border-amber-500/40 text-amber-950 dark:text-amber-100"
-              : currentUserZone === "promotion"
-              ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-950 dark:text-emerald-100"
-              : currentUserZone === "demotion"
-              ? "bg-rose-500/10 border-rose-500/40 text-rose-950 dark:text-rose-100 animate-pulse"
-              : "bg-blue-500/10 border-blue-500/30 text-blue-950 dark:text-blue-100"
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="shrink-0">
-                {currentUserZone === "podium" && <TrophyIcon className="w-8 h-8 text-amber-500" />}
-                {currentUserZone === "promotion" && <RocketIcon className="w-8 h-8 text-emerald-500" />}
-                {currentUserZone === "safe" && <ShieldIcon className="w-8 h-8 text-blue-500" />}
-                {currentUserZone === "demotion" && <AlertTriangleIcon className="w-8 h-8 text-rose-500" />}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-sm sm:text-base">
-                    You are Rank #{currentUserRank} in {currentUserEntry.tier} League
-                  </h3>
-                  <span
-                    className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                      currentUserZone === "podium"
-                        ? "bg-amber-500 text-white"
-                        : currentUserZone === "promotion"
-                        ? "bg-emerald-600 text-white"
-                        : currentUserZone === "demotion"
-                        ? "bg-rose-600 text-white"
-                        : "bg-blue-600 text-white"
-                    }`}
-                  >
-                    {currentUserZone === "podium" && "Podium Winner"}
-                    {currentUserZone === "promotion" && "Promotion Zone"}
-                    {currentUserZone === "safe" && "Safe Zone"}
-                    {currentUserZone === "demotion" && "Demotion Zone"}
-                  </span>
-                </div>
-                <p className="text-xs opacity-90 mt-0.5">
-                  {currentUserZone === "podium" && (
-                    <>
-                      You are in line for the <strong>Weekly Prize Pool</strong> and automatic promotion to{" "}
-                      <strong>{LEAGUES.find((l) => l.name === currentUserEntry.tier)?.next || "Master"} League</strong>!
-                    </>
-                  )}
-                  {currentUserZone === "promotion" && (
-                    <>
-                      On track to advance to{" "}
-                      <strong>{LEAGUES.find((l) => l.name === currentUserEntry.tier)?.next || "Master"} League</strong> this Sunday!
-                    </>
-                  )}
-                  {currentUserZone === "safe" && (
-                    <>
-                      You are safe from relegation (+{(currentUserEntry.xp - safeZoneCutoffXp).toLocaleString()} XP above demotion cutoff).
-                    </>
-                  )}
-                  {currentUserZone === "demotion" && (
-                    <>
-                      <strong>Demotion Warning:</strong> You are currently in the bottom 5. Earn at least{" "}
-                      <span className="font-bold underline">
-                        {Math.max(1, safeZoneCutoffXp - currentUserEntry.xp + 1)} XP
-                      </span>{" "}
-                      to climb into the Safe Zone before Sunday!
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
+      {/* ── 3. DUOLINGO TOP 3 3D PODIUM ── */}
+      {top3.length >= 3 && selectedLeague === "All" && (
+        <section className="relative overflow-hidden rounded-3xl bg-linear-to-b from-card to-card/60 border border-border p-6 sm:p-8 shadow-xs">
+          <div className="text-center space-y-1 mb-8">
+            <span className="text-[10px] font-black uppercase tracking-widest text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 inline-block">
+              Top 3 Podium Champions
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+              Weekly League Trophy Standings
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Podium winners earn PrepGems and permanent profile badge honors at Sunday midnight reset.
+            </p>
+          </div>
 
-            <div className="text-right shrink-0">
-              <span className="text-xl sm:text-2xl font-black tabular-nums">
-                {currentUserEntry.xp.toLocaleString()}
-              </span>
-              <span className="text-xs font-semibold ml-1 opacity-80">XP</span>
-            </div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-6 items-end max-w-2xl mx-auto pt-6">
+            {/* Rank 2 (Silver) - Left Pillar */}
+            {rank2 && (
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="relative">
+                  <div
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-linear-to-tr ${getAvatarColor(
+                      rank2.userId
+                    )} text-white flex items-center justify-center font-black text-sm sm:text-base shadow-md ring-2 ring-slate-400`}
+                  >
+                    {getInitials(rank2.name)}
+                  </div>
+                  <span className="absolute -bottom-2 -right-1 text-base sm:text-xl">🥈</span>
+                </div>
+
+                <div className="w-full space-y-0.5">
+                  <h3 className="text-xs sm:text-sm font-extrabold text-foreground truncate max-w-[100px] sm:max-w-[130px] mx-auto">
+                    {rank2.name}
+                  </h3>
+                  <div className="flex items-center justify-center gap-1 text-[10px] font-bold text-amber-500">
+                    <FlameIcon className="w-3 h-3 text-amber-500" />
+                    <span>{rank2.streakDays}d</span>
+                  </div>
+                </div>
+
+                {/* Silver Pillar */}
+                <div className="w-full rounded-2xl bg-linear-to-b from-slate-300 via-slate-400 to-slate-500 dark:from-slate-700 dark:to-slate-800 p-3 sm:p-4 text-white shadow-md flex flex-col justify-between h-28 sm:h-36">
+                  <div className="text-xl sm:text-2xl font-black">#2</div>
+                  <div className="space-y-0.5">
+                    <div className="text-xs sm:text-sm font-black tabular-nums">{rank2.xp.toLocaleString()} XP</div>
+                    <div className="text-[10px] font-black uppercase text-slate-100 bg-white/20 rounded-full px-2 py-0.5 inline-block">
+                      +150 Gems
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Rank 1 (Gold) - Center Tall Pillar */}
+            {rank1 && (
+              <div className="flex flex-col items-center text-center space-y-2 -translate-y-2 sm:-translate-y-4">
+                <CrownIcon className="w-6 h-6 text-amber-400 animate-bounce" />
+                <div className="relative">
+                  <div
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-linear-to-tr ${getAvatarColor(
+                      rank1.userId
+                    )} text-white flex items-center justify-center font-black text-base sm:text-lg shadow-xl ring-4 ring-amber-400`}
+                  >
+                    {getInitials(rank1.name)}
+                  </div>
+                  <span className="absolute -bottom-2 -right-1 text-xl sm:text-2xl">🥇</span>
+                </div>
+
+                <div className="w-full space-y-0.5">
+                  <h3 className="text-xs sm:text-base font-black text-foreground truncate max-w-[110px] sm:max-w-[150px] mx-auto">
+                    {rank1.name}
+                  </h3>
+                  <div className="flex items-center justify-center gap-1 text-[11px] font-bold text-amber-500">
+                    <FlameIcon className="w-3.5 h-3.5 text-amber-500" />
+                    <span>{rank1.streakDays}d streak</span>
+                  </div>
+                </div>
+
+                {/* Gold Pillar */}
+                <div className="w-full rounded-2xl bg-linear-to-b from-amber-400 via-yellow-500 to-amber-600 p-3 sm:p-4 text-white shadow-xl flex flex-col justify-between h-36 sm:h-44">
+                  <div className="text-2xl sm:text-3xl font-black">#1</div>
+                  <div className="space-y-0.5">
+                    <div className="text-sm sm:text-base font-black tabular-nums">{rank1.xp.toLocaleString()} XP</div>
+                    <div className="text-[10px] font-black uppercase text-amber-950 bg-white/40 rounded-full px-2 py-0.5 inline-block">
+                      +250 Gems
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Rank 3 (Bronze) - Right Pillar */}
+            {rank3 && (
+              <div className="flex flex-col items-center text-center space-y-2">
+                <div className="relative">
+                  <div
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-linear-to-tr ${getAvatarColor(
+                      rank3.userId
+                    )} text-white flex items-center justify-center font-black text-sm sm:text-base shadow-md ring-2 ring-amber-700`}
+                  >
+                    {getInitials(rank3.name)}
+                  </div>
+                  <span className="absolute -bottom-2 -right-1 text-base sm:text-xl">🥉</span>
+                </div>
+
+                <div className="w-full space-y-0.5">
+                  <h3 className="text-xs sm:text-sm font-extrabold text-foreground truncate max-w-[100px] sm:max-w-[130px] mx-auto">
+                    {rank3.name}
+                  </h3>
+                  <div className="flex items-center justify-center gap-1 text-[10px] font-bold text-amber-500">
+                    <FlameIcon className="w-3 h-3 text-amber-500" />
+                    <span>{rank3.streakDays}d</span>
+                  </div>
+                </div>
+
+                {/* Bronze Pillar */}
+                <div className="w-full rounded-2xl bg-linear-to-b from-amber-700 via-orange-800 to-yellow-900 p-3 sm:p-4 text-white shadow-md flex flex-col justify-between h-24 sm:h-32">
+                  <div className="text-xl sm:text-2xl font-black">#3</div>
+                  <div className="space-y-0.5">
+                    <div className="text-xs sm:text-sm font-black tabular-nums">{rank3.xp.toLocaleString()} XP</div>
+                    <div className="text-[10px] font-black uppercase text-white bg-white/20 rounded-full px-2 py-0.5 inline-block">
+                      +75 Gems
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* Weekly Prize Pool Cards (Top 3 League Winners) */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
-              <TrophyIcon className="w-6 h-6 text-amber-500" />
-              <span>Top 3 League Champions &amp; Weekly Prizes</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Concluding the week on the podium awards prizes and an instant promotion to the next league!
-            </p>
-          </div>
+      {/* ── 4. SEARCH & STREAM FILTER TOOLBAR ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Stream Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setSelectedStream("all")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border ${
+              selectedStream === "all"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-card hover:bg-muted text-muted-foreground border-border"
+            }`}
+          >
+            All Streams
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedStream("science")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border flex items-center gap-1.5 ${
+              selectedStream === "science"
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-card hover:bg-muted text-muted-foreground border-border"
+            }`}
+          >
+            <BeakerIcon className="w-3.5 h-3.5 text-blue-400" />
+            <span>Science</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedStream("commercial")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border flex items-center gap-1.5 ${
+              selectedStream === "commercial"
+                ? "bg-amber-600 text-white border-amber-600"
+                : "bg-card hover:bg-muted text-muted-foreground border-border"
+            }`}
+          >
+            <BriefcaseIcon className="w-3.5 h-3.5 text-amber-400" />
+            <span>Commercial</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedStream("arts")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border flex items-center gap-1.5 ${
+              selectedStream === "arts"
+                ? "bg-purple-600 text-white border-purple-600"
+                : "bg-card hover:bg-muted text-muted-foreground border-border"
+            }`}
+          >
+            <PaletteIcon className="w-3.5 h-3.5 text-purple-400" />
+            <span>Arts &amp; Humanities</span>
+          </button>
         </div>
 
-        {/* Top 3 Cards Layout */}
-        {topThree.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-end pt-2">
-            {/* #2 Runner-Up (Silver) */}
-            {topThree[1] && (
-              <div className="order-2 md:order-1 rounded-3xl bg-card border-2 border-slate-300 dark:border-slate-700 p-5 sm:p-6 text-center relative overflow-hidden shadow-md hover:shadow-xl transition-all group">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-slate-300 via-slate-400 to-slate-500" />
-                
-                {/* Prize Badge */}
-                <div className="mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black shadow-xs">
-                    <AwardIcon className="w-3.5 h-3.5 text-slate-400" />
-                    <span>2nd Place Prize</span>
-                  </span>
-                </div>
-
-                <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-slate-400 via-slate-500 to-slate-600 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-md ring-4 ring-slate-300/40 group-hover:scale-105 transition-transform">
-                  {getInitials(topThree[1].name)}
-                </div>
-
-                <h3 className="font-extrabold text-base text-foreground truncate">
-                  {topThree[1].name}
-                  {topThree[1].userId === currentUserId && (
-                    <span className="ml-1.5 px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-bold">
-                      You
-                    </span>
-                  )}
-                </h3>
-
-                <span
-                  className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border inline-block mt-1 ${getTierBadge(
-                    topThree[1].tier
-                  )}`}
-                >
-                  {topThree[1].tier} League
-                </span>
-
-                <div className="text-xl sm:text-2xl font-black text-foreground tabular-nums mt-2">
-                  {topThree[1].xp.toLocaleString()}{" "}
-                  <span className="text-xs text-muted-foreground font-semibold">XP</span>
-                </div>
-
-                {/* Prize Box */}
-                <div className="mt-3 p-2.5 rounded-xl bg-slate-500/10 border border-slate-500/20 text-xs text-center space-y-0.5">
-                  <span className="font-black text-slate-700 dark:text-slate-300 block flex items-center justify-center gap-1">
-                    <GiftIcon className="w-3.5 h-3.5 text-slate-500" />
-                    <span>150 Gems + Diagnostic Pass</span>
-                  </span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center gap-1">
-                    <RocketIcon className="w-3 h-3 text-emerald-500" />
-                    <span>Upgrades to Next League</span>
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* #1 Champion (Gold) - Elevated Card */}
-            {topThree[0] && (
-              <div className="order-1 md:order-2 rounded-3xl bg-card border-2 border-amber-500/80 p-6 sm:p-7 text-center relative overflow-hidden shadow-xl shadow-amber-500/15 md:-translate-y-3 group hover:-translate-y-4 transition-all">
-                <div className="absolute top-0 left-0 right-0 h-2 bg-linear-to-r from-amber-400 via-yellow-300 to-amber-500 animate-pulse" />
-                
-                <div className="w-10 h-10 mx-auto text-amber-500 mb-1 flex items-center justify-center">
-                  <CrownIcon className="w-8 h-8" />
-                </div>
-
-                {/* Prize Badge */}
-                <div className="mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-700 dark:text-amber-300 text-xs font-black shadow-xs">
-                    <CrownIcon className="w-3.5 h-3.5 text-amber-500" />
-                    <span>1st Place Grand Prize</span>
-                  </span>
-                </div>
-
-                <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-amber-400 via-amber-500 to-yellow-600 text-white font-black text-2xl flex items-center justify-center mx-auto mb-3 shadow-xl shadow-amber-500/40 ring-4 ring-amber-400/30 group-hover:scale-105 transition-transform">
-                  {getInitials(topThree[0].name)}
-                </div>
-
-                <h3 className="font-black text-lg text-foreground truncate">
-                  {topThree[0].name}
-                  {topThree[0].userId === currentUserId && (
-                    <span className="ml-1.5 px-2 py-0.5 rounded-md bg-blue-600 text-white text-[11px] font-bold">
-                      You
-                    </span>
-                  )}
-                </h3>
-
-                <span
-                  className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border inline-block mt-1 ${getTierBadge(
-                    topThree[0].tier
-                  )}`}
-                >
-                  {topThree[0].tier} League
-                </span>
-
-                <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 tabular-nums mt-2">
-                  {topThree[0].xp.toLocaleString()}{" "}
-                  <span className="text-xs text-muted-foreground font-semibold">XP</span>
-                </div>
-
-                {/* Champion Prize Box */}
-                <div className="mt-3 p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-xs text-center space-y-0.5">
-                  <span className="font-black text-amber-700 dark:text-amber-300 block flex items-center justify-center gap-1">
-                    <GiftIcon className="w-3.5 h-3.5 text-amber-500" />
-                    <span>250 Gems + 1x Streak Freeze</span>
-                  </span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black flex items-center justify-center gap-1">
-                    <RocketIcon className="w-3 h-3 text-emerald-500" />
-                    <span>Upgrades to Next League + Champion Trophy</span>
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* #3 Third Place (Bronze) */}
-            {topThree[2] && (
-              <div className="order-3 rounded-3xl bg-card border-2 border-amber-700/40 dark:border-amber-700/60 p-5 sm:p-6 text-center relative overflow-hidden shadow-md hover:shadow-xl transition-all group">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-amber-600 via-amber-700 to-amber-800" />
-                
-                {/* Prize Badge */}
-                <div className="mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950/80 border border-amber-600/30 text-amber-800 dark:text-amber-300 text-xs font-black shadow-xs">
-                    <AwardIcon className="w-3.5 h-3.5 text-amber-600" />
-                    <span>3rd Place Prize</span>
-                  </span>
-                </div>
-
-                <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-600 via-amber-700 to-amber-800 text-white font-bold text-lg flex items-center justify-center mx-auto mb-3 shadow-md ring-4 ring-amber-600/30 group-hover:scale-105 transition-transform">
-                  {getInitials(topThree[2].name)}
-                </div>
-
-                <h3 className="font-extrabold text-base text-foreground truncate">
-                  {topThree[2].name}
-                  {topThree[2].userId === currentUserId && (
-                    <span className="ml-1.5 px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-bold">
-                      You
-                    </span>
-                  )}
-                </h3>
-
-                <span
-                  className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border inline-block mt-1 ${getTierBadge(
-                    topThree[2].tier
-                  )}`}
-                >
-                  {topThree[2].tier} League
-                </span>
-
-                <div className="text-xl sm:text-2xl font-black text-foreground tabular-nums mt-2">
-                  {topThree[2].xp.toLocaleString()}{" "}
-                  <span className="text-xs text-muted-foreground font-semibold">XP</span>
-                </div>
-
-                {/* Prize Box */}
-                <div className="mt-3 p-2.5 rounded-xl bg-amber-700/10 border border-amber-700/20 text-xs text-center space-y-0.5">
-                  <span className="font-black text-amber-800 dark:text-amber-300 block flex items-center justify-center gap-1">
-                    <GiftIcon className="w-3.5 h-3.5 text-amber-700" />
-                    <span>75 Gems + Bronze Crest</span>
-                  </span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center justify-center gap-1">
-                    <RocketIcon className="w-3 h-3 text-emerald-500" />
-                    <span>Upgrades to Next League</span>
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* League & Search Filter Strip */}
-      <section className="space-y-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-card border border-border/80 rounded-2xl p-4 shadow-xs">
-          {/* League selector */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-bold text-muted-foreground mr-1 hidden sm:inline">
-              League:
-            </span>
+        {/* Search input */}
+        <div className="relative w-full sm:w-64">
+          <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search candidate name..."
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground text-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          />
+          {searchQuery && (
             <button
               type="button"
-              onClick={() => setSelectedLeague("All")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                selectedLeague === "All"
-                  ? "bg-blue-600 text-white shadow-xs font-bold"
-                  : "bg-muted text-muted-foreground hover:text-foreground border border-border/60"
-              }`}
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
             >
-              All Leagues
+              <XIcon className="w-3.5 h-3.5" />
             </button>
-            {LEAGUES.map((league) => {
-              const LeagueIcon = league.icon;
+          )}
+        </div>
+      </div>
+
+      {/* ── 5. DUOLINGO DIVISION BRACKET LEADERBOARD TABLE ── */}
+      <section className="rounded-3xl border border-border bg-card overflow-hidden shadow-xs">
+        {/* Table Header Bar */}
+        <div className="bg-muted/50 px-4 py-3 border-b border-border text-[11px] font-black uppercase tracking-wider text-muted-foreground grid grid-cols-12 gap-2 items-center">
+          <div className="col-span-2 sm:col-span-1 text-center">Rank</div>
+          <div className="col-span-7 sm:col-span-8">Candidate Profile</div>
+          <div className="col-span-3 sm:col-span-3 text-right">Weekly XP</div>
+        </div>
+
+        {/* Rows with Duolingo Zones */}
+        <div className="divide-y divide-border">
+          {filteredEntries.length === 0 ? (
+            <div className="py-12 text-center space-y-2">
+              <TrophyIcon className="w-8 h-8 text-muted-foreground mx-auto" />
+              <p className="text-sm font-bold text-foreground">No candidates match your filter</p>
+              <p className="text-xs text-muted-foreground">Try clearing your search query or selecting All Leagues.</p>
+            </div>
+          ) : (
+            filteredEntries.map((entry, index) => {
+              const rank = index + 1;
+              const isCurrentUser =
+                entry.userId === currentUserId ||
+                entry.isCurrentUser ||
+                (currentCandidate && entry.userId === currentCandidate.userId);
+
+              const isPromotion = rank <= PROMOTION_CUTOFF;
+              const isDemotion = rank >= DEMOTION_START;
+
+              // Render zone separation headers
+              const showPromotionHeader = rank === 1;
+              const showSafeZoneHeader = rank === PROMOTION_CUTOFF + 1;
+              const showDemotionHeader = rank === DEMOTION_START;
+
               return (
-                <button
-                  key={league.name}
-                  type="button"
-                  onClick={() => setSelectedLeague(league.name)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                    selectedLeague === league.name
-                      ? "bg-blue-600 text-white shadow-xs font-bold ring-2 ring-blue-500/30"
-                      : "bg-muted text-muted-foreground hover:text-foreground border border-border/60"
-                  }`}
-                >
-                  <LeagueIcon className="w-3.5 h-3.5 shrink-0" />
-                  <span>{league.name}</span>
-                </button>
-              );
-            })}
-          </div>
+                <div key={entry.userId}>
+                  {/* Duolingo Zone Banners */}
+                  {showPromotionHeader && (
+                    <div className="bg-emerald-500/10 border-y border-emerald-500/20 px-4 py-1.5 flex items-center justify-between text-xs font-black text-emerald-600 dark:text-emerald-400">
+                      <span className="flex items-center gap-1.5">
+                        <TrendingUpIcon className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>PROMOTION ZONE — Top 7 advance to the next league</span>
+                      </span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider">▲ Promoted</span>
+                    </div>
+                  )}
 
-          {/* Search candidate input */}
-          <div className="relative min-w-[220px]">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search candidate in league..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-muted/60 border border-border/80 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
-        </div>
-      </section>
+                  {showSafeZoneHeader && (
+                    <div className="bg-muted/40 border-y border-border px-4 py-1.5 flex items-center justify-between text-[11px] font-bold text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <ShieldIcon className="w-3.5 h-3.5 text-blue-500" />
+                        <span>SAFE ZONE — Ranks {PROMOTION_CUTOFF + 1} to {DEMOTION_START - 1} remain in current league</span>
+                      </span>
+                      <span className="text-[10px] uppercase font-bold">Stable</span>
+                    </div>
+                  )}
 
-      {/* Table View for Other Users with Duolingo Promotion, Safe, and Demotion Zones */}
-      <section className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 className="text-xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
-              <ChartBarIcon className="w-5 h-5 text-blue-500" />
-              <span>League Standings (Table View)</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                Ranks #4+
-              </span>
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Ranks #4 and beyond. Top ranks advance to the next league, middle ranks remain safe, while bottom 5 face demotion!
-            </p>
-          </div>
+                  {showDemotionHeader && (
+                    <div className="bg-rose-500/10 border-y border-rose-500/20 px-4 py-1.5 flex items-center justify-between text-xs font-black text-rose-600 dark:text-rose-400">
+                      <span className="flex items-center gap-1.5">
+                        <TrendingDownIcon className="w-3.5 h-3.5 text-rose-500" />
+                        <span>DEMOTION ZONE — Bottom 5 drop to the lower league</span>
+                      </span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider">▼ Relegated</span>
+                    </div>
+                  )}
 
-          {/* Legend Pills */}
-          <div className="flex items-center gap-2 text-[11px] font-semibold flex-wrap">
-            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" /> Promotion (Top 5)
-            </span>
-            <span className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400">
-              <span className="w-2 h-2 rounded-full bg-blue-500" /> Safe Zone
-            </span>
-            <span className="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400">
-              <span className="w-2 h-2 rounded-full bg-rose-500" /> Demotion (Bottom 5)
-            </span>
-          </div>
-        </div>
+                  {/* Candidate Row */}
+                  <div
+                    className={`grid grid-cols-12 gap-2 items-center px-4 py-3 transition-colors ${
+                      isCurrentUser
+                        ? "bg-blue-500/10 dark:bg-blue-950/40 ring-2 ring-inset ring-blue-500 font-bold"
+                        : "hover:bg-muted/40"
+                    }`}
+                  >
+                    {/* Rank Badge */}
+                    <div className="col-span-2 sm:col-span-1 flex items-center justify-center">
+                      {rank === 1 ? (
+                        <span className="text-xl">🥇</span>
+                      ) : rank === 2 ? (
+                        <span className="text-xl">🥈</span>
+                      ) : rank === 3 ? (
+                        <span className="text-xl">🥉</span>
+                      ) : isPromotion ? (
+                        <span className="w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-black text-xs flex items-center justify-center">
+                          {rank}
+                        </span>
+                      ) : isDemotion ? (
+                        <span className="w-6 h-6 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 font-black text-xs flex items-center justify-center">
+                          {rank}
+                        </span>
+                      ) : (
+                        <span className="text-xs font-bold text-muted-foreground tabular-nums">
+                          {rank}
+                        </span>
+                      )}
+                    </div>
 
-        {filteredEntries.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border p-12 text-center space-y-2 bg-card/50">
-            <div className="w-10 h-10 mx-auto text-muted-foreground flex items-center justify-center">
-              <SearchIcon className="w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-foreground text-sm">No Candidates Found</h4>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              No students match the selected filter. Try selecting another league or clearing search.
-            </p>
-          </div>
-        ) : otherUsers.length === 0 ? (
-          <div className="rounded-2xl bg-card border border-border/80 p-8 text-center space-y-3 shadow-xs">
-            <div className="w-10 h-10 mx-auto text-amber-500 flex items-center justify-center">
-              <SparklesIcon className="w-6 h-6" />
-            </div>
-            <h4 className="font-bold text-foreground text-sm">All Candidates on the Podium</h4>
-            <p className="text-xs text-muted-foreground max-w-md mx-auto">
-              All students in this category are currently in the Top 3 cards above!
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-2xl bg-card border border-border/80 overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs sm:text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-border bg-muted/60 text-muted-foreground font-extrabold uppercase tracking-wider text-[11px]">
-                    <th className="py-3.5 px-4 sm:px-6 w-16 text-center">Rank</th>
-                    <th className="py-3.5 px-4 sm:px-6">Candidate</th>
-                    <th className="py-3.5 px-4 sm:px-6">League</th>
-                    <th className="py-3.5 px-4 sm:px-6">Weekly Zone</th>
-                    <th className="py-3.5 px-4 sm:px-6 text-right">Weekly XP</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {otherUsers.map((entry, index) => {
-                    const isCurrentUser = entry.userId === currentUserId;
-                    const isPromotionZone = entry.rank <= promotionThresholdRank;
-                    const isDemotionZone = entry.rank >= demotionThresholdRank && totalCount > 5;
-                    const isSafeZone = !isPromotionZone && !isDemotionZone;
-
-                    // Show divider line before the first demotion row
-                    const isFirstDemotionRow = entry.rank === demotionThresholdRank;
-
-                    return (
-                      <tr
-                        key={entry.userId}
-                        className={`transition-colors ${
-                          isFirstDemotionRow ? "border-t-2 border-t-rose-500/80" : ""
-                        } ${
-                          isCurrentUser
-                            ? "bg-blue-500/15 dark:bg-blue-500/20 border-l-4 border-l-blue-600 font-medium"
-                            : isDemotionZone
-                            ? "bg-rose-500/5 dark:bg-rose-500/10 hover:bg-rose-500/10"
-                            : isPromotionZone
-                            ? "bg-emerald-500/5 dark:bg-emerald-500/10 hover:bg-emerald-500/10"
-                            : "hover:bg-muted/40"
-                        }`}
+                    {/* Candidate Info */}
+                    <div className="col-span-7 sm:col-span-8 flex items-center gap-3">
+                      <div
+                        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-tr ${getAvatarColor(
+                          entry.userId
+                        )} text-white flex items-center justify-center font-black text-xs shrink-0 shadow-2xs`}
                       >
-                        {/* Rank Column */}
-                        <td className="py-3.5 px-4 sm:px-6 text-center font-black">
-                          <span
-                            className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold ${
-                              isPromotionZone
-                                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                                : isDemotionZone
-                                ? "bg-rose-500/15 text-rose-600 dark:text-rose-400"
-                                : "bg-muted text-foreground"
-                            }`}
-                          >
-                            #{entry.rank}
+                        {getInitials(entry.name)}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs sm:text-sm font-bold truncate text-foreground ${isCurrentUser ? "text-blue-600 dark:text-blue-400 font-black" : ""}`}>
+                            {entry.name}
                           </span>
-                        </td>
 
-                        {/* Candidate Column */}
-                        <td className="py-3.5 px-4 sm:px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-blue-600 to-indigo-700 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                              {getInitials(entry.name)}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="font-bold text-foreground text-xs sm:text-sm truncate">
-                                  {entry.name}
-                                </span>
-                                {isCurrentUser && (
-                                  <span className="px-1.5 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-extrabold uppercase shrink-0">
-                                    You
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-[11px] text-muted-foreground block truncate">
-                                UTME Candidate
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* League Column */}
-                        <td className="py-3.5 px-4 sm:px-6">
-                          <span
-                            className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border inline-block ${getTierBadge(
-                              entry.tier
-                            )}`}
-                          >
-                            {entry.tier}
-                          </span>
-                        </td>
-
-                        {/* Weekly Zone Status Badge */}
-                        <td className="py-3.5 px-4 sm:px-6">
-                          {isPromotionZone ? (
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-                              <RocketIcon className="w-3.5 h-3.5" />
-                              <span>Promotion Zone</span>
-                            </span>
-                          ) : isDemotionZone ? (
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2.5 py-1 rounded-full animate-pulse">
-                              <TrendingDownIcon className="w-3.5 h-3.5" />
-                              <span>Demotion Zone</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full">
-                              <ShieldIcon className="w-3.5 h-3.5" />
-                              <span>Safe in League</span>
+                          {isCurrentUser && (
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
+                              You
                             </span>
                           )}
-                        </td>
 
-                        {/* Weekly XP Column */}
-                        <td className="py-3.5 px-4 sm:px-6 text-right font-black tabular-nums text-foreground text-sm sm:text-base">
-                          {entry.xp.toLocaleString()}{" "}
-                          <span className="text-[11px] text-muted-foreground font-semibold">
-                            XP
+                          <span className="hidden sm:inline-flex text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
+                            {entry.stream}
                           </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </div>
 
-            {/* Demotion Zone Warning Footer */}
-            <div className="px-4 sm:px-6 py-3.5 bg-rose-500/10 border-t border-rose-500/30 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-rose-900 dark:text-rose-200 font-semibold gap-2">
-              <div className="flex items-center gap-1.5">
-                <AlertTriangleIcon className="w-4 h-4 text-rose-500 shrink-0" />
-                <span>
-                  <strong>Demotion Rule:</strong> The bottom 5 candidates (starting from rank #{demotionThresholdRank} to #{totalCount}) drop down one league every Sunday.
-                </span>
-              </div>
-              <span className="text-[11px] opacity-80 shrink-0">
-                Resets every Sunday at 23:59 UTC
-              </span>
-            </div>
-          </div>
-        )}
-      </section>
+                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                          <span className="flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400">
+                            <FlameIcon className="w-3 h-3 text-amber-500" />
+                            <span>{entry.streakDays}d streak</span>
+                          </span>
+                          <span>•</span>
+                          <span className="hidden sm:inline">Target: <strong>{entry.targetScore}</strong> pts</span>
+                          <span className="sm:hidden font-medium capitalize">{entry.stream}</span>
+                        </div>
+                      </div>
+                    </div>
 
-      {/* Duolingo League Progression Rules & FAQ */}
-      <section className="rounded-2xl bg-card border border-border/80 p-5 sm:p-6 shadow-xs space-y-4">
-        <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
-          <ZapIcon className="w-4 h-4 text-blue-500" />
-          <span>How the PrepSmart Weekly Leagues Work</span>
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-1.5">
-            <div className="flex items-center gap-2 font-black text-emerald-600 dark:text-emerald-400">
-              <RocketIcon className="w-4 h-4 text-emerald-500" />
-              <span>1. Promotion Zone &amp; Top 3 Prizes</span>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              Earn XP throughout the week. The top 5 candidates advance to the next league tier. The top 3 podium winners earn <strong>PrepGems (250, 150, 75)</strong>, streak shields, and medals!
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 space-y-1.5">
-            <div className="flex items-center gap-2 font-black text-blue-600 dark:text-blue-400">
-              <ShieldIcon className="w-4 h-4 text-blue-500" />
-              <span>2. Safe Zone</span>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              Maintain daily study sessions to finish above the bottom 5. Safe candidates remain in their league to battle for the championship next week.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-1.5">
-            <div className="flex items-center gap-2 font-black text-rose-600 dark:text-rose-400">
-              <TrendingDownIcon className="w-4 h-4 text-rose-500" />
-              <span>3. Demotion Zone</span>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              The 5 candidates with the least weekly points (5th-from-the-bottom to last) get demoted to the lower tier when the timer reaches zero on Sunday midnight.
-            </p>
-          </div>
+                    {/* XP Score */}
+                    <div className="col-span-3 sm:col-span-3 text-right">
+                      <div className="text-xs sm:text-sm font-black text-foreground tabular-nums">
+                        {entry.xp.toLocaleString()} <span className="text-[10px] text-muted-foreground font-bold">XP</span>
+                      </div>
+                      <div className="text-[10px] font-bold text-muted-foreground flex items-center justify-end gap-1">
+                        {isPromotion ? (
+                          <span className="text-emerald-500 flex items-center gap-0.5 font-black">
+                            <TrendingUpIcon className="w-3 h-3" />
+                            <span>Advance</span>
+                          </span>
+                        ) : isDemotion ? (
+                          <span className="text-rose-500 flex items-center gap-0.5 font-black">
+                            <TrendingDownIcon className="w-3 h-3" />
+                            <span>Danger</span>
+                          </span>
+                        ) : (
+                          <span>Safe</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </section>
 
-      {/* Sunday Reset Simulation Modal */}
-      {showResolutionModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-border pb-3">
+      {/* ── 6. FLOATING CURRENT USER BAR (DUOLINGO STICKY DOCK) ── */}
+      {currentCandidate && (
+        <aside
+          aria-label="Your tournament standing"
+          className="fixed bottom-4 left-4 right-4 max-w-4xl mx-auto z-40 bg-card/95 backdrop-blur-md border border-blue-500/40 rounded-2xl p-3 sm:p-4 shadow-xl flex items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+              #{currentCandidateRankInFiltered ?? currentCandidate.rank}
+            </div>
+
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <SparklesIcon className="w-5 h-5 text-purple-500" />
-                <div>
-                  <h3 className="font-black text-base text-foreground">Sunday League Resolution Preview</h3>
-                  <span className="text-[11px] text-muted-foreground">What happens when the weekly timer ends</span>
-                </div>
+                <span className="text-xs sm:text-sm font-black text-foreground truncate">
+                  Your Tournament Standing
+                </span>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-300">
+                  {currentCandidate.tier}
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground truncate">
+                <strong>{currentCandidate.xp.toLocaleString()} XP</strong> • {currentCandidate.streakDays}d streak •{" "}
+                {(currentCandidateRankInFiltered ?? currentCandidate.rank) <= PROMOTION_CUTOFF ? (
+                  <span className="text-emerald-500 font-bold">You are in the Promotion Zone! ▲</span>
+                ) : (
+                  <span className="text-amber-500 font-bold">Earn XP to climb into Promotion Zone</span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/study?tab=mock-exam"
+            className="shrink-0 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-xs flex items-center gap-1.5 transition-all"
+          >
+            <ZapIcon className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Boost XP (+150 XP)</span>
+            <span className="sm:hidden">Practice</span>
+          </Link>
+        </aside>
+      )}
+
+      {/* ── 7. DUOLINGO LEAGUE RULES & FAQ MODAL ── */}
+      {showRulesModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 animate-scaleUp">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🏆</span>
+                <h3 className="text-lg font-black text-foreground tracking-tight">
+                  How Duolingo Leagues Work
+                </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setShowResolutionModal(false)}
-                className="w-8 h-8 rounded-full bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center cursor-pointer"
+                onClick={() => setShowRulesModal(false)}
+                className="w-8 h-8 rounded-full bg-muted hover:bg-muted/80 text-foreground flex items-center justify-center cursor-pointer transition-colors"
               >
                 <XIcon className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs max-h-[60vh] overflow-y-auto pr-1">
-              {/* Top 3 Winners */}
-              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
-                <span className="font-black text-amber-700 dark:text-amber-300 block flex items-center gap-1.5">
-                  <TrophyIcon className="w-4 h-4 text-amber-500" />
-                  <span>Weekly Prize Pool Awardees</span>
-                </span>
-                <div className="space-y-1">
-                  <div className="flex justify-between font-bold">
-                    <span className="flex items-center gap-1">
-                      <CrownIcon className="w-3.5 h-3.5 text-amber-500" />
-                      <span>{topThree[0]?.name || "1st Place"}</span>
-                    </span>
-                    <span className="text-amber-600 dark:text-amber-400">+250 Gems &amp; 1x Streak Freeze</span>
-                  </div>
-                  <div className="flex justify-between font-bold">
-                    <span className="flex items-center gap-1">
-                      <AwardIcon className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{topThree[1]?.name || "2nd Place"}</span>
-                    </span>
-                    <span className="text-slate-600 dark:text-slate-300">+150 Gems &amp; Diagnostic Pass</span>
-                  </div>
-                  <div className="flex justify-between font-bold">
-                    <span className="flex items-center gap-1">
-                      <AwardIcon className="w-3.5 h-3.5 text-amber-700" />
-                      <span>{topThree[2]?.name || "3rd Place"}</span>
-                    </span>
-                    <span className="text-amber-700 dark:text-amber-300">+75 Gems &amp; Bronze Crest</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Promoted */}
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-1.5">
-                <span className="font-black text-emerald-600 dark:text-emerald-400 block flex items-center gap-1.5">
-                  <RocketIcon className="w-3.5 h-3.5" />
-                  <span>Upgrading to Higher League (Ranks 1 – 5)</span>
-                </span>
-                <p className="text-muted-foreground">
-                  {filteredEntries.slice(0, promotionThresholdRank).map((e) => e.name).join(", ")}
+            <div className="space-y-4 text-xs text-muted-foreground leading-relaxed">
+              <div className="p-3.5 rounded-2xl bg-muted/50 border border-border space-y-1">
+                <h4 className="font-black text-foreground flex items-center gap-1.5 text-xs">
+                  <span>📅</span>
+                  <span>Weekly 30-Candidate Cohort</span>
+                </h4>
+                <p>
+                  Every Monday 00:00 WAT, you are matched into a competitive 30-candidate group based on your current league. The tournament ends every Sunday at 23:59 WAT.
                 </p>
               </div>
 
-              {/* Safe */}
-              <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/30 space-y-1.5">
-                <span className="font-black text-blue-600 dark:text-blue-400 block flex items-center gap-1.5">
-                  <ShieldIcon className="w-3.5 h-3.5" />
-                  <span>Remaining in Current League</span>
-                </span>
-                <p className="text-muted-foreground">
-                  {filteredEntries.slice(promotionThresholdRank, demotionThresholdRank - 1).map((e) => e.name).join(", ") || "No candidates in this tier"}
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
+                <h4 className="font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 text-xs">
+                  <span>▲</span>
+                  <span>Promotion Zone (Top 7)</span>
+                </h4>
+                <p>
+                  Finish in the Top 7 on Sunday night to get promoted to the next league! The Top 3 podium winners also receive 250, 150, or 75 PrepGems.
                 </p>
               </div>
 
-              {/* Demoted */}
-              <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
-                <span className="font-black text-rose-600 dark:text-rose-400 block flex items-center gap-1.5">
-                  <TrendingDownIcon className="w-3.5 h-3.5" />
-                  <span>Degrading to Lower League (Bottom 5: Ranks #{demotionThresholdRank} – #{totalCount})</span>
-                </span>
-                <p className="text-muted-foreground">
-                  {filteredEntries.slice(demotionThresholdRank - 1).map((e) => e.name).join(", ")}
+              <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 space-y-1">
+                <h4 className="font-black text-rose-600 dark:text-rose-400 flex items-center gap-1.5 text-xs">
+                  <span>▼</span>
+                  <span>Demotion Zone (Bottom 5)</span>
+                </h4>
+                <p>
+                  Candidates who finish in the bottom 5 of their group drop down one league tier next week. Keep your daily study streak active to prevent relegation.
                 </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 space-y-1.5">
+                <h4 className="font-black text-blue-600 dark:text-blue-400 flex items-center gap-1.5 text-xs">
+                  <span>⚡</span>
+                  <span>Ways to Earn XP</span>
+                </h4>
+                <ul className="grid grid-cols-2 gap-2 text-foreground font-semibold">
+                  <li>• CBT Mock Exam: <strong>+150 XP</strong></li>
+                  <li>• Diagnostic Test: <strong>+100 XP</strong></li>
+                  <li>• Syllabus Topic: <strong>+50 XP</strong></li>
+                  <li>• Daily Streak Check-in: <strong>+25 XP</strong></li>
+                  <li>• Correct Practice Question: <strong>+5 XP</strong></li>
+                </ul>
               </div>
             </div>
 
-            <div className="pt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowResolutionModal(false)}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer"
-              >
-                Got It! Keep Studying
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowRulesModal(false)}
+              className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-xs cursor-pointer transition-colors"
+            >
+              Got It, Let&apos;s Climb the Ranks!
+            </button>
           </div>
         </div>
       )}

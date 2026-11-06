@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
+import ProfileView from "./ProfileView";
 
 export const metadata: Metadata = {
-  title: "Candidate Profile & Diagnostic Report",
-  description: "Review your baseline readiness score, subject strength breakdown, and target institution roadmap.",
+  title: "Candidate Profile, Academic Stream & Study Preferences | PrepSmart",
+  description:
+    "Manage your enrolled UTME academic stream, choose your 4 JAMB examination subjects, set your target score, and customize your daily study cadence.",
 };
 
 export default function ProfilePage() {
   return (
-    <div className="space-y-6">
-      <div className="bg-card border border-border rounded-2xl p-6 shadow-xs transition-colors duration-200">
-        <h1 className="text-2xl font-bold text-foreground">Diagnostic Readiness Report</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Review your baseline test results, projected score gains, and targeted syllabus recommendations.
-        </p>
-      </div>
+    <div className="py-4 sm:py-6">
+      <ProfileView />
     </div>
   );
 }

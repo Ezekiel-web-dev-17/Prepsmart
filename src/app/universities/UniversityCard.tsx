@@ -55,6 +55,11 @@ export default function UniversityCard({
               aspectRatio="thumb"
               className="rounded-xl w-20 h-20 sm:w-24 sm:h-24 object-cover border border-border/80 shadow-2xs"
               overlayGradient={true}
+              dbImageUrl={university.imageUrl}
+              dbLandmark={university.imageLandmark}
+              dbCaption={university.imageCaption}
+              dbBrandColor={university.brandColor}
+              dbSecondaryColor={university.secondaryColor}
             />
             <div className="absolute -bottom-2 -right-2 ring-2 ring-card rounded-lg bg-card shadow-xs">
               <UniversityLogo
@@ -62,6 +67,9 @@ export default function UniversityCard({
                 name={university.name}
                 acronym={university.acronym}
                 size="sm"
+                dbLogoUrl={university.logoUrl}
+                dbBrandColor={university.brandColor}
+                dbSecondaryColor={university.secondaryColor}
               />
             </div>
           </div>
@@ -73,6 +81,9 @@ export default function UniversityCard({
               name={university.name}
               acronym={university.acronym}
               size="md"
+              dbLogoUrl={university.logoUrl}
+              dbBrandColor={university.brandColor}
+              dbSecondaryColor={university.secondaryColor}
             />
           </div>
 
@@ -172,6 +183,11 @@ export default function UniversityCard({
           acronym={university.acronym}
           aspectRatio="card"
           showLandmarkBadge={true}
+          dbImageUrl={university.imageUrl}
+          dbLandmark={university.imageLandmark}
+          dbCaption={university.imageCaption}
+          dbBrandColor={university.brandColor}
+          dbSecondaryColor={university.secondaryColor}
         />
 
         {/* Floating Badges on Image */}
@@ -205,6 +221,9 @@ export default function UniversityCard({
                 name={university.name}
                 acronym={university.acronym}
                 size="md"
+                dbLogoUrl={university.logoUrl}
+                dbBrandColor={university.brandColor}
+                dbSecondaryColor={university.secondaryColor}
               />
             </div>
 

@@ -10,6 +10,7 @@ import {
   EXAM_TIMING_STRATEGY,
   NormalizedTopic,
 } from "./study-data";
+import { useUserContext } from "@/context/UserContext";
 import {
   TargetIcon,
   ClockIcon,
@@ -30,6 +31,8 @@ export interface StudyCurriculumHubProps {
 }
 
 export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurriculumHubProps = {}) {
+  const { department: userDepartment, isSignedIn } = useUserContext();
+
   // Navigation / active section state
   const [activeTab, setActiveTab] = useState<
     "streams" | "roadmap" | "syllabus" | "blueprint" | "traps"
@@ -283,19 +286,30 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {ACADEMIC_STREAMS.map((stream) => (
+            {ACADEMIC_STREAMS.map((stream) => {
+              const isUserStream = isSignedIn && userDepartment === stream.id;
+              return (
               <div
                 key={stream.id}
-                className={`bg-card rounded-3xl border p-6 flex flex-col justify-between shadow-xs transition-all duration-300 hover:shadow-md ${stream.accentBorder} ${stream.accentBg}`}
+                className={`bg-card rounded-3xl border p-6 flex flex-col justify-between shadow-xs transition-all duration-300 hover:shadow-md ${stream.accentBorder} ${stream.accentBg} ${
+                  isUserStream ? "ring-2 ring-blue-500 shadow-md" : ""
+                }`}
               >
                 <div className="space-y-5">
                   {/* Top Badge & Header */}
                   <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border ${stream.accentBadge}`}
-                    >
-                      {stream.badge}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border ${stream.accentBadge}`}
+                      >
+                        {stream.badge}
+                      </span>
+                      {isUserStream && (
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-xs">
+                          Your Stream
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-card border border-border text-foreground shadow-2xs">
                       {stream.targetScore}
                     </span>
@@ -398,7 +412,8 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
                   </button>
                 </div>
               </div>
-            ))}
+            );
+          })}
           </div>
         </section>
       )}

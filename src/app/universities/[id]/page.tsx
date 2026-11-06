@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import UniversityDetailView from "./UniversityDetailView";
 import type { UniversityData } from "../types";
 import { UNIVERSITIES_DATA } from "@/data/universities";
+import { getUniversityImageMeta } from "@/data/university-images";
+import { getUniversityLogoMeta } from "@/data/university-logos";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -70,6 +72,12 @@ export default async function UniversityDetailPage({ params }: PageProps) {
       ...rawUniversity,
       createdAt: rawUniversity.createdAt.toISOString(),
       updatedAt: rawUniversity.updatedAt.toISOString(),
+      imageUrl: rawUniversity.imageUrl ?? null,
+      logoUrl: rawUniversity.logoUrl ?? null,
+      imageLandmark: rawUniversity.imageLandmark ?? null,
+      imageCaption: rawUniversity.imageCaption ?? null,
+      brandColor: rawUniversity.brandColor ?? null,
+      secondaryColor: rawUniversity.secondaryColor ?? null,
       coursesCount: rawUniversity.courses.length,
       minCourseCutOff:
         rawUniversity.courses.length > 0
@@ -90,6 +98,9 @@ export default async function UniversityDetailPage({ params }: PageProps) {
     }
 
     const courseValues = Object.values(catalogUni.departmentalCutOffs || {});
+    const imgMeta = getUniversityImageMeta(catalogUni.id, catalogUni.acronym);
+    const logoMeta = getUniversityLogoMeta(catalogUni.id, catalogUni.acronym);
+
     university = {
       id: catalogUni.id,
       slug: catalogUni.id,
@@ -109,6 +120,12 @@ export default async function UniversityDetailPage({ params }: PageProps) {
       estYear: catalogUni.estYear,
       website: catalogUni.website,
       campusHighlights: catalogUni.campusHighlights,
+      imageUrl: imgMeta.imageUrl ?? null,
+      logoUrl: logoMeta.logoUrl ?? null,
+      imageLandmark: imgMeta.landmark ?? null,
+      imageCaption: imgMeta.caption ?? null,
+      brandColor: logoMeta.brandColor ?? null,
+      secondaryColor: logoMeta.secondaryColor ?? null,
       courses: Object.entries(catalogUni.departmentalCutOffs || {}).map(([key, cutOff]) => ({
         id: `${catalogUni.id}-${key}`,
         universityId: catalogUni.id,

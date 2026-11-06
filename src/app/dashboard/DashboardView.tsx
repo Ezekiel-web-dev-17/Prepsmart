@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useGamification } from "@/components/gamification/XPToast";
 import { awardUserXPAction } from "@/actions/gamification";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useUserContext } from "@/context/UserContext";
 import { ProgressDashboardClient } from "@/app/progress/ProgressDashboardClient";
 import RevisionHubClient, { type RevisionQuestion } from "@/app/revision/RevisionHubClient";
 import type { CandidateProgressData } from "@/lib/progress";
@@ -45,6 +46,14 @@ interface DashboardUser {
   xp: number;
 }
 
+function getTodayDateString(): string {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 interface DashboardViewProps {
   user: DashboardUser;
   profile: DashboardProfile | null;
@@ -53,6 +62,7 @@ interface DashboardViewProps {
   progressData?: CandidateProgressData | null;
   revisionQuestions?: RevisionQuestion[];
   initialActiveTab?: string;
+  initialStreakClaimedToday?: boolean;
 }
 
 type MainTab = "overview" | "readiness" | "revision";
@@ -65,9 +75,11 @@ export default function DashboardView({
   progressData,
   revisionQuestions = [],
   initialActiveTab = "overview",
+  initialStreakClaimedToday = false,
 }: DashboardViewProps) {
   const { triggerXPToast } = useGamification();
   const { isSubscribed, subscribeToPush, sendTestNotification } = usePushNotifications();
+  const { refetchUser } = useUserContext();
 
   const [mainTab, setMainTab] = useState<MainTab>(() => {
     if (initialActiveTab === "readiness" || initialActiveTab === "progress") return "readiness";
@@ -79,9 +91,55 @@ export default function DashboardView({
     profile?.selectedSubjects[0] || "Use of English"
   );
   const [isClaimingDaily, setIsClaimingDaily] = useState(false);
-  const [hasClaimedToday, setHasClaimedToday] = useState(false);
+  const [hasClaimedToday, setHasClaimedToday] = useState<boolean>(() => {
+    if (initialStreakClaimedToday) return true;
+    if (typeof window !== "undefined") {
+      try {
+        const storedDate = localStorage.getItem(`prepsmart_streak_claimed_${user.id}`);
+        if (storedDate === getTodayDateString()) return true;
+      } catch {
+        // Ignore localStorage read error
+      }
+    }
+    return false;
+  });
+
+  const [activeStreak, setActiveStreak] = useState<number>(
+    progressData?.activeStreak ?? 0
+  );
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [testSentSuccess, setTestSentSuccess] = useState(false);
+
+  // Synchronize streak collected state across page refreshes and next-day transitions
+  useEffect(() => {
+    const todayStr = getTodayDateString();
+    if (initialStreakClaimedToday) {
+      setHasClaimedToday(true);
+      try {
+        localStorage.setItem(`prepsmart_streak_claimed_${user.id}`, todayStr);
+      } catch {
+        // Ignore
+      }
+    } else {
+      try {
+        const storedDate = localStorage.getItem(`prepsmart_streak_claimed_${user.id}`);
+        if (storedDate === todayStr) {
+          setHasClaimedToday(true);
+        } else {
+          setHasClaimedToday(false);
+        }
+      } catch {
+        // Ignore
+      }
+    }
+  }, [initialStreakClaimedToday, user.id]);
+
+  // Keep active streak in sync if progressData prop changes
+  useEffect(() => {
+    if (progressData?.activeStreak !== undefined) {
+      setActiveStreak(progressData.activeStreak);
+    }
+  }, [progressData?.activeStreak]);
 
   // Sync tab with URL if changed
   const handleTabChange = (tab: MainTab) => {
@@ -113,13 +171,33 @@ export default function DashboardView({
     setIsClaimingDaily(true);
     try {
       const result = await awardUserXPAction(user.id, "DAILY_STREAK");
-      triggerXPToast({
-        points: result.pointsAwarded,
-        eventType: "DAILY_STREAK",
-        message: "Daily Streak Protected! +25 XP",
-        newTotalXp: result.newTotalXp,
-      });
+
+      // Persist to local storage for instant multi-tab & offline resilience
+      const todayStr = getTodayDateString();
+      try {
+        localStorage.setItem(`prepsmart_streak_claimed_${user.id}`, todayStr);
+      } catch {
+        // Ignore
+      }
+
       setHasClaimedToday(true);
+
+      // If user had not practiced yet today, increment active streak count immediately
+      if (!progressData?.hasActivityToday) {
+        setActiveStreak((prev) => (prev > 0 ? prev + 1 : 1));
+      }
+
+      if (result.pointsAwarded > 0) {
+        triggerXPToast({
+          points: result.pointsAwarded,
+          eventType: "DAILY_STREAK",
+          message: "Daily Streak Protected! +25 XP",
+          newTotalXp: result.newTotalXp,
+        });
+      }
+
+      // Sync user profile across navbar and rest of app
+      await refetchUser();
     } catch (e) {
       console.error(e);
     } finally {
@@ -291,12 +369,14 @@ export default function DashboardView({
                   <FlameIcon className="w-5 h-5 text-amber-500" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-foreground tabular-nums">
-                  {progressData?.activeStreak !== undefined ? `${progressData.activeStreak} Day Streak` : "0 Day Streak"}
+                  {`${activeStreak} Day Streak`}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {progressData?.activeStreak && progressData.activeStreak > 0
-                    ? `Consecutive days of real practice recorded in your learning log. Keep it active today!`
-                    : "Complete a CBT drill or mock exam today to activate your daily study streak."}
+                  {hasClaimedToday
+                    ? "Today's daily streak reward collected (+25 XP). Keep up the great consistency and return tomorrow!"
+                    : activeStreak > 0
+                    ? "Consecutive days of real practice recorded in your learning log. Keep it active today!"
+                    : "Complete a CBT drill or claim today's streak reward to start your streak."}
                 </p>
               </div>
 
@@ -304,16 +384,16 @@ export default function DashboardView({
                 type="button"
                 disabled={hasClaimedToday || isClaimingDaily}
                 onClick={handleClaimStreak}
-                className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   hasClaimedToday
                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-default"
-                    : "bg-amber-500 hover:bg-amber-600 text-white shadow-xs"
+                    : "bg-amber-500 hover:bg-amber-600 text-white shadow-xs cursor-pointer"
                 }`}
               >
                 {hasClaimedToday ? (
                   <>
                     <CheckCircleIcon className="w-3.5 h-3.5" />
-                    <span>Today&apos;s Streak Protected (+25 XP)</span>
+                    <span>Today&apos;s Streak Collected (+25 XP)</span>
                   </>
                 ) : isClaimingDaily ? (
                   <span>Claiming...</span>
@@ -571,7 +651,7 @@ export default function DashboardView({
                 Active Streak
               </span>
               <div className="text-xl sm:text-2xl font-black text-amber-500 tabular-nums">
-                {progressData?.activeStreak ?? 0}d
+                {activeStreak}d
               </div>
             </div>
 

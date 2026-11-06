@@ -15,6 +15,7 @@ model User {
   name               String?
   email              String              @unique
   image              String?
+  role               String              @default("candidate") // "candidate" | "leaderboard_bot"
   xp                 Int                 @default(0)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -29,6 +30,7 @@ model User {
   examSessions       ExamSession[]
 
   @@index([xp])
+  @@index([role])
 }
 
 model OnboardingProfile {
@@ -239,6 +241,12 @@ model University {
   estYear            Int?
   website            String?
   campusHighlights   String?
+  imageUrl           String?             // Campus landmark photo URL (Wikipedia Commons / S3)
+  logoUrl            String?             // Official university crest/seal URL
+  imageCaption       String?             // Human-readable caption for the campus image
+  imageLandmark      String?             // Specific landmark name shown in the image
+  brandColor         String?             // Primary hex brand color e.g. "#002B49"
+  secondaryColor     String?             // Secondary hex brand color e.g. "#EAAA00"
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 

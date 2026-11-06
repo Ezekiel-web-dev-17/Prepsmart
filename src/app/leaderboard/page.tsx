@@ -27,7 +27,7 @@ export default async function LeaderboardPage() {
     redirect("/sign-in?redirect_url=/leaderboard");
   }
 
-  const leaderboard = await getTopLeaderboard(50);
+  const leaderboard = await getTopLeaderboard(50, userId);
 
-  return <LeaderboardView initialEntries={leaderboard} />;
+  return <LeaderboardView initialEntries={leaderboard} currentUserId={userId} />;
 }

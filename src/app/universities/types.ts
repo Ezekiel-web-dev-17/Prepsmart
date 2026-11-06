@@ -35,6 +35,14 @@ export interface UniversityData {
   estYear: number | null;
   website: string | null;
   campusHighlights: string | null;
+  // DB-stored real image & logo fields
+  imageUrl: string | null;
+  logoUrl: string | null;
+  imageLandmark: string | null;
+  imageCaption: string | null;
+  brandColor: string | null;
+  secondaryColor: string | null;
+  // Legacy aliases (kept for backward compat with static data path)
   campusImage?: string | null;
   landmarkName?: string | null;
   createdAt?: string | Date;

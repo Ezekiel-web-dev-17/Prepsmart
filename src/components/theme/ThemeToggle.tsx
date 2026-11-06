@@ -27,6 +27,9 @@ export default function ThemeToggle() {
   }, [isOpen]);
 
   const isDark = mounted ? resolvedTheme === "dark" : false;
+  // Use a stable fallback until mounted to prevent SSR/client hydration mismatch
+  // on attributes that reflect the stored theme preference.
+  const displayTheme = mounted ? theme : "system";
 
   const options: { value: Theme; label: string; icon: React.ReactNode }[] = [
     {
@@ -98,9 +101,9 @@ export default function ThemeToggle() {
           e.preventDefault();
           setIsOpen(!isOpen);
         }}
-        aria-label={`Current theme: ${theme}. Click to switch to ${isDark ? "light" : "dark"
+        aria-label={`Current theme: ${displayTheme}. Click to switch to ${isDark ? "light" : "dark"
           } mode, or open menu.`}
-        title={`Theme: ${theme.toUpperCase()} (Click to toggle)`}
+        title={`Theme: ${displayTheme.toUpperCase()} (Click to toggle)`}
         className="group relative flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-card hover:bg-muted text-foreground shadow-xs transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/50 cursor-pointer"
       >
         {isDark ? (

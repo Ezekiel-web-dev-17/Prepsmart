@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { getTopLeaderboard } from "@/lib/leaderboard";
 
 export async function GET(request: Request) {
@@ -6,7 +7,8 @@ export async function GET(request: Request) {
   const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit")) || 50));
 
   try {
-    const leaderboard = await getTopLeaderboard(limit);
+    const { userId } = await auth();
+    const leaderboard = await getTopLeaderboard(limit, userId || undefined);
 
     return NextResponse.json({
       success: true,

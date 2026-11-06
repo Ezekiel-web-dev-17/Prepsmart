@@ -162,13 +162,19 @@ export default function SubjectSyllabusView({
             Dashboard
           </Link>
           <span>/</span>
-          <button
-            type="button"
-            onClick={onSwitchToCurriculumOverview}
-            className="hover:text-foreground transition-colors font-medium cursor-pointer"
-          >
-            Study Hub
-          </button>
+          {onSwitchToCurriculumOverview ? (
+            <button
+              type="button"
+              onClick={onSwitchToCurriculumOverview}
+              className="hover:text-foreground transition-colors font-medium cursor-pointer"
+            >
+              Study Hub
+            </button>
+          ) : (
+            <span className="font-medium text-foreground">
+              Study Hub
+            </span>
+          )}
           <span>/</span>
           <span className="capitalize font-bold text-foreground">
             {curriculum.streamName}

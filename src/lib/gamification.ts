@@ -24,6 +24,7 @@ export interface AwardXpResult {
   newTotalXp: number;
   rank: number | null;
   eventType: XpEventType;
+  alreadyClaimed?: boolean;
 }
 
 /**
@@ -39,6 +40,37 @@ export async function awardUserXP(
   const points = XP_RULES[eventType];
   if (!points || points <= 0) {
     throw new Error(`Invalid event type or zero points defined for: ${eventType}`);
+  }
+
+  // Prevent duplicate daily streak rewards on the same calendar day
+  if (eventType === "DAILY_STREAK") {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const alreadyClaimed = await prisma.xpHistory.findFirst({
+      where: {
+        userId,
+        eventType: "DAILY_STREAK",
+        createdAt: { gte: startOfToday },
+      },
+      select: { id: true },
+    });
+
+    if (alreadyClaimed) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, xp: true },
+      });
+      const zeroRank = await redis.zrevrank(LEADERBOARD_KEY, userId);
+      return {
+        success: true,
+        alreadyClaimed: true,
+        pointsAwarded: 0,
+        newTotalXp: currentUser?.xp ?? 0,
+        rank: zeroRank !== null ? zeroRank + 1 : null,
+        eventType,
+      };
+    }
   }
 
   // Ensure user exists or create placeholder if anonymous/test

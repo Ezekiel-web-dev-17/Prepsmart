@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import CounsellorDashboard from "./CounsellorDashboard";
 import type { UniversityData } from "./types";
 import { UNIVERSITIES_DATA } from "@/data/universities";
+import { getUniversityImageMeta } from "@/data/university-images";
+import { getUniversityLogoMeta } from "@/data/university-logos";
 
 export const metadata: Metadata = {
   title: "Nigerian University Admission Counsellor & Cut-Off Finder",
@@ -45,6 +47,13 @@ export default async function UniversitiesPage() {
     ...uni,
     createdAt: uni.createdAt.toISOString(),
     updatedAt: uni.updatedAt.toISOString(),
+    // DB image fields (may be null for older rows)
+    imageUrl: uni.imageUrl ?? null,
+    logoUrl: uni.logoUrl ?? null,
+    imageLandmark: uni.imageLandmark ?? null,
+    imageCaption: uni.imageCaption ?? null,
+    brandColor: uni.brandColor ?? null,
+    secondaryColor: uni.secondaryColor ?? null,
     coursesCount: uni.courses.length,
     minCourseCutOff:
       uni.courses.length > 0
@@ -81,6 +90,12 @@ export default async function UniversitiesPage() {
       estYear: uni.estYear,
       website: uni.website,
       campusHighlights: uni.campusHighlights,
+      imageUrl: null,
+      logoUrl: null,
+      imageLandmark: null,
+      imageCaption: null,
+      brandColor: null,
+      secondaryColor: null,
       courses: Object.entries(uni.departmentalCutOffs || {}).map(([key, cutOff]) => ({
         id: `${uni.id}-${key}`,
         universityId: uni.id,

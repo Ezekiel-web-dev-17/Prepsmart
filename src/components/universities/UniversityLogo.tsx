@@ -10,6 +10,10 @@ interface UniversityLogoProps {
   acronym?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg";
+  // DB-sourced fields (preferred when provided)
+  dbLogoUrl?: string | null;
+  dbBrandColor?: string | null;
+  dbSecondaryColor?: string | null;
 }
 
 export default function UniversityLogo({
@@ -18,9 +22,17 @@ export default function UniversityLogo({
   acronym,
   className = "",
   size = "md",
+  dbLogoUrl,
+  dbBrandColor,
+  dbSecondaryColor,
 }: UniversityLogoProps) {
   const [hasError, setHasError] = useState(false);
-  const meta = getUniversityLogoMeta(slug, acronym);
+
+  // Prefer DB-stored values; fall back to static data lookup
+  const staticMeta = getUniversityLogoMeta(slug, acronym);
+  const logoUrl = !hasError ? (dbLogoUrl || staticMeta.logoUrl) : null;
+  const brandColor = dbBrandColor || staticMeta.brandColor;
+  const secondaryColor = dbSecondaryColor || staticMeta.secondaryColor;
 
   const sizeClasses =
     size === "sm"
@@ -38,13 +50,13 @@ export default function UniversityLogo({
       .join("")
       .toUpperCase();
 
-  if (hasError || !meta.logoUrl) {
+  if (!logoUrl) {
     return (
       <div
         className={`${sizeClasses} rounded-xl flex flex-col items-center justify-center font-black shrink-0 border border-border shadow-xs text-white p-1 text-center select-none ${className}`}
         style={{
-          backgroundColor: meta.brandColor,
-          borderColor: meta.secondaryColor,
+          backgroundColor: brandColor,
+          borderColor: secondaryColor,
         }}
         title={name}
       >
@@ -60,7 +72,7 @@ export default function UniversityLogo({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={meta.logoUrl}
+        src={logoUrl}
         alt={`${name} official emblem`}
         loading="lazy"
         onError={() => setHasError(true)}

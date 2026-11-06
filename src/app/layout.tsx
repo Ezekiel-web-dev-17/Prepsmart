@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import AuthProvider from "@/providers/AuthProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { UserProvider } from "@/context/UserContext";
 import { GamificationProvider } from "@/components/gamification/XPToast";
 import ThemeScript from "@/components/theme/ThemeScript";
 import Navbar from "@/components/layout/Navbar";
@@ -81,20 +82,22 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col bg-background text-foreground font-sans transition-colors duration-200 selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100">
           <ThemeProvider>
             <QueryProvider>
-              <GamificationProvider>
-                <Suspense
-                  fallback={
-                    <div className="h-16 border-b border-border bg-card" />
-                  }
-                >
-                  <Navbar />
-                </Suspense>
-                <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-                  {children}
-                </main>
-                <Footer />
-                <StudyNotificationManager />
-              </GamificationProvider>
+              <UserProvider>
+                <GamificationProvider>
+                  <Suspense
+                    fallback={
+                      <div className="h-16 border-b border-border bg-card" />
+                    }
+                  >
+                    <Navbar />
+                  </Suspense>
+                  <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+                    {children}
+                  </main>
+                  <Footer />
+                  <StudyNotificationManager />
+                </GamificationProvider>
+              </UserProvider>
             </QueryProvider>
           </ThemeProvider>
         </body>

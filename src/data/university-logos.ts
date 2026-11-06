@@ -211,6 +211,202 @@ export const UNIVERSITY_LOGOS: Record<string, UniversityLogoMeta> = {
     brandColor: "#4C1D95",
     secondaryColor: "#F59E0B",
   },
+
+  // Additional Federal Universities
+  uniuyo: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/University_of_Uyo_logo.png/320px-University_of_Uyo_logo.png",
+    brandColor: "#003366",
+    secondaryColor: "#EAAA00",
+  },
+  unimaid: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/University_of_Maiduguri_logo.png/320px-University_of_Maiduguri_logo.png",
+    brandColor: "#0B5345",
+    secondaryColor: "#F39C12",
+  },
+  udus: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Usmanu_Danfodiyo_University_logo.png/320px-Usmanu_Danfodiyo_University_logo.png",
+    brandColor: "#145A32",
+    secondaryColor: "#F4D03F",
+  },
+  atbu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Abubakar_Tafawa_Balewa_University_logo.png/320px-Abubakar_Tafawa_Balewa_University_logo.png",
+    brandColor: "#1B4F72",
+    secondaryColor: "#E67E22",
+  },
+  fuoye: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/Federal_University_Oye_Ekiti_logo.png/320px-Federal_University_Oye_Ekiti_logo.png",
+    brandColor: "#196F3D",
+    secondaryColor: "#F1C40F",
+  },
+  fupre: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/0/07/Federal_University_of_Petroleum_Resources_Effurun_logo.png/320px-Federal_University_of_Petroleum_Resources_Effurun_logo.png",
+    brandColor: "#78281F",
+    secondaryColor: "#F5B041",
+  },
+  funai: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/Alex_Ekwueme_Federal_University_Ndufu-Alike_logo.png/320px-Alex_Ekwueme_Federal_University_Ndufu-Alike_logo.png",
+    brandColor: "#154360",
+    secondaryColor: "#58D68D",
+  },
+  fulokoja: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Federal_University_Lokoja_logo.png/320px-Federal_University_Lokoja_logo.png",
+    brandColor: "#0E3A2F",
+    secondaryColor: "#F39C12",
+  },
+  fudma: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Federal_University_Dutsin-Ma_logo.png/320px-Federal_University_Dutsin-Ma_logo.png",
+    brandColor: "#1E8449",
+    secondaryColor: "#F7DC6F",
+  },
+  mau: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/Modibbo_Adama_University_logo.png/320px-Modibbo_Adama_University_logo.png",
+    brandColor: "#1B365D",
+    secondaryColor: "#FFA300",
+  },
+  nda: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Nigerian_Defence_Academy_emblem.png/320px-Nigerian_Defence_Academy_emblem.png",
+    brandColor: "#1C2833",
+    secondaryColor: "#C0392B",
+  },
+
+  // Additional State Universities
+  imsu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/0/0b/Imo_State_University_logo.png/320px-Imo_State_University_logo.png",
+    brandColor: "#002B49",
+    secondaryColor: "#EAAA00",
+  },
+  esut: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/2/23/Enugu_State_University_of_Science_and_Technology_logo.png/320px-Enugu_State_University_of_Science_and_Technology_logo.png",
+    brandColor: "#7B241C",
+    secondaryColor: "#F4D03F",
+  },
+  ebsu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Ebonyi_State_University_logo.png/320px-Ebonyi_State_University_logo.png",
+    brandColor: "#117864",
+    secondaryColor: "#F5B041",
+  },
+  bsu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/Benue_State_University_logo.png/320px-Benue_State_University_logo.png",
+    brandColor: "#1A5276",
+    secondaryColor: "#E67E22",
+  },
+  paau: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Prince_Abubakar_Audu_University_logo.png/320px-Prince_Abubakar_Audu_University_logo.png",
+    brandColor: "#196F3D",
+    secondaryColor: "#F4D03F",
+  },
+  basug: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Bauchi_State_University_logo.png/320px-Bauchi_State_University_logo.png",
+    brandColor: "#1F618D",
+    secondaryColor: "#E74C3C",
+  },
+  ysu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/3/30/Yobe_State_University_logo.png/320px-Yobe_State_University_logo.png",
+    brandColor: "#0E6251",
+    secondaryColor: "#F39C12",
+  },
+  unicross: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Cross_River_University_of_Technology_logo.png/320px-Cross_River_University_of_Technology_logo.png",
+    brandColor: "#0C2340",
+    secondaryColor: "#E74C3C",
+  },
+  aksu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/7/75/Akwa_Ibom_State_University_logo.png/320px-Akwa_Ibom_State_University_logo.png",
+    brandColor: "#145A32",
+    secondaryColor: "#F5B041",
+  },
+  tasued: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Tai_Solarin_University_of_Education_logo.png/320px-Tai_Solarin_University_of_Education_logo.png",
+    brandColor: "#1B4F72",
+    secondaryColor: "#E67E22",
+  },
+  plasu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/8/81/Plateau_State_University_logo.png/320px-Plateau_State_University_logo.png",
+    brandColor: "#117864",
+    secondaryColor: "#F4D03F",
+  },
+  umyu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1a/Umaru_Musa_Yaradua_University_logo.png/320px-Umaru_Musa_Yaradua_University_logo.png",
+    brandColor: "#0E3A2F",
+    secondaryColor: "#DAA520",
+  },
+  adustech: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/Kano_University_of_Science_and_Technology_logo.png/320px-Kano_University_of_Science_and_Technology_logo.png",
+    brandColor: "#1C3F94",
+    secondaryColor: "#DCA72C",
+  },
+  aau: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/Ambrose_Alli_University_logo.png/320px-Ambrose_Alli_University_logo.png",
+    brandColor: "#580000",
+    secondaryColor: "#F4C430",
+  },
+  ndu: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Niger_Delta_University_logo.png/320px-Niger_Delta_University_logo.png",
+    brandColor: "#154360",
+    secondaryColor: "#E67E22",
+  },
+  coou: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Chukwuemeka_Odumegwu_Ojukwu_University_logo.png/320px-Chukwuemeka_Odumegwu_Ojukwu_University_logo.png",
+    brandColor: "#78281F",
+    secondaryColor: "#F7DC6F",
+  },
+
+  // Additional Private Universities
+  aun: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/2/23/American_University_of_Nigeria_seal.png/320px-American_University_of_Nigeria_seal.png",
+    brandColor: "#002D62",
+    secondaryColor: "#C59B27",
+  },
+  bells: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/Bells_University_of_Technology_logo.png/320px-Bells_University_of_Technology_logo.png",
+    brandColor: "#1B365D",
+    secondaryColor: "#DCA72C",
+  },
+  alhikmah: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Al-Hikmah_University_logo.png/320px-Al-Hikmah_University_logo.png",
+    brandColor: "#004B23",
+    secondaryColor: "#F4A261",
+  },
+  ajayi: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Ajayi_Crowther_University_logo.png/320px-Ajayi_Crowther_University_logo.png",
+    brandColor: "#4A235A",
+    secondaryColor: "#F5B041",
+  },
+  godfrey: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Godfrey_Okoye_University_logo.png/320px-Godfrey_Okoye_University_logo.png",
+    brandColor: "#154360",
+    secondaryColor: "#F1C40F",
+  },
+  madonna: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/3/30/Madonna_University_Nigeria_logo.png/320px-Madonna_University_Nigeria_logo.png",
+    brandColor: "#0E6251",
+    secondaryColor: "#F39C12",
+  },
+  bingham: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/Bingham_University_logo.png/320px-Bingham_University_logo.png",
+    brandColor: "#1B4F72",
+    secondaryColor: "#E67E22",
+  },
+  caleb: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Caleb_University_logo.png/320px-Caleb_University_logo.png",
+    brandColor: "#0C2340",
+    secondaryColor: "#EAA023",
+  },
+  adeleke: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/7/75/Adeleke_University_logo.png/320px-Adeleke_University_logo.png",
+    brandColor: "#1E3A8A",
+    secondaryColor: "#F59E0B",
+  },
+  elizade: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/Elizade_University_logo.png/320px-Elizade_University_logo.png",
+    brandColor: "#14532D",
+    secondaryColor: "#EAB308",
+  },
+  igbinedion: {
+    logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Igbinedion_University_logo.png/320px-Igbinedion_University_logo.png",
+    brandColor: "#3B1147",
+    secondaryColor: "#DFB235",
+  },
 };
 
 /**

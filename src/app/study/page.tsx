@@ -78,7 +78,7 @@ export default async function StudyPage({ searchParams }: StudyPageProps) {
       redirect("/sign-in?redirect_url=/study?tab=mock-exam");
     }
     initialTab = "mock-exam";
-  } else if (hasSubjectParam) {
+  } else if (hasSubjectParam || userId) {
     initialTab = "subject-syllabus";
   }
 
