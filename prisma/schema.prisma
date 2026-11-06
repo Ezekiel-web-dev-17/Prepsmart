@@ -28,6 +28,7 @@ model User {
   failedQuestions    FailedQuestion[]
   examAttempts       ExamAttempt[]
   examSessions       ExamSession[]
+  topicProgress      TopicProgress[]
 
   @@index([xp])
   @@index([role])
@@ -98,6 +99,8 @@ model Question {
   topic          String   // Syllabus topic e.g. "Calculus", "Organic Chemistry", "Figurative Language"
   concept        String   // Core concept tested e.g. "Integration by Parts", "Isomerism", "Metaphor"
   explanation    String   // Detailed examiner-quality step-by-step solution
+  mnemonic       String?  // Memory trick or rule (e.g. "OIL RIG", "SOH CAH TOA")
+  diagramSvg     String?  @db.Text // Embedded SVG illustration / circuit / curve
   difficulty     String   @default("medium") // "easy" | "medium" | "hard"
   isActive       Boolean  @default(true) // Soft-delete / QA toggle
   createdAt      DateTime @default(now())
@@ -113,6 +116,34 @@ model Question {
   @@index([topic])
   @@index([concept])
   @@index([isActive])
+}
+
+// ==========================================
+// Candidate Topic Progress & Feynman AI Review
+// ==========================================
+model TopicProgress {
+  id           String    @id @default(cuid())
+  userId       String
+  subject      String    // e.g. "mathematics", "physics", "use-of-english"
+  stream       String    // "science" | "commercial" | "arts"
+  topicSlug    String    // normalized topic identifier e.g. "calculus", "kinematics"
+  topicTitle   String
+  studentNote  String?   @db.Text // Explanation written by candidate in own words
+  aiFeedback   String?   @db.Text // Constructive AI critique & guidance
+  aiScore      Int?      // AI review score (0 - 100)
+  quizScore    Int?      // e.g. 8
+  quizTotal    Int?      // e.g. 10
+  isCompleted  Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject, topicSlug])
+  @@index([userId])
+  @@index([subject])
+  @@index([isCompleted])
 }
 
 // ==========================================

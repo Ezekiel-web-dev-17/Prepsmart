@@ -193,9 +193,49 @@ export default function StudyHubView({
         </section>
       )}
 
+      {/* Interactive Visual Roadmap Feature Banner (Roadmap.sh Style) */}
+      <section className="p-5 rounded-3xl bg-linear-to-r from-blue-600/15 via-indigo-600/10 to-purple-600/15 border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-600 text-white shadow-xs">
+              NEW FEATURE
+            </span>
+            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+              Roadmap.sh-Style Flowchart
+            </span>
+          </div>
+          <h3 className="text-base font-black text-foreground tracking-tight">
+            Interactive Visual Learning Roadmap & AI Feynman Gates
+          </h3>
+          <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
+            Follow structured stages from foundational principles to advanced mastery. Write notes reviewed in real-time by AI, drill 5–15 authentic JAMB CBT questions with mnemonics, and master topics for +50 XP.
+          </p>
+        </div>
+
+        <Link
+          href={`/study/roadmap?stream=${currentStream}&subject=${currentSubject}`}
+          className="shrink-0 px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer group"
+        >
+          <SparklesIcon className="w-4 h-4 text-amber-300" />
+          <span>Open Visual Roadmap</span>
+          <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </section>
+
       {/* Top Level Hub Navigator */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
+          {/* Visual Roadmap Tab */}
+          <Link
+            href={`/study/roadmap?stream=${currentStream}&subject=${currentSubject}`}
+            className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 bg-card hover:bg-muted text-foreground border border-blue-500/40 hover:border-blue-500 shadow-xs"
+          >
+            <SparklesIcon className="w-4 h-4 text-blue-500" />
+            <span>Interactive Visual Roadmap</span>
+            <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black">
+              Roadmap.sh Style
+            </span>
+          </Link>
           {/* Tab 1: Syllabus Roadmap & Milestones (Guest/Unauthenticated users only) */}
           {!isUserAuthenticated && (
             <button
