@@ -5,17 +5,9 @@ import { EXAM_CONFIG } from "../app/api/mock-exam/config/route";
 
 describe("JAMB Mock Exam Simulator Business Logic", () => {
   let localServer: http.Server | null = null;
-  const baseUrl = "http://127.0.0.1:3000";
+  let baseUrl = "http://127.0.0.1:3000";
 
   before(async () => {
-    // Check if localhost:3000 is already active
-    try {
-      const ping = await fetch(`${baseUrl}/api/mock-exam/config`, { signal: AbortSignal.timeout(500) });
-      if (ping.ok) return;
-    } catch {
-      // Server not active, spin up test server on localhost:3000
-    }
-
     await new Promise<void>((resolve, reject) => {
       localServer = http.createServer((req, res) => {
         if (req.url === "/api/mock-exam/config") {
@@ -33,7 +25,13 @@ describe("JAMB Mock Exam Simulator Business Logic", () => {
         }
       });
 
-      localServer.listen(3000, "127.0.0.1", () => resolve());
+      localServer.listen(0, "127.0.0.1", () => {
+        const addr = localServer!.address();
+        if (typeof addr === "object" && addr !== null) {
+          baseUrl = `http://127.0.0.1:${addr.port}`;
+        }
+        resolve();
+      });
       localServer.on("error", (err) => reject(err));
     });
   });
