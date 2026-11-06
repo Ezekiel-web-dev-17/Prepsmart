@@ -1,7 +1,7 @@
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import RoadmapView from "./RoadmapView";
 
 export const metadata: Metadata = {
   title: "UTME Interactive Visual Roadmap | PrepSmart",
@@ -61,11 +61,6 @@ export default async function RoadmapPage({ searchParams }: RoadmapPageProps) {
       | "arts";
   const effectiveSubject = resolvedParams.subject || initialSubject;
 
-  return (
-    <RoadmapView
-      initialStream={effectiveStream}
-      initialSubject={effectiveSubject}
-      isAuthenticated={Boolean(userId)}
-    />
-  );
+  // Seamlessly redirect to the unified syllabus roadmap tab
+  redirect(`/study?tab=subject-syllabus&stream=${effectiveStream}&subject=${effectiveSubject}`);
 }

@@ -212,30 +212,20 @@ export default function StudyHubView({
           </p>
         </div>
 
-        <Link
-          href={`/study/roadmap?stream=${currentStream}&subject=${currentSubject}`}
+        <button
+          type="button"
+          onClick={() => handleTabChange("subject-syllabus")}
           className="shrink-0 px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer group"
         >
           <SparklesIcon className="w-4 h-4 text-amber-300" />
-          <span>Open Visual Roadmap</span>
+          <span>Open Syllabus Roadmap Flowchart</span>
           <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-        </Link>
+        </button>
       </section>
 
       {/* Top Level Hub Navigator */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Visual Roadmap Tab */}
-          <Link
-            href={`/study/roadmap?stream=${currentStream}&subject=${currentSubject}`}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 bg-card hover:bg-muted text-foreground border border-blue-500/40 hover:border-blue-500 shadow-xs"
-          >
-            <SparklesIcon className="w-4 h-4 text-blue-500" />
-            <span>Interactive Visual Roadmap</span>
-            <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-black">
-              Roadmap.sh Style
-            </span>
-          </Link>
           {/* Tab 1: Syllabus Roadmap & Milestones (Guest/Unauthenticated users only) */}
           {!isUserAuthenticated && (
             <button
@@ -255,7 +245,7 @@ export default function StudyHubView({
             </button>
           )}
 
-          {/* Tab 2: JAMB Subject Syllabus & Topics */}
+          {/* Tab 2: Unified JAMB Subject Syllabus & Interactive Roadmap */}
           <button
             type="button"
             onClick={() => handleTabChange("subject-syllabus")}
@@ -265,10 +255,10 @@ export default function StudyHubView({
                 : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
             }`}
           >
-            <BookOpenIcon className="w-4 h-4" />
-            <span>{currentCurriculum.subjectName} Syllabus</span>
+            <SparklesIcon className="w-4 h-4 text-blue-500" />
+            <span>{currentCurriculum.subjectName} Syllabus &amp; Roadmap</span>
             <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
-              {currentCurriculum.totalTopics} Topics
+              {currentCurriculum.totalTopics} Topics • Flowchart
             </span>
           </button>
 

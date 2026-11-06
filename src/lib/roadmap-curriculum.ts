@@ -1,3 +1,5 @@
+import { getSubjectCurriculum, SubjectCurriculum } from "@/app/study/curriculum-data";
+
 export interface RoadmapTopicNode {
   id: string; // unique slug e.g. "math-indices-logarithms"
   subject: string; // e.g. "mathematics"
@@ -1146,63 +1148,173 @@ export const ALL_ROADMAPS: Record<string, SubjectRoadmap> = {
   government: ARTS_GOVERNMENT_ROADMAP,
 };
 
+export function convertCurriculumToRoadmap(curriculum: SubjectCurriculum): SubjectRoadmap {
+  const iconMap: Record<string, string> = {
+    mathematics: "calculator",
+    physics: "zap",
+    chemistry: "beaker",
+    biology: "heart",
+    english: "book-open",
+    economics: "trending-up",
+    government: "shield",
+    commerce: "briefcase",
+    accounts: "file-text",
+    literature: "feather",
+    crs: "book",
+  };
+
+  const subjectKey = curriculum.id.toLowerCase();
+  const iconName = iconMap[subjectKey] || "book-open";
+
+  // Build a lookup of curated rich topic details from curated roadmaps
+  const curatedRoadmap = ALL_ROADMAPS[curriculum.id];
+  const curatedTopicMap = new Map<string, RoadmapTopicNode>();
+  if (curatedRoadmap?.stages) {
+    curatedRoadmap.stages.flatMap((s) => s.topics).forEach((t) => {
+      curatedTopicMap.set(t.id.toLowerCase(), t);
+      curatedTopicMap.set(t.title.toLowerCase(), t);
+      curatedTopicMap.set(t.drillTopic.toLowerCase(), t);
+    });
+  }
+
+  let totalTopics = 0;
+  let highYieldCount = 0;
+
+  const stages: RoadmapStage[] = curriculum.sections.map((section, sIdx) => {
+    const stageNum = sIdx + 1;
+    const stageTitle = section.sectionTitle;
+    const stageDesc =
+      curriculum.examinationStructure[sIdx]?.description ||
+      `Official JAMB examination section covering ${section.topics.length} syllabus topics with targeted CBT questions.`;
+
+    const topics: RoadmapTopicNode[] = section.topics.map((t, tIdx) => {
+      totalTopics++;
+      const isHighYield = Boolean(t.highYield || tIdx === 0 || t.objectives.length >= 4);
+      if (isHighYield) highYieldCount++;
+
+      const topicId = `${curriculum.id}-t${t.topicNumber}`;
+      const searchKey = t.title.toLowerCase();
+
+      // Check if curated notes exist for this topic
+      let curatedMatch: RoadmapTopicNode | undefined;
+      for (const [key, node] of curatedTopicMap.entries()) {
+        if (searchKey.includes(key) || key.includes(searchKey)) {
+          curatedMatch = node;
+          break;
+        }
+      }
+
+      // Format recommended textbook advice from curriculum
+      const defaultTextbook =
+        curriculum.recommendedTexts.length > 0
+          ? curriculum.recommendedTexts[0]
+          : `Senior Secondary ${curriculum.subjectName} Textbook`;
+
+      const textbookAdvice =
+        curatedMatch && curatedMatch.textbookAdvice.length > 0
+          ? curatedMatch.textbookAdvice
+          : [
+              {
+                textbook: defaultTextbook,
+                chapters: `Topic ${t.topicNumber}: ${t.title}`,
+                focusNote: `Read relevant chapter on ${t.title}. Pay special attention to: ${t.contents.slice(0, 3).join("; ")}.`,
+              },
+              ...(curriculum.recommendedTexts.length > 1
+                ? [
+                    {
+                      textbook: curriculum.recommendedTexts[1],
+                      chapters: "Past UTME Review Questions",
+                      focusNote: `Solve end-of-unit objective questions testing: ${t.objectives.slice(0, 2).join("; ")}.`,
+                    },
+                  ]
+                : []),
+            ];
+
+      const syllabusOutlines =
+        t.objectives && t.objectives.length > 0
+          ? t.objectives
+          : t.contents && t.contents.length > 0
+          ? t.contents
+          : [`Master fundamental principles and problem solving in ${t.title}`];
+
+      const conceptDeepDive =
+        curatedMatch?.conceptDeepDive ||
+        `${t.title} is an essential component of the official JAMB UTME syllabus for ${curriculum.subjectName}. Core curriculum contents include: ${t.contents.join("; ")}. Key examination objectives: ${t.objectives.join("; ")}. Candidates must master these principles to score high in CBT assessments.`;
+
+      const keyFormulasOrRules =
+        curatedMatch?.keyFormulasOrRules && curatedMatch.keyFormulasOrRules.length > 0
+          ? curatedMatch.keyFormulasOrRules
+          : t.contents.filter((c) => c.length < 90).slice(0, 5);
+
+      const trapAlert =
+        t.trapAlert ||
+        curatedMatch?.trapAlert ||
+        curriculum.examinerTraps?.find((et) =>
+          et.title.toLowerCase().includes(t.title.toLowerCase())
+        )?.explanation ||
+        undefined;
+
+      const sampleMnemonics = curatedMatch?.sampleMnemonics || [];
+
+      // Link previous and next topics in sequence
+      const prevTopicInStage = tIdx > 0 ? [`${curriculum.id}-t${section.topics[tIdx - 1].topicNumber}`] : [];
+      const nextTopicInStage =
+        tIdx < section.topics.length - 1
+          ? [`${curriculum.id}-t${section.topics[tIdx + 1].topicNumber}`]
+          : [];
+
+      return {
+        id: topicId,
+        subject: curriculum.id,
+        stream: curriculum.streamId,
+        stage: stageNum,
+        stageTitle,
+        order: t.topicNumber || tIdx + 1,
+        title: t.title,
+        subtitle: t.contents.slice(0, 2).join(", ") || `${curriculum.subjectName} curriculum topic`,
+        highYield: isHighYield,
+        examinerTrap: Boolean(trapAlert),
+        trapAlert,
+        syllabusOutlines,
+        conceptDeepDive,
+        textbookAdvice,
+        keyFormulasOrRules:
+          keyFormulasOrRules.length > 0
+            ? keyFormulasOrRules
+            : [`Review core definitions and practice questions on ${t.title}.`],
+        sampleMnemonics,
+        drillTopic: t.drillTopicId || t.title,
+        prerequisites: prevTopicInStage,
+        nextTopics: nextTopicInStage,
+      };
+    });
+
+    return {
+      stage: stageNum,
+      title: stageTitle,
+      description: stageDesc,
+      topics,
+    };
+  });
+
+  return {
+    id: curriculum.id,
+    name: curriculum.subjectName,
+    code: curriculum.subjectCode,
+    stream: curriculum.streamId,
+    iconName,
+    totalTopics,
+    highYieldCount,
+    description: curriculum.overview,
+    stages,
+  };
+}
+
 export function getRoadmapForSubject(
   subjectSlug: string,
   stream: "science" | "commercial" | "arts" = "science"
 ): SubjectRoadmap {
-  const norm = subjectSlug.toLowerCase().trim();
-  if (norm.includes("math") || norm === "mth") return SCIENCE_MATHEMATICS_ROADMAP;
-  if (norm.includes("physic") || norm === "phy") return SCIENCE_PHYSICS_ROADMAP;
-  if (norm.includes("chem") || norm === "chm") return SCIENCE_CHEMISTRY_ROADMAP;
-  if (norm.includes("econ") || norm === "eco") return COMMERCIAL_ECONOMICS_ROADMAP;
-  if (norm.includes("gov")) return ARTS_GOVERNMENT_ROADMAP;
-
-  // Fallback default roadmap for other subjects
-  return {
-    id: norm,
-    name: norm.charAt(0).toUpperCase() + norm.slice(1),
-    code: norm.slice(0, 3).toUpperCase(),
-    stream,
-    iconName: "book-open",
-    totalTopics: 4,
-    highYieldCount: 2,
-    description: `Comprehensive UTME mastery roadmap for ${norm}.`,
-    stages: [
-      {
-        stage: 1,
-        title: "Stage 1: Core Fundamentals",
-        description: `Foundational concepts and principles in ${norm}.`,
-        topics: [
-          {
-            id: `${norm}-fundamentals`,
-            subject: norm,
-            stream,
-            stage: 1,
-            stageTitle: "Stage 1: Fundamentals",
-            order: 1,
-            title: `Key Concepts in ${norm.charAt(0).toUpperCase() + norm.slice(1)}`,
-            subtitle: "Fundamental definitions and principles according to JAMB syllabus.",
-            highYield: true,
-            syllabusOutlines: [
-              `Identify core definitions and historical background of ${norm}.`,
-              "Apply standard problem-solving methodologies to multiple-choice drills.",
-            ],
-            conceptDeepDive: `Understanding ${norm} begins with mastering its foundational definitions and recognizing standard patterns tested repeatedly in UTME past questions.`,
-            textbookAdvice: [
-              {
-                textbook: `Standard Senior Secondary ${norm.charAt(0).toUpperCase() + norm.slice(1)} Text`,
-                chapters: "Chapters 1 - 3",
-                focusNote: "Read core introductory definitions and review end-of-chapter exercises.",
-              },
-            ],
-            keyFormulasOrRules: ["Rule 1: Always check question qualifiers and units."],
-            drillTopic: norm,
-            prerequisites: [],
-            nextTopics: [],
-          },
-        ],
-      },
-    ],
-  };
+  const curriculum = getSubjectCurriculum(stream, subjectSlug);
+  return convertCurriculumToRoadmap(curriculum);
 }
 

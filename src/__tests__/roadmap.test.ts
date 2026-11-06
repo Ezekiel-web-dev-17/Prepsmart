@@ -2,11 +2,13 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
   getRoadmapForSubject,
+  convertCurriculumToRoadmap,
   SCIENCE_MATHEMATICS_ROADMAP,
   SCIENCE_PHYSICS_ROADMAP,
   COMMERCIAL_ECONOMICS_ROADMAP,
   ARTS_GOVERNMENT_ROADMAP,
 } from "../lib/roadmap-curriculum";
+import { getSubjectCurriculum } from "../app/study/curriculum-data";
 import { generateJambDorkQueries, enrichQuestionWithConceptData } from "../lib/jamb-dorker";
 
 describe("Visual Learning Roadmap & Syllabus Architecture", () => {
@@ -25,7 +27,21 @@ describe("Visual Learning Roadmap & Syllabus Architecture", () => {
     assert.ok(firstTopic.keyFormulasOrRules.length > 0, "Expected formulas or rules");
   });
 
-  it("provides valid roadmap structures for Physics, Economics, and Government", () => {
+  it("translates official syllabus curriculum 1:1 into visual roadmap stages and topics", () => {
+    const mathCurriculum = getSubjectCurriculum("science", "mathematics");
+    const roadmap = convertCurriculumToRoadmap(mathCurriculum);
+
+    assert.strictEqual(roadmap.stages.length, mathCurriculum.sections.length);
+    assert.strictEqual(roadmap.name, mathCurriculum.subjectName);
+
+    // Verify each stage title matches the corresponding section title
+    mathCurriculum.sections.forEach((sec, idx) => {
+      assert.strictEqual(roadmap.stages[idx].title, sec.sectionTitle);
+      assert.strictEqual(roadmap.stages[idx].topics.length, sec.topics.length);
+    });
+  });
+
+  it("provides valid roadmap structures for Physics, Economics, Government, and Use of English", () => {
     const physicsRoadmap = getRoadmapForSubject("physics", "science");
     assert.strictEqual(physicsRoadmap.id, "physics");
     assert.ok(physicsRoadmap.stages.length >= 3);
@@ -35,6 +51,10 @@ describe("Visual Learning Roadmap & Syllabus Architecture", () => {
 
     const govRoadmap = getRoadmapForSubject("government", "arts");
     assert.strictEqual(govRoadmap.id, "government");
+
+    const engRoadmap = getRoadmapForSubject("english", "science");
+    assert.strictEqual(engRoadmap.id, "english");
+    assert.ok(engRoadmap.stages.length >= 2);
   });
 
   it("generates authentic Nigerian Google dork search queries", () => {

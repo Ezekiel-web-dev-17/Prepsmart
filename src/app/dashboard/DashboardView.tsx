@@ -26,6 +26,7 @@ import {
   BriefcaseIcon,
   PaletteIcon,
   ClockIcon,
+  UserIcon,
 } from "@/components/ui/icons";
 
 interface DashboardProfile {
@@ -65,7 +66,7 @@ interface DashboardViewProps {
   initialStreakClaimedToday?: boolean;
 }
 
-type MainTab = "overview" | "readiness" | "revision";
+type MainTab = "overview" | "readiness" | "revision" | "profile";
 
 export default function DashboardView({
   user,
@@ -84,6 +85,7 @@ export default function DashboardView({
   const [mainTab, setMainTab] = useState<MainTab>(() => {
     if (initialActiveTab === "readiness" || initialActiveTab === "progress") return "readiness";
     if (initialActiveTab === "revision") return "revision";
+    if (initialActiveTab === "profile") return "profile";
     return "overview";
   });
 
@@ -282,6 +284,19 @@ export default function DashboardView({
               </span>
             )}
           </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange("profile")}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              mainTab === "profile"
+                ? "bg-blue-600 text-white shadow-xs"
+                : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
+            }`}
+          >
+            <UserIcon className="w-4 h-4" />
+            <span>Candidate Profile</span>
+          </button>
         </div>
 
         <div className="text-xs text-muted-foreground hidden lg:flex items-center gap-2">
@@ -314,6 +329,208 @@ export default function DashboardView({
             initialQuestions={revisionQuestions}
             initialTotal={reviewQuestionsCount}
           />
+        </section>
+      )}
+
+      {/* ── TAB 4: CANDIDATE PROFILE & STRATEGY CENTER ── */}
+      {mainTab === "profile" && (
+        <section className="space-y-6 animate-fadeIn">
+          {/* Identity & Top Banner Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-border/70">
+              <div className="flex items-center gap-5">
+                {user.image ? (
+                  <img
+                    src={user.image}
+                    alt={user.name || "Candidate Avatar"}
+                    className="w-20 h-20 rounded-2xl object-cover border-2 border-primary/20 shadow-md"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-black text-3xl flex items-center justify-center shadow-md shadow-blue-500/20">
+                    {(user.name?.[0] || user.email[0] || "U").toUpperCase()}
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-2xl font-black text-foreground">
+                      {user.name || "JAMB Candidate"}
+                    </h2>
+                    <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1.5">
+                      {streamIcon}
+                      <span>{streamLabel}</span>
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium">
+                    {user.email}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                    <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-muted text-foreground">
+                      Rank {rank ? `#${rank}` : "Unranked"}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                      {user.xp} Total XP
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                      {activeStreak}d Active Streak
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Prominent Action Button Linking to /profile */}
+              <div className="flex flex-col sm:items-end gap-2">
+                <Link
+                  href="/profile"
+                  className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <UserIcon className="w-4 h-4" />
+                  <span>Update Profile & Study Preferences</span>
+                  <ArrowRightIcon className="w-4 h-4" />
+                </Link>
+                <span className="text-[11px] text-muted-foreground text-center sm:text-right">
+                  Edit target score, department stream, and daily study cadence
+                </span>
+              </div>
+            </div>
+
+            {/* Profile Parameters Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Target UTME Score
+                </span>
+                <div className="text-2xl font-black text-foreground">
+                  {profile?.targetScore || 280} <span className="text-xs font-normal text-muted-foreground">/ 400</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {profile?.targetScore && profile.targetScore >= 300
+                    ? "Elite tier: qualifies for Medicine, Engineering, Law."
+                    : "Competitive tier: meets cutoffs for top federal universities."}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  UTME Target Exam Date
+                </span>
+                <div className="text-2xl font-black text-foreground">
+                  {daysRemaining} <span className="text-xs font-normal text-muted-foreground">days left</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {profile?.targetExamDate
+                    ? new Date(profile.targetExamDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+                    : "April 2027 Session"}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Daily Study Rhythm
+                </span>
+                <div className="text-2xl font-black text-foreground">
+                  {profile?.dailyStudyMinutes || 60}m <span className="text-xs font-normal text-muted-foreground">daily</span>
+                </div>
+                <p className="text-xs text-muted-foreground capitalize">
+                  Scheduled for {profile?.preferredStudyTime || "evening"} study.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Proficiency Level
+                </span>
+                <div className="text-2xl font-black text-foreground capitalize">
+                  {profile?.proficiencyLevel || "Intermediate"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Adaptive question difficulty adjusts automatically to this baseline.
+                </p>
+              </div>
+            </div>
+
+            {/* 4 Registered UTME Subjects Grid */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-extrabold text-foreground">
+                  Registered UTME Examination Subjects ({subjects.length})
+                </h3>
+                <Link
+                  href="/profile"
+                  className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                >
+                  <span>Modify Selection</span>
+                  <ArrowRightIcon className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {subjects.map((sub, idx) => {
+                  const subSlug = sub.toLowerCase().includes("english")
+                    ? "english"
+                    : sub.toLowerCase().includes("math")
+                    ? "mathematics"
+                    : sub.toLowerCase().includes("physic")
+                    ? "physics"
+                    : sub.toLowerCase().includes("chem")
+                    ? "chemistry"
+                    : sub.toLowerCase().includes("bio")
+                    ? "biology"
+                    : sub.toLowerCase().includes("econ")
+                    ? "economics"
+                    : sub.toLowerCase().replace(/\s+/g, "-");
+
+                  return (
+                    <div
+                      key={sub}
+                      className="p-4 rounded-2xl bg-card border border-border/80 hover:border-blue-500 hover:shadow-xs transition-all space-y-3 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                          <span>Subject #{idx + 1}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                            UTME
+                          </span>
+                        </div>
+                        <h4 className="font-extrabold text-sm text-foreground mt-2">
+                          {sub}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Official syllabus curriculum and Roadmap flowchart.
+                        </p>
+                      </div>
+
+                      <Link
+                        href={`/study?tab=subject-syllabus&stream=${profile?.departmentStream || "science"}&subject=${subSlug}`}
+                        className="w-full py-2 rounded-xl bg-muted hover:bg-blue-600 hover:text-white text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <BookOpenIcon className="w-3.5 h-3.5" />
+                        <span>Open Syllabus Roadmap</span>
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Direct Update CTA Banner */}
+            <div className="p-5 rounded-2xl bg-linear-to-r from-blue-600/10 via-indigo-600/5 to-purple-600/10 border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h4 className="font-extrabold text-sm text-foreground">
+                  Need to change your target institution, exam date, or study pace?
+                </h4>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Your daily study schedule and mock exam presets will update instantly.
+                </p>
+              </div>
+              <Link
+                href="/profile"
+                className="shrink-0 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-xs flex items-center justify-center gap-1.5"
+              >
+                <span>Open Full Profile Settings</span>
+                <ArrowRightIcon className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
         </section>
       )}
 
@@ -392,6 +609,160 @@ export default function DashboardView({
               </button>
             </div>
           )}
+
+          {/* Candidate Profile & UTME Academic Strategy Card */}
+          <div className="rounded-3xl bg-card border border-border p-6 shadow-xs space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-5 border-b border-border/70">
+              <div className="flex items-center gap-4">
+                {user.image ? (
+                  <img
+                    src={user.image}
+                    alt={user.name || "Candidate Avatar"}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-primary/20 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-black text-2xl flex items-center justify-center shadow-md shadow-blue-500/20">
+                    {(user.name?.[0] || user.email[0] || "U").toUpperCase()}
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-xl font-black text-foreground">
+                      {user.name || "JAMB Candidate"}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                      {streamIcon}
+                      <span>{streamLabel}</span>
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 flex items-center gap-1">
+                      <TrophyIcon className="w-3 h-3" />
+                      <span>Rank {rank ? `#${rank}` : "Unranked"}</span>
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-medium">
+                    {user.email} • Candidate ID: <code className="font-mono text-[11px] text-foreground/80">{user.id.slice(0, 12)}...</code>
+                  </p>
+                </div>
+              </div>
+
+              {/* Primary Action Button: Link to Profile */}
+              <Link
+                href="/profile"
+                className="shrink-0 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer group"
+              >
+                <UserIcon className="w-4 h-4" />
+                <span>Update Profile & Preferences</span>
+                <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+
+            {/* Target, Countdown, Study Rhythm & XP Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Target Score</span>
+                  <TargetIcon className="w-3.5 h-3.5 text-blue-500" />
+                </div>
+                <div className="text-2xl font-black text-foreground tabular-nums">
+                  {profile?.targetScore || 280} <span className="text-xs font-normal text-muted-foreground">/ 400 pts</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Competitive cutoff for Nigerian university admission.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">UTME Countdown</span>
+                  <HourglassIcon className="w-3.5 h-3.5 text-amber-500" />
+                </div>
+                <div className="text-2xl font-black text-amber-500 tabular-nums">
+                  {daysRemaining} <span className="text-xs font-normal text-muted-foreground">days</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Exam target: {profile?.targetExamDate ? new Date(profile.targetExamDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "April 2027"}.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Study Rhythm</span>
+                  <ClockIcon className="w-3.5 h-3.5 text-emerald-500" />
+                </div>
+                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
+                  {profile?.dailyStudyMinutes || 60}m <span className="text-xs font-normal text-muted-foreground">/ day</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground capitalize">
+                  Preferred: {profile?.preferredStudyTime || "evening"} • {profile?.proficiencyLevel || "intermediate"} level.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-1">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Total Earned XP</span>
+                  <SparklesIcon className="w-3.5 h-3.5 text-purple-500" />
+                </div>
+                <div className="text-2xl font-black text-purple-600 dark:text-purple-400 tabular-nums">
+                  {user.xp} <span className="text-xs font-normal text-muted-foreground">XP</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Accumulated from practice drills and streak claims.
+                </p>
+              </div>
+            </div>
+
+            {/* Enrolled 4 UTME Subjects */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Your 4 Enrolled UTME Examination Subjects
+                </span>
+                <Link
+                  href="/profile"
+                  className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Edit Subjects in Profile →
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {subjects.map((sub) => {
+                  const subSlug = sub.toLowerCase().includes("english")
+                    ? "english"
+                    : sub.toLowerCase().includes("math")
+                    ? "mathematics"
+                    : sub.toLowerCase().includes("physic")
+                    ? "physics"
+                    : sub.toLowerCase().includes("chem")
+                    ? "chemistry"
+                    : sub.toLowerCase().includes("bio")
+                    ? "biology"
+                    : sub.toLowerCase().includes("econ")
+                    ? "economics"
+                    : sub.toLowerCase().replace(/\s+/g, "-");
+                  return (
+                    <Link
+                      key={sub}
+                      href={`/study?tab=subject-syllabus&stream=${profile?.departmentStream || "science"}&subject=${subSlug}`}
+                      className="p-3 rounded-xl bg-background border border-border/80 hover:border-blue-500 hover:shadow-xs transition-all flex flex-col justify-between group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                          UTME
+                        </span>
+                        <BookOpenIcon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-blue-500 transition-colors" />
+                      </div>
+                      <div className="font-bold text-xs text-foreground mt-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {sub}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground mt-0.5">
+                        View Syllabus & Roadmap →
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
 
           {/* Core Daily Habit & Motivation Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
