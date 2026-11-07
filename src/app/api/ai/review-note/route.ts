@@ -17,7 +17,8 @@ interface ReviewResponse {
   strengths: string[];
   missingConcepts: string[];
   textbookTip: string;
-  evaluatedBy: "gemini" | "heuristic";
+  evaluatedBy: "gemini" | "openai" | "groq" | "heuristic";
+  modelName?: string;
 }
 
 // Fallback heuristic evaluator for zero-cost, offline, or unconfigured environments
@@ -116,6 +117,11 @@ function evaluateNoteHeuristically(
   };
 }
 
+function parseAiJsonResponse(raw: string): ReviewResponse {
+  const cleaned = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+  return JSON.parse(cleaned);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
@@ -130,12 +136,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const geminiKey = process.env.GEMINI_API_KEY;
-
-    // If Gemini key is available, attempt real-time Gemini 2.5 Flash review
-    if (geminiKey) {
-      try {
-        const prompt = `You are a top-tier Nigerian JAMB UTME academic tutor specializing in ${subject}.
+    const prompt = `You are a top-tier Nigerian JAMB UTME academic tutor specializing in ${subject}.
 A candidate is studying the topic "${topicTitle}" (Syllabus reference: ${topicSlug}).
 Official Syllabus Outlines:
 ${(syllabusOutlines || []).map((o) => `• ${o}`).join("\n")}
@@ -162,39 +163,134 @@ Return ONLY a valid JSON object with the following schema, and no extra markdown
   "textbookTip": "<specific reading advice for standard Nigerian textbooks like Anyakoha, Ababio, Oluwasanmi, Ashade, etc.>"
 }`;
 
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                responseMimeType: "application/json",
-                temperature: 0.3,
-              },
-            }),
-            signal: AbortSignal.timeout(9000),
-          }
-        );
+    // 1. Check for Google Gemini API key
+    const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+    if (geminiKey) {
+      // Try Gemini 2.0 Flash first, fallback to Gemini 1.5 Flash
+      const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+      for (const model of models) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                  responseMimeType: "application/json",
+                  temperature: 0.3,
+                },
+              }),
+              signal: AbortSignal.timeout(9000),
+            }
+          );
 
-        if (res.ok) {
-          const data = await res.json();
-          const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (rawText) {
-            const parsed = JSON.parse(rawText) as ReviewResponse;
-            return NextResponse.json({
-              ...parsed,
-              evaluatedBy: "gemini",
-            });
+          if (res.ok) {
+            const data = await res.json();
+            const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (rawText) {
+              const parsed = parseAiJsonResponse(rawText);
+              return NextResponse.json({
+                ...parsed,
+                evaluatedBy: "gemini",
+                modelName: `Google Gemini (${model})`,
+              });
+            }
           }
+        } catch (geminiErr) {
+          console.warn(`Gemini (${model}) API call failed:`, geminiErr);
         }
-      } catch (geminiErr) {
-        console.warn("Gemini API call failed or timed out, falling back to heuristic review:", geminiErr);
       }
     }
 
-    // Heuristic fallback
+    // 2. Check for OpenAI API key
+    const openaiKey = process.env.OPENAI_API_KEY;
+    if (openaiKey) {
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openaiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            response_format: { type: "json_object" },
+            temperature: 0.3,
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a top-tier Nigerian JAMB UTME academic tutor. You evaluate student notes according to the official JAMB syllabus and return pure JSON.",
+              },
+              { role: "user", content: prompt },
+            ],
+          }),
+          signal: AbortSignal.timeout(9000),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            const parsed = parseAiJsonResponse(content);
+            return NextResponse.json({
+              ...parsed,
+              evaluatedBy: "openai",
+              modelName: "OpenAI (gpt-4o-mini)",
+            });
+          }
+        }
+      } catch (openaiErr) {
+        console.warn("OpenAI API call failed:", openaiErr);
+      }
+    }
+
+    // 3. Check for Groq API key (Ultra-fast Llama 3)
+    const groqKey = process.env.GROQ_API_KEY;
+    if (groqKey) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${groqKey}`,
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            response_format: { type: "json_object" },
+            temperature: 0.3,
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a top-tier Nigerian JAMB UTME academic tutor. Return pure JSON adhering to the specified schema.",
+              },
+              { role: "user", content: prompt },
+            ],
+          }),
+          signal: AbortSignal.timeout(9000),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            const parsed = parseAiJsonResponse(content);
+            return NextResponse.json({
+              ...parsed,
+              evaluatedBy: "groq",
+              modelName: "Groq (Llama 3.3 70B)",
+            });
+          }
+        }
+      } catch (groqErr) {
+        console.warn("Groq API call failed:", groqErr);
+      }
+    }
+
+    // 4. Heuristic Fallback Engine (when no external AI API key is configured or network is offline)
     const result = evaluateNoteHeuristically(
       studentNote,
       topicTitle,

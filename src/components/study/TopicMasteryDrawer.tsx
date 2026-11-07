@@ -44,7 +44,8 @@ interface AiReviewData {
   strengths: string[];
   missingConcepts: string[];
   textbookTip: string;
-  evaluatedBy: "gemini" | "heuristic";
+  evaluatedBy: "gemini" | "openai" | "groq" | "heuristic";
+  modelName?: string;
 }
 
 export interface TopicProgressState {
@@ -542,8 +543,13 @@ export default function TopicMasteryDrawer({
                     }`}
                   >
                     <div>
-                      <div className="text-[11px] font-black uppercase tracking-wider">
-                        {aiReview.passed ? "Feynman Gate Cleared!" : "Needs More Detail"}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[11px] font-black uppercase tracking-wider">
+                          {aiReview.passed ? "Feynman Gate Cleared!" : "Needs More Detail"}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-background/80 border border-current/20">
+                          {aiReview.modelName || (aiReview.evaluatedBy === "heuristic" ? "Rule-Based Evaluator" : "AI Tutor")}
+                        </span>
                       </div>
                       <p className="text-xs font-semibold mt-0.5">{aiReview.summary}</p>
                     </div>
@@ -595,6 +601,15 @@ export default function TopicMasteryDrawer({
                     </span>
                     <span className="font-medium text-muted-foreground">{aiReview.textbookTip}</span>
                   </div>
+
+                  {aiReview.evaluatedBy === "heuristic" && (
+                    <div className="p-3 rounded-xl bg-muted/40 border border-border/70 text-[11px] text-muted-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <span>Evaluated using built-in syllabus keyword &amp; structure heuristics.</span>
+                      <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                        Add GEMINI_API_KEY in .env.local for live Gemini LLM review
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
