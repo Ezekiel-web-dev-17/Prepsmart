@@ -55,7 +55,7 @@ export default function StudyNotificationBanner({
   }
 
   return (
-    <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 max-w-md w-[calc(100vw-2.5rem)] animate-in fade-in slide-in-from-bottom-5 duration-300">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 sm:top-5 z-50 max-w-lg w-[calc(100vw-2rem)] animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
       <div
         className={`rounded-2xl p-4 sm:p-5 shadow-2xl backdrop-blur-md border ${borderClasses} transition-all`}
       >

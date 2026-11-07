@@ -224,17 +224,17 @@ export default function DashboardView({
       : "Science Stream";
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-8 pb-16 max-w-full min-w-0 overflow-x-hidden">
       {/* First Login Workspace Welcome Modal */}
       <FirstLoginWelcomeModal />
 
       {/* ── TOP UNIFIED COMMAND CENTER TABS ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4 max-w-full min-w-0">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 max-w-full scrollbar-none sm:flex-wrap">
           <button
             type="button"
             onClick={() => handleTabChange("overview")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
               mainTab === "overview"
                 ? "bg-blue-600 text-white shadow-xs"
                 : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
@@ -247,7 +247,7 @@ export default function DashboardView({
           <button
             type="button"
             onClick={() => handleTabChange("readiness")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
               mainTab === "readiness"
                 ? "bg-blue-600 text-white shadow-xs"
                 : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
@@ -265,7 +265,7 @@ export default function DashboardView({
           <button
             type="button"
             onClick={() => handleTabChange("revision")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 relative ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 relative ${
               mainTab === "revision"
                 ? "bg-blue-600 text-white shadow-xs"
                 : reviewQuestionsCount > 0
@@ -288,7 +288,7 @@ export default function DashboardView({
           <button
             type="button"
             onClick={() => handleTabChange("profile")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+            className={`shrink-0 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
               mainTab === "profile"
                 ? "bg-blue-600 text-white shadow-xs"
                 : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
@@ -334,25 +334,25 @@ export default function DashboardView({
 
       {/* ── TAB 4: CANDIDATE PROFILE & STRATEGY CENTER ── */}
       {mainTab === "profile" && (
-        <section className="space-y-6 animate-fadeIn">
+        <section className="space-y-6 animate-fadeIn min-w-0 max-w-full">
           {/* Identity & Top Banner Card */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-border/70">
-              <div className="flex items-center gap-5">
+          <div className="p-4 sm:p-6 lg:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6 min-w-0 max-w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-border/70 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center items-start gap-4 sm:gap-5 min-w-0 flex-1">
                 {user.image ? (
                   <img
                     src={user.image}
                     alt={user.name || "Candidate Avatar"}
-                    className="w-20 h-20 rounded-2xl object-cover border-2 border-primary/20 shadow-md"
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-primary/20 shadow-md shrink-0"
                   />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-black text-3xl flex items-center justify-center shadow-md shadow-blue-500/20">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
                     {(user.name?.[0] || user.email[0] || "U").toUpperCase()}
                   </div>
                 )}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-2xl font-black text-foreground">
+                    <h2 className="text-xl sm:text-2xl font-black text-foreground break-words">
                       {user.name || "JAMB Candidate"}
                     </h2>
                     <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1.5">
@@ -360,7 +360,7 @@ export default function DashboardView({
                       <span>{streamLabel}</span>
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground font-medium">
+                  <p className="text-xs text-muted-foreground font-medium truncate max-w-full break-all">
                     {user.email}
                   </p>
                   <div className="flex flex-wrap items-center gap-2 pt-0.5">
@@ -378,10 +378,10 @@ export default function DashboardView({
               </div>
 
               {/* Prominent Action Button Linking to /profile */}
-              <div className="flex flex-col sm:items-end gap-2">
+              <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto">
                 <Link
                   href="/profile"
-                  className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer text-center"
                 >
                   <UserIcon className="w-4 h-4" />
                   <span>Update Profile & Study Preferences</span>
@@ -538,10 +538,10 @@ export default function DashboardView({
       {mainTab === "overview" && (
         <div className="space-y-8 animate-fadeIn">
           {/* Header Banner: Countdown & Greeting */}
-          <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-6 sm:p-8 shadow-lg shadow-blue-500/10">
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold tracking-wide">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-4 sm:p-6 lg:p-8 shadow-lg shadow-blue-500/10 min-w-0 max-w-full">
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 min-w-0">
+              <div className="space-y-2 max-w-xl min-w-0">
+                <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-[11px] sm:text-xs font-semibold tracking-wide max-w-full">
                   <span className="flex items-center gap-1.5">
                     {streamIcon}
                     <span>{streamLabel}</span>
@@ -549,7 +549,7 @@ export default function DashboardView({
                   <span>•</span>
                   <span>Target: {profile?.targetScore || 280} / 400</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight break-words">
                   Welcome back, {user.name || "JAMB Candidate"}!
                 </h1>
                 <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
@@ -558,9 +558,9 @@ export default function DashboardView({
               </div>
 
               {/* Countdown Dial Badge */}
-              <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shrink-0">
+              <div className="flex items-center justify-around sm:justify-start gap-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shrink-0 w-full sm:w-auto">
                 <div className="text-center">
-                  <div className="text-3xl sm:text-4xl font-black tracking-tight">{daysRemaining}</div>
+                  <div className="text-2xl sm:text-4xl font-black tracking-tight">{daysRemaining}</div>
                   <div className="text-[10px] uppercase font-bold tracking-wider text-blue-200">
                     Days to UTME
                   </div>
@@ -581,13 +581,13 @@ export default function DashboardView({
 
           {/* Pending Topic Revisions Warning Banner */}
           {reviewQuestionsCount > 0 && (
-            <div className="p-4 sm:p-5 rounded-3xl bg-linear-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 border-2 border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-pulse">
-              <div className="flex items-start sm:items-center gap-3">
+            <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-linear-to-r from-amber-500/15 via-orange-500/10 to-amber-500/5 border-2 border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-pulse min-w-0 max-w-full">
+              <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
                 <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                   <RefreshCwIcon className="w-5 h-5 animate-spin" style={{ animationDuration: "5s" }} />
                 </div>
-                <div>
-                  <h4 className="text-xs font-black text-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs font-black text-foreground uppercase tracking-wider flex flex-wrap items-center gap-2">
                     <span>{reviewQuestionsCount} Weak Topic Error{reviewQuestionsCount === 1 ? "" : "s"} In Revision Hub</span>
                     <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black">
                       Action Needed
@@ -602,7 +602,7 @@ export default function DashboardView({
               <button
                 type="button"
                 onClick={() => handleTabChange("revision")}
-                className="shrink-0 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center"
               >
                 <span>Start Topic Revision</span>
                 <ArrowRightIcon className="w-3.5 h-3.5" />
@@ -611,23 +611,23 @@ export default function DashboardView({
           )}
 
           {/* Candidate Profile & UTME Academic Strategy Card */}
-          <div className="rounded-3xl bg-card border border-border p-6 shadow-xs space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-5 border-b border-border/70">
-              <div className="flex items-center gap-4">
+          <div className="rounded-2xl sm:rounded-3xl bg-card border border-border p-4 sm:p-6 shadow-xs space-y-6 min-w-0 max-w-full">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 pb-5 border-b border-border/70 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center items-start gap-4 min-w-0 flex-1">
                 {user.image ? (
                   <img
                     src={user.image}
                     alt={user.name || "Candidate Avatar"}
-                    className="w-16 h-16 rounded-2xl object-cover border-2 border-primary/20 shadow-xs"
+                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-primary/20 shadow-xs shrink-0"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-black text-2xl flex items-center justify-center shadow-md shadow-blue-500/20">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
                     {(user.name?.[0] || user.email[0] || "U").toUpperCase()}
                   </div>
                 )}
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-xl font-black text-foreground">
+                    <h2 className="text-lg sm:text-xl font-black text-foreground break-words">
                       {user.name || "JAMB Candidate"}
                     </h2>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
@@ -639,7 +639,7 @@ export default function DashboardView({
                       <span>Rank {rank ? `#${rank}` : "Unranked"}</span>
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground font-medium">
+                  <p className="text-xs text-muted-foreground font-medium truncate max-w-full break-all">
                     {user.email} • Candidate ID: <code className="font-mono text-[11px] text-foreground/80">{user.id.slice(0, 12)}...</code>
                   </p>
                 </div>
@@ -648,7 +648,7 @@ export default function DashboardView({
               {/* Primary Action Button: Link to Profile */}
               <Link
                 href="/profile"
-                className="shrink-0 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer group"
+                className="w-full sm:w-auto shrink-0 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer group text-center"
               >
                 <UserIcon className="w-4 h-4" />
                 <span>Update Profile & Preferences</span>
@@ -743,18 +743,18 @@ export default function DashboardView({
                     <Link
                       key={sub}
                       href={`/study?tab=subject-syllabus&stream=${profile?.departmentStream || "science"}&subject=${subSlug}`}
-                      className="p-3 rounded-xl bg-background border border-border/80 hover:border-blue-500 hover:shadow-xs transition-all flex flex-col justify-between group"
+                      className="p-3 rounded-xl bg-background border border-border/80 hover:border-blue-500 hover:shadow-xs transition-all flex flex-col justify-between group min-w-0"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                           UTME
                         </span>
-                        <BookOpenIcon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-blue-500 transition-colors" />
+                        <BookOpenIcon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-blue-500 transition-colors shrink-0" />
                       </div>
-                      <div className="font-bold text-xs text-foreground mt-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <div className="font-bold text-xs text-foreground mt-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {sub}
                       </div>
-                      <span className="text-[10px] text-muted-foreground mt-0.5">
+                      <span className="text-[10px] text-muted-foreground mt-0.5 truncate">
                         View Syllabus & Roadmap →
                       </span>
                     </Link>
@@ -1044,56 +1044,56 @@ export default function DashboardView({
 
           {/* Real Recorded Data Summary Footer */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card border border-border/80 text-center space-y-1 min-w-0">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
                 Target Score
               </span>
-              <div className="text-xl sm:text-2xl font-black text-foreground tabular-nums">
+              <div className="text-lg sm:text-2xl font-black text-foreground tabular-nums truncate">
                 {profile?.targetScore || 280}
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card border border-border/80 text-center space-y-1 min-w-0">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
                 Active Streak
               </span>
-              <div className="text-xl sm:text-2xl font-black text-amber-500 tabular-nums">
+              <div className="text-lg sm:text-2xl font-black text-amber-500 tabular-nums truncate">
                 {activeStreak}d
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                Questions / Week
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card border border-border/80 text-center space-y-1 min-w-0">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
+                Questions / Wk
               </span>
-              <div className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums">
+              <div className="text-lg sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums truncate">
                 {progressData?.weeklyQuestionsCount ?? 0}
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card border border-border/80 text-center space-y-1 min-w-0">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
                 Total XP
               </span>
-              <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">
+              <div className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums truncate">
                 {user.xp}
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                Leaderboard Rank
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card border border-border/80 text-center space-y-1 min-w-0">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
+                Leaderboard
               </span>
-              <div className="text-xl sm:text-2xl font-black text-purple-600 dark:text-purple-400">
+              <div className="text-lg sm:text-2xl font-black text-purple-600 dark:text-purple-400 truncate">
                 {rank ? `#${rank}` : "Unranked"}
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-card border border-border/80 text-center space-y-1">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-card border border-border/80 text-center space-y-1 min-w-0">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate">
                 Review Queue
               </span>
-              <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 tabular-nums">
+              <div className="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-400 tabular-nums truncate">
                 {reviewQuestionsCount}
               </div>
             </div>

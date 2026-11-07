@@ -79,7 +79,7 @@ export default function RootLayout({
         <head>
           <ThemeScript />
         </head>
-        <body className="min-h-full flex flex-col bg-background text-foreground font-sans transition-colors duration-200 selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100">
+        <body className="min-h-full flex flex-col bg-background text-foreground font-sans transition-colors duration-200 selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100 overflow-x-hidden max-w-full">
           <ThemeProvider>
             <QueryProvider>
               <UserProvider>
@@ -91,7 +91,7 @@ export default function RootLayout({
                   >
                     <Navbar />
                   </Suspense>
-                  <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+                  <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 min-w-0">
                     {children}
                   </main>
                   <Footer />

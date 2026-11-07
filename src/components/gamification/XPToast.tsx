@@ -154,7 +154,7 @@ function XPToastContainer({
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full px-4 sm:px-0">
+    <div className="fixed top-4 right-4 sm:top-5 sm:right-6 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-[calc(100vw-2rem)] sm:w-full animate-in fade-in slide-in-from-top-4 duration-300">
       {toasts.map((toast) => {
         const meta = EVENT_LABELS[toast.eventType] || {
           title: "XP Earned!",

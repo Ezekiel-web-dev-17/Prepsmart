@@ -249,7 +249,7 @@ export default function SubjectSyllabusView({
   const streamSubjects = STREAM_SUBJECTS_MAP[currentStream] || STREAM_SUBJECTS_MAP.science;
 
   return (
-    <div className="space-y-8 pb-16 animate-fadeIn">
+    <div className="space-y-8 pb-16 animate-fadeIn max-w-full min-w-0 overflow-x-hidden">
       {/* ── 1. BREADCRUMBS & TOP NAV ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-muted-foreground border-b border-border pb-3">
         <div className="flex flex-wrap items-center gap-1.5">
@@ -713,11 +713,12 @@ export default function SubjectSyllabusView({
             </div>
           </div>
 
-          {/* Flowchart Stages Canvas with Dynamic Zoom */}
-          <div
-            className="w-full max-w-4xl mx-auto transition-transform origin-top space-y-12 py-4"
-            style={{ transform: `scale(${zoomScale})` }}
-          >
+          {/* Flowchart Stages Canvas with Dynamic Zoom (Contained Horizontal Overflow) */}
+          <div className="w-full overflow-x-auto pb-6 scrollbar-thin">
+            <div
+              className="w-full max-w-4xl mx-auto transition-transform origin-top space-y-12 py-4"
+              style={{ transform: `scale(${zoomScale})` }}
+            >
             {roadmap.stages.map((stage, stageIdx) => (
               <div key={stage.stage} className="relative flex flex-col items-center">
                 {/* Stage Milestone Banner */}
@@ -823,6 +824,7 @@ export default function SubjectSyllabusView({
                 )}
               </div>
             ))}
+            </div>
           </div>
         </section>
       )}

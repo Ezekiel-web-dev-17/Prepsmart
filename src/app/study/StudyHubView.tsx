@@ -114,7 +114,7 @@ export default function StudyHubView({
   };
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-8 pb-16 max-w-full min-w-0 overflow-x-hidden">
       {/* Personalized Candidate Context Header (Signed-in candidates) */}
       {isUserAuthenticated && user && (
         <section className="rounded-3xl border border-blue-500/20 bg-linear-to-r from-blue-900/10 via-card to-indigo-900/10 p-5 sm:p-6 shadow-xs">
