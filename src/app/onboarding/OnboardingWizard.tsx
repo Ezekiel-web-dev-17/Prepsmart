@@ -106,7 +106,7 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
       const success = await subscribeToPush();
       setPushOptIn(success);
       if (success) {
-        sendTestNotification("Duolingo-style Streak Enabled", "You'll receive lesson reminders!");
+        sendTestNotification("Daily Lesson Streak Enabled", "You'll receive lesson reminders!");
       }
     } else {
       setPushOptIn(false);
@@ -419,11 +419,11 @@ export default function OnboardingWizard({ initialUserId }: OnboardingWizardProp
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground">
                 Never miss your {dailyMinutes}-minute daily quota. We send gentle
-                Pinterest/Duolingo-style push notifications directly to your browser.
+                daily push notifications directly to your browser.
               </p>
             </div>
 
-            {/* Duolingo Streak Box */}
+            {/* Daily Streak Box */}
             <div className="p-6 rounded-2xl bg-linear-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
               <div className="flex items-center gap-3">
                 <FlameIcon className="w-8 h-8 text-amber-500 shrink-0" />

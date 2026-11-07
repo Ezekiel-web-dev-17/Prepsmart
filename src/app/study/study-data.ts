@@ -130,7 +130,7 @@ export const ACADEMIC_STREAMS: AcademicStream[] = [
   {
     id: "science",
     title: "Science & Technology",
-    tagline: "Comprehensive UTME roadmap for Medicine, Engineering, Computing, and Pure Sciences.",
+    tagline: "Comprehensive UTME curriculum for Medicine, Engineering, Computing, and Pure Sciences.",
     badge: "STEM Stream",
     targetScore: "310+ Score",
     studyTime: "2.5 hrs / day",

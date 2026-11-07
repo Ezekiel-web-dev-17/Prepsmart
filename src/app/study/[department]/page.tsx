@@ -560,7 +560,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${data.title} Curriculum - Prepsmart JAMB 2026`,
-    description: `${data.tagline} Structured syllabus roadmap, topic breakdown, and CBT practice drills.`,
+    description: `${data.tagline} Structured syllabus breakdown, topic outline, and CBT practice drills.`,
   };
 }
 
@@ -656,12 +656,12 @@ export default async function DepartmentStudyPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Syllabus Milestone Roadmap */}
+      {/* Syllabus Study Milestones */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <div>
             <h2 className="text-xl font-extrabold text-foreground">
-              Syllabus Milestone Roadmap
+              Syllabus Study Milestones
             </h2>
             <p className="text-xs text-muted-foreground">
               Step-by-step progress milestones designed for steady practice and solid revision.

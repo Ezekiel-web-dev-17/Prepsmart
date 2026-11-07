@@ -4,9 +4,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "UTME Interactive Visual Roadmap | PrepSmart",
+  title: "UTME Interactive Visual Syllabus | PrepSmart",
   description:
-    "Master the JAMB syllabus step-by-step with our interactive Roadmap.sh-style visual learning pathways, Nigerian textbook advice, Feynman AI evaluation, and CBT drills.",
+    "Master the JAMB syllabus step-by-step with our interactive visual learning pathways, Nigerian textbook advice, Feynman AI evaluation, and CBT drills.",
 };
 
 interface RoadmapPageProps {
@@ -49,7 +49,7 @@ export default async function RoadmapPage({ searchParams }: RoadmapPageProps) {
         }
       }
     } catch (err) {
-      console.warn("Could not load user profile for roadmap:", err);
+      console.warn("Could not load user profile for syllabus:", err);
     }
   }
 
@@ -61,6 +61,6 @@ export default async function RoadmapPage({ searchParams }: RoadmapPageProps) {
       | "arts";
   const effectiveSubject = resolvedParams.subject || initialSubject;
 
-  // Seamlessly redirect to the unified syllabus roadmap tab
+  // Seamlessly redirect to the unified syllabus tab
   redirect(`/study?tab=subject-syllabus&stream=${effectiveStream}&subject=${effectiveSubject}`);
 }

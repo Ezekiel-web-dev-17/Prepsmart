@@ -172,7 +172,7 @@ export function ReadinessRing({
       <div className="mt-3 w-full grid grid-cols-2 gap-2 text-center text-xs">
         <div className="p-2 rounded-xl bg-primary/5 border border-primary/15">
           <span className="text-[10px] uppercase font-bold text-muted-foreground block">
-            Roadmap Mastered
+            Syllabus Mastered
           </span>
           <span className="font-black text-foreground">
             {completedTopicsCount} Topic{completedTopicsCount === 1 ? "" : "s"}

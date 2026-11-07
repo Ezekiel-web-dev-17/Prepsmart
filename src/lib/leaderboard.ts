@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { LEADERBOARD_KEY } from "./gamification";
 
-export type DuolingoLeagueTier =
+export type LeagueTier =
   | "Bronze"
   | "Silver"
   | "Gold"
@@ -20,7 +20,7 @@ export interface LeaderboardEntry {
   name: string;
   image: string | null;
   xp: number;
-  tier: DuolingoLeagueTier;
+  tier: LeagueTier;
   stream: "science" | "commercial" | "arts";
   streakDays: number;
   targetScore: number;
@@ -28,7 +28,7 @@ export interface LeaderboardEntry {
   isCurrentUser?: boolean;
 }
 
-export function getTierForXp(xp: number): DuolingoLeagueTier {
+export function getTierForXp(xp: number): LeagueTier {
   if (xp >= 2800) return "Diamond";
   if (xp >= 2250) return "Obsidian";
   if (xp >= 1750) return "Pearl";
@@ -42,7 +42,7 @@ export function getTierForXp(xp: number): DuolingoLeagueTier {
 }
 
 /**
- * Retrieves ranked students with complete Duolingo-style gamification attributes.
+ * Retrieves ranked students with complete league gamification attributes.
  * Hydrates candidate profiles, study stream, active streak, and target scores.
  */
 export async function getTopLeaderboard(

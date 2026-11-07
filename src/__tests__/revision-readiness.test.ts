@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { generateCalculationVariant } from "../lib/revision-generator";
 
-describe("Duolingo-Style Revision & Isomorphic Calculation Variants", () => {
+describe("Targeted Error Revision & Isomorphic Calculation Variants", () => {
   it("generates isomorphic calculation variants for Logarithms questions", () => {
     const baseLogQuestion = {
       id: "q-log-1",

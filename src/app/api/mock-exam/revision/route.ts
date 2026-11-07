@@ -8,7 +8,7 @@ import {
   TopicRevisionQuestion,
 } from "@/lib/revision-generator";
 
-// GET /api/mock-exam/revision — fetch revision questions (supports flat batch or Duolingo per-topic grouping)
+// GET /api/mock-exam/revision — fetch revision questions (supports flat batch or per-topic grouping)
 export async function GET(request: Request) {
   try {
     const { userId } = await auth();
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
     const totalRecords = await prisma.failedQuestion.count({ where: { userId } });
 
-    // ── 1. DUOLINGO STYLE: TOPIC-ORGANIZED REVISION (3 QUESTIONS PER TOPIC) ──
+    // ── 1. TOPIC-ORGANIZED REVISION (3 QUESTIONS PER TOPIC) ──
     if (view === "topics") {
       const allFailed = await prisma.failedQuestion.findMany({
         where: { userId },

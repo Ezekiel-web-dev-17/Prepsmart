@@ -89,8 +89,8 @@ export default function SubjectSyllabusView({
     }));
   };
 
-  // View mode switcher: 🗺️ Interactive Roadmap Flowchart (default) vs 📋 Document Outline
-  const [viewMode, setViewMode] = useState<"roadmap" | "outline">("roadmap");
+  // View mode switcher: 🗺️ Interactive Syllabus Flowchart (default) vs 📋 Document Outline
+  const [viewMode, setViewMode] = useState<"flowchart" | "outline">("flowchart");
 
   // Dynamic zoom for flowchart canvas
   const [zoomScale, setZoomScale] = useState<number>(1);
@@ -103,7 +103,7 @@ export default function SubjectSyllabusView({
   const [progressMap, setProgressMap] = useState<Record<string, TopicProgressState>>({});
   const [isLoadingProgress, setIsLoadingProgress] = useState<boolean>(true);
 
-  // Convert official curriculum directly into unified interactive roadmap
+  // Convert official curriculum directly into unified interactive syllabus flowchart
   const roadmap = useMemo(() => convertCurriculumToRoadmap(curriculum), [curriculum]);
 
   // Fetch real recorded progress from database
@@ -530,20 +530,20 @@ export default function SubjectSyllabusView({
 
       {/* ── 5. TOPIC MASTERY TRACKER & VIEW SWITCHER ── */}
       <section className="bg-card border border-border/80 rounded-2xl p-5 space-y-5 shadow-xs">
-        {/* View Mode Switcher: 🗺️ Interactive Roadmap Flowchart (Default) vs 📋 Document Outline */}
+        {/* View Mode Switcher: 🗺️ Interactive Syllabus Flowchart (Default) vs 📋 Document Outline */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted/60 border border-border">
             <button
               type="button"
-              onClick={() => setViewMode("roadmap")}
+              onClick={() => setViewMode("flowchart")}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === "roadmap"
+                viewMode === "flowchart"
                   ? "bg-blue-600 text-white shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <SparklesIcon className="w-3.5 h-3.5" />
-              <span>Interactive Roadmap Flowchart</span>
+              <span>Interactive Syllabus Flowchart</span>
               <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-white text-[9px] font-black uppercase">
                 Default
               </span>
@@ -564,8 +564,8 @@ export default function SubjectSyllabusView({
           </div>
 
           <span className="text-[11px] font-bold text-muted-foreground hidden sm:inline">
-            {viewMode === "roadmap"
-              ? "Roadmap.sh visual flowchart matching official JAMB syllabus"
+            {viewMode === "flowchart"
+              ? "Interactive visual flowchart matching official JAMB syllabus"
               : "Traditional curriculum blueprint & search"}
           </span>
         </div>
@@ -665,14 +665,14 @@ export default function SubjectSyllabusView({
         )}
       </section>
 
-      {/* ── 6A. VIEW MODE CONTENT: INTERACTIVE ROADMAP FLOWCHART (ROADMAP.SH STYLE) ── */}
-      {viewMode === "roadmap" && (
+      {/* ── 6A. VIEW MODE CONTENT: INTERACTIVE SYLLABUS FLOWCHART ── */}
+      {viewMode === "flowchart" && (
         <section className="space-y-8 animate-fadeIn">
           {/* Zoom and Stats Bar */}
           <div className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border shadow-xs">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                Roadmap.sh Visual Engine
+                Visual Flowchart Engine
               </span>
               <span className="text-xs text-muted-foreground hidden sm:inline">
                 Click any topic node to write notes for AI review and unlock 5–15 JAMB questions.
@@ -1062,7 +1062,7 @@ export default function SubjectSyllabusView({
         </div>
       </section>
 
-      {/* Slide-Over Topic Mastery Drawer (Shared between Roadmap & Outline) */}
+      {/* Slide-Over Topic Mastery Drawer (Shared between Flowchart & Outline) */}
       <TopicMasteryDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

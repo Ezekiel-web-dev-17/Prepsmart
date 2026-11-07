@@ -39,8 +39,8 @@ export async function createUser(formData: FormData): Promise<CreateUserResult> 
       data: { name: name ?? null, email },
     });
 
-    // Revalidate the /users path so UI refreshes
-    revalidatePath("/users");
+    // Revalidate the /dashboard path so UI refreshes
+    revalidatePath("/dashboard");
 
     return { success: true, user: newUser };
   } catch (error) {

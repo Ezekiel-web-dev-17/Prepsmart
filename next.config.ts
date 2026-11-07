@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "en.wikipedia.org",
+      },
+      {
+        protocol: "https",
+        hostname: "*.wikimedia.org",
+      },
+      {
+        protocol: "https",
+        hostname: "*.wikipedia.org",
+      },
+      {
+        protocol: "https",
         hostname: "avatar.vercel.sh",
       },
       {

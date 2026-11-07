@@ -35,13 +35,13 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
 
   // Navigation / active section state
   const [activeTab, setActiveTab] = useState<
-    "streams" | "roadmap" | "syllabus" | "blueprint" | "traps"
+    "streams" | "milestones" | "syllabus" | "blueprint" | "traps"
   >("streams");
 
-  // Roadmap week selector
+  // Study milestones week selector
   const [selectedWeek, setSelectedWeek] = useState<number>(1);
 
-  // Roadmap interactive checklist stored in localStorage
+  // Study milestones interactive checklist stored in localStorage
   const [completedMilestones, setCompletedMilestones] = useState<Record<string, boolean>>({});
 
   // Syllabus Explorer state
@@ -216,13 +216,13 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab("roadmap")}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${activeTab === "roadmap"
+              onClick={() => setActiveTab("milestones")}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${activeTab === "milestones"
                   ? "bg-blue-600 text-white shadow-xs shadow-blue-500/30"
                   : "bg-card border border-border text-foreground hover:bg-muted"
                 }`}
             >
-              Milestone Roadmap
+              Study Milestones
             </button>
             <button
               type="button"
@@ -418,8 +418,8 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
         </section>
       )}
 
-      {/* ================= SECTION 2: SYLLABUS ROADMAP ================= */}
-      {activeTab === "roadmap" && (
+      {/* ================= SECTION 2: STUDY MILESTONES ================= */}
+      {activeTab === "milestones" && (
         <section className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -1147,10 +1147,10 @@ export default function StudyCurriculumHub({ onSwitchToMockExam }: StudyCurricul
               Take Pre-Test Evaluation
             </Link>
             <Link
-              href="/roster"
+              href="/universities"
               className="px-4 py-2.5 rounded-xl bg-card border border-border hover:bg-muted font-bold text-xs text-foreground transition-colors"
             >
-              View Class Timetable
+              Explore Universities &amp; Cut-Offs
             </Link>
             <Link
               href="/dashboard?tab=readiness"

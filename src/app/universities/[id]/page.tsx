@@ -68,16 +68,42 @@ export default async function UniversityDetailPage({ params }: PageProps) {
   let university: UniversityData;
 
   if (rawUniversity) {
+    const imgMeta = getUniversityImageMeta(rawUniversity.slug, rawUniversity.acronym);
+    const logoMeta = getUniversityLogoMeta(rawUniversity.slug, rawUniversity.acronym);
+    const imageUrl = rawUniversity.imageUrl || imgMeta.imageUrl;
+    const logoUrl = rawUniversity.logoUrl || logoMeta.logoUrl;
+    const imageLandmark = rawUniversity.imageLandmark || imgMeta.landmark;
+    const imageCaption = rawUniversity.imageCaption || imgMeta.caption;
+    const brandColor = rawUniversity.brandColor || logoMeta.brandColor;
+    const secondaryColor = rawUniversity.secondaryColor || logoMeta.secondaryColor;
+
+    // Self-healing: backfill database record if missing image or logo URL
+    if (!rawUniversity.imageUrl || !rawUniversity.logoUrl) {
+      prisma.university
+        .update({
+          where: { id: rawUniversity.id },
+          data: {
+            imageUrl,
+            logoUrl,
+            imageLandmark,
+            imageCaption,
+            brandColor,
+            secondaryColor,
+          },
+        })
+        .catch(() => {});
+    }
+
     university = {
       ...rawUniversity,
       createdAt: rawUniversity.createdAt.toISOString(),
       updatedAt: rawUniversity.updatedAt.toISOString(),
-      imageUrl: rawUniversity.imageUrl ?? null,
-      logoUrl: rawUniversity.logoUrl ?? null,
-      imageLandmark: rawUniversity.imageLandmark ?? null,
-      imageCaption: rawUniversity.imageCaption ?? null,
-      brandColor: rawUniversity.brandColor ?? null,
-      secondaryColor: rawUniversity.secondaryColor ?? null,
+      imageUrl,
+      logoUrl,
+      imageLandmark,
+      imageCaption,
+      brandColor,
+      secondaryColor,
       coursesCount: rawUniversity.courses.length,
       minCourseCutOff:
         rawUniversity.courses.length > 0

@@ -279,7 +279,7 @@ export default function AboutPage() {
                 We saw our friends, younger siblings, and thousands of brilliant candidates repeating JAMB year after year simply because nobody showed them the system.
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                PrepSmart was built using the exact study routine we used to clear our exams. We automated the Spaced Repetition Queue, added examiner trap alerts, integrated authentic 120-minute CBT calculators, and created a step-by-step syllabus roadmap so any student in Nigeria can follow the same winning routine.
+                PrepSmart was built using the exact study routine we used to clear our exams. We automated the Spaced Repetition Queue, added examiner trap alerts, integrated authentic 120-minute CBT calculators, and created a step-by-step syllabus curriculum so any student in Nigeria can follow the same winning routine.
               </p>
             </div>
             <div className="pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">

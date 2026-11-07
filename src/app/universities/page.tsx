@@ -42,28 +42,55 @@ export default async function UniversitiesPage() {
     console.warn("Prisma university fetch note, using fallback catalog:", err);
   }
 
-  // 1. Serialize DB records
-  const dbUniversities: UniversityData[] = rawUniversities.map((uni) => ({
-    ...uni,
-    createdAt: uni.createdAt.toISOString(),
-    updatedAt: uni.updatedAt.toISOString(),
-    // DB image fields (may be null for older rows)
-    imageUrl: uni.imageUrl ?? null,
-    logoUrl: uni.logoUrl ?? null,
-    imageLandmark: uni.imageLandmark ?? null,
-    imageCaption: uni.imageCaption ?? null,
-    brandColor: uni.brandColor ?? null,
-    secondaryColor: uni.secondaryColor ?? null,
-    coursesCount: uni.courses.length,
-    minCourseCutOff:
-      uni.courses.length > 0
-        ? Math.min(...uni.courses.map((c: any) => c.cutOffMark))
-        : uni.generalCutOff,
-    maxCourseCutOff:
-      uni.courses.length > 0
-        ? Math.max(...uni.courses.map((c: any) => c.cutOffMark))
-        : uni.generalCutOff,
-  }));
+  // 1. Serialize DB records and ensure real verified image & logo URLs
+  const dbUniversities: UniversityData[] = rawUniversities.map((uni) => {
+    const imgMeta = getUniversityImageMeta(uni.slug, uni.acronym);
+    const logoMeta = getUniversityLogoMeta(uni.slug, uni.acronym);
+    const imageUrl = uni.imageUrl || imgMeta.imageUrl;
+    const logoUrl = uni.logoUrl || logoMeta.logoUrl;
+    const imageLandmark = uni.imageLandmark || imgMeta.landmark;
+    const imageCaption = uni.imageCaption || imgMeta.caption;
+    const brandColor = uni.brandColor || logoMeta.brandColor;
+    const secondaryColor = uni.secondaryColor || logoMeta.secondaryColor;
+
+    // Self-healing: backfill database record if missing image or logo URL
+    if (!uni.imageUrl || !uni.logoUrl) {
+      prisma.university
+        .update({
+          where: { id: uni.id },
+          data: {
+            imageUrl,
+            logoUrl,
+            imageLandmark,
+            imageCaption,
+            brandColor,
+            secondaryColor,
+          },
+        })
+        .catch(() => {});
+    }
+
+    return {
+      ...uni,
+      createdAt: uni.createdAt.toISOString(),
+      updatedAt: uni.updatedAt.toISOString(),
+      imageUrl,
+      logoUrl,
+      imageLandmark,
+      imageCaption,
+      brandColor,
+      secondaryColor,
+      coursesCount: uni.courses.length,
+      minCourseCutOff:
+        uni.courses.length > 0
+          ? Math.min(...uni.courses.map((c: any) => c.cutOffMark))
+          : uni.generalCutOff,
+      maxCourseCutOff:
+        uni.courses.length > 0
+          ? Math.max(...uni.courses.map((c: any) => c.cutOffMark))
+          : uni.generalCutOff,
+    };
+  });
 
   // 2. Identify universities from catalog not yet in the DB
   const dbSlugs = new Set(rawUniversities.map((u) => u.slug.toLowerCase()));
@@ -71,6 +98,8 @@ export default async function UniversitiesPage() {
     (uni) => !dbSlugs.has(uni.id.toLowerCase())
   ).map((uni) => {
     const courseValues = Object.values(uni.departmentalCutOffs || {});
+    const imgMeta = getUniversityImageMeta(uni.id, uni.acronym);
+    const logoMeta = getUniversityLogoMeta(uni.id, uni.acronym);
     return {
       id: uni.id,
       slug: uni.id,
@@ -90,12 +119,12 @@ export default async function UniversitiesPage() {
       estYear: uni.estYear,
       website: uni.website,
       campusHighlights: uni.campusHighlights,
-      imageUrl: null,
-      logoUrl: null,
-      imageLandmark: null,
-      imageCaption: null,
-      brandColor: null,
-      secondaryColor: null,
+      imageUrl: imgMeta.imageUrl,
+      logoUrl: logoMeta.logoUrl,
+      imageLandmark: imgMeta.landmark,
+      imageCaption: imgMeta.caption,
+      brandColor: logoMeta.brandColor,
+      secondaryColor: logoMeta.secondaryColor,
       courses: Object.entries(uni.departmentalCutOffs || {}).map(([key, cutOff]) => ({
         id: `${uni.id}-${key}`,
         universityId: uni.id,

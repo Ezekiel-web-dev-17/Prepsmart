@@ -193,7 +193,7 @@ export default function StudyHubView({
         </section>
       )}
 
-      {/* Interactive Visual Roadmap Feature Banner (Roadmap.sh Style) */}
+      {/* Interactive Visual Syllabus Feature Banner */}
       <section className="p-5 rounded-3xl bg-linear-to-r from-blue-600/15 via-indigo-600/10 to-purple-600/15 border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -201,11 +201,11 @@ export default function StudyHubView({
               NEW FEATURE
             </span>
             <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
-              Roadmap.sh-Style Flowchart
+              Interactive Learning Flowchart
             </span>
           </div>
           <h3 className="text-base font-black text-foreground tracking-tight">
-            Interactive Visual Learning Roadmap & AI Feynman Gates
+            Interactive Visual Learning Syllabus & AI Feynman Gates
           </h3>
           <p className="text-xs text-muted-foreground max-w-2xl leading-relaxed">
             Follow structured stages from foundational principles to advanced mastery. Write notes reviewed in real-time by AI, drill 5–15 authentic JAMB CBT questions with mnemonics, and master topics for +50 XP.
@@ -218,7 +218,7 @@ export default function StudyHubView({
           className="shrink-0 px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer group"
         >
           <SparklesIcon className="w-4 h-4 text-amber-300" />
-          <span>Open Syllabus Roadmap Flowchart</span>
+          <span>Open Subject Syllabus Flowchart</span>
           <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
         </button>
       </section>
@@ -226,7 +226,7 @@ export default function StudyHubView({
       {/* Top Level Hub Navigator */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Tab 1: Syllabus Roadmap & Milestones (Guest/Unauthenticated users only) */}
+          {/* Tab 1: Syllabus Study Milestones (Guest/Unauthenticated users only) */}
           {!isUserAuthenticated && (
             <button
               type="button"
@@ -238,14 +238,14 @@ export default function StudyHubView({
               }`}
             >
               <BookOpenIcon className="w-4 h-4" />
-              <span>Syllabus Roadmap</span>
+              <span>Study Milestones</span>
               <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[10px] font-black">
                 All Streams
               </span>
             </button>
           )}
 
-          {/* Tab 2: Unified JAMB Subject Syllabus & Interactive Roadmap */}
+          {/* Tab 2: Unified JAMB Subject Syllabus & Interactive Flowchart */}
           <button
             type="button"
             onClick={() => handleTabChange("subject-syllabus")}
@@ -256,7 +256,7 @@ export default function StudyHubView({
             }`}
           >
             <SparklesIcon className="w-4 h-4 text-blue-500" />
-            <span>{currentCurriculum.subjectName} Syllabus &amp; Roadmap</span>
+            <span>{currentCurriculum.subjectName} Subject Syllabus</span>
             <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
               {currentCurriculum.totalTopics} Topics • Flowchart
             </span>
@@ -307,7 +307,7 @@ export default function StudyHubView({
         </section>
       )}
 
-      {/* View 2: Syllabus Milestone Roadmap Overview (Guest/Unauthenticated users only) */}
+      {/* View 2: Syllabus Study Milestones Overview (Guest/Unauthenticated users only) */}
       {activeTab === "curriculum" && !isUserAuthenticated && (
         <section className="space-y-6 animate-fadeIn">
           <StudyCurriculumHub onSwitchToMockExam={() => handleTabChange("mock-exam")} />

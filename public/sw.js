@@ -1,5 +1,5 @@
 // public/sw.js
-// PrepSmart Service Worker for Native Web Push Notifications (Duolingo / Pinterest style)
+// PrepSmart Service Worker for Native Web Push Notifications (Daily Reminders & Streaks)
 
 self.addEventListener("install", (event) => {
   // Activate immediately

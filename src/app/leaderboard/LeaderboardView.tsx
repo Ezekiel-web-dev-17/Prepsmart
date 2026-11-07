@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import type { LeaderboardEntry, DuolingoLeagueTier } from "@/lib/leaderboard";
+import type { LeaderboardEntry, LeagueTier } from "@/lib/leaderboard";
 import {
   TrophyIcon,
   CrownIcon,
@@ -29,7 +29,7 @@ interface LeaderboardViewProps {
 }
 
 export interface LeagueConfig {
-  id: DuolingoLeagueTier;
+  id: LeagueTier;
   name: string;
   minXp: number;
   color: string;
@@ -40,7 +40,7 @@ export interface LeagueConfig {
   rewardText: string;
 }
 
-export const DUOLINGO_LEAGUES: LeagueConfig[] = [
+export const UTME_LEAGUES: LeagueConfig[] = [
   {
     id: "Diamond",
     name: "Diamond League",
@@ -242,7 +242,7 @@ export default function LeaderboardView({
     return idx !== -1 ? idx + 1 : null;
   }, [filteredEntries, currentCandidate]);
 
-  // Duolingo Zone Bracket definitions for standard 30-candidate league:
+  // Zone Bracket definitions for standard 30-candidate league:
   // Top 7: Promotion Zone
   // Bottom 5 (ranks >= 24 in a 28+ list): Demotion Zone
   const PROMOTION_CUTOFF = 7;
@@ -257,23 +257,23 @@ export default function LeaderboardView({
   const currentLeagueConfig = useMemo(() => {
     if (selectedLeague === "All") {
       return (
-        DUOLINGO_LEAGUES.find((l) => l.id === (currentCandidate?.tier || "Diamond")) ||
-        DUOLINGO_LEAGUES[0]
+        UTME_LEAGUES.find((l) => l.id === (currentCandidate?.tier || "Diamond")) ||
+        UTME_LEAGUES[0]
       );
     }
-    return DUOLINGO_LEAGUES.find((l) => l.id === selectedLeague) || DUOLINGO_LEAGUES[0];
+    return UTME_LEAGUES.find((l) => l.id === selectedLeague) || UTME_LEAGUES[0];
   }, [selectedLeague, currentCandidate?.tier]);
 
   return (
     <div className="space-y-8 pb-24">
-      {/* ── 1. DUOLINGO TOURNAMENT HEADER ── */}
+      {/* ── 1. TOURNAMENT HEADER ── */}
       <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-card via-card/90 to-blue-900/10 border border-border p-6 sm:p-8 shadow-sm">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2.5">
               <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1.5">
                 <TrophyIcon className="w-3.5 h-3.5 text-amber-500" />
-                <span>Duolingo-Style League Cohort</span>
+                <span>UTME Weekly League Cohort</span>
               </span>
 
               <span className={`text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border ${currentLeagueConfig.badge} flex items-center gap-1.5`}>
@@ -337,11 +337,11 @@ export default function LeaderboardView({
         <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       </section>
 
-      {/* ── 2. DUOLINGO 10-TIER LEAGUE SELECTOR PILLS ── */}
+      {/* ── 2. 10-TIER LEAGUE SELECTOR PILLS ── */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">
-            Explore Duolingo Leagues (10 Tiers)
+            Explore UTME Leagues (10 Tiers)
           </span>
           <span className="text-xs text-muted-foreground font-semibold">
             {selectedLeague === "All" ? "Viewing Entire Cohort" : `Viewing ${selectedLeague} Tier`}
@@ -361,7 +361,7 @@ export default function LeaderboardView({
             🏆 All Leagues ({entries.length})
           </button>
 
-          {DUOLINGO_LEAGUES.map((league) => {
+          {UTME_LEAGUES.map((league) => {
             const isSelected = selectedLeague === league.id;
             const countInLeague = entries.filter((e) => e.tier === league.id).length;
             return (
@@ -384,7 +384,7 @@ export default function LeaderboardView({
         </div>
       </section>
 
-      {/* ── 3. DUOLINGO TOP 3 3D PODIUM ── */}
+      {/* ── 3. TOP 3 3D PODIUM ── */}
       {top3.length >= 3 && selectedLeague === "All" && (
         <section className="relative overflow-hidden rounded-3xl bg-linear-to-b from-card to-card/60 border border-border p-6 sm:p-8 shadow-xs">
           <div className="text-center space-y-1 mb-8">
@@ -590,7 +590,7 @@ export default function LeaderboardView({
         </div>
       </div>
 
-      {/* ── 5. DUOLINGO DIVISION BRACKET LEADERBOARD TABLE ── */}
+      {/* ── 5. DIVISION BRACKET LEADERBOARD TABLE ── */}
       <section className="rounded-3xl border border-border bg-card overflow-hidden shadow-xs">
         {/* Table Header Bar */}
         <div className="bg-muted/50 px-4 py-3 border-b border-border text-[11px] font-black uppercase tracking-wider text-muted-foreground grid grid-cols-12 gap-2 items-center">
@@ -599,7 +599,7 @@ export default function LeaderboardView({
           <div className="col-span-3 sm:col-span-3 text-right">Weekly XP</div>
         </div>
 
-        {/* Rows with Duolingo Zones */}
+        {/* Rows with League Zones */}
         <div className="divide-y divide-border">
           {filteredEntries.length === 0 ? (
             <div className="py-12 text-center space-y-2">
@@ -625,7 +625,7 @@ export default function LeaderboardView({
 
               return (
                 <div key={entry.userId}>
-                  {/* Duolingo Zone Banners */}
+                  {/* League Zone Banners */}
                   {showPromotionHeader && (
                     <div className="bg-emerald-500/10 border-y border-emerald-500/20 px-4 py-1.5 flex items-center justify-between text-xs font-black text-emerald-600 dark:text-emerald-400">
                       <span className="flex items-center gap-1.5">
@@ -755,7 +755,7 @@ export default function LeaderboardView({
         </div>
       </section>
 
-      {/* ── 6. FLOATING CURRENT USER BAR (DUOLINGO STICKY DOCK) ── */}
+      {/* ── 6. FLOATING CURRENT USER BAR (STICKY DOCK) ── */}
       {currentCandidate && (
         <aside
           aria-label="Your tournament standing"
@@ -797,7 +797,7 @@ export default function LeaderboardView({
         </aside>
       )}
 
-      {/* ── 7. DUOLINGO LEAGUE RULES & FAQ MODAL ── */}
+      {/* ── 7. LEAGUE RULES & FAQ MODAL ── */}
       {showRulesModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 animate-scaleUp">
@@ -805,7 +805,7 @@ export default function LeaderboardView({
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🏆</span>
                 <h3 className="text-lg font-black text-foreground tracking-tight">
-                  How Duolingo Leagues Work
+                  How UTME Leagues Work
                 </h3>
               </div>
               <button

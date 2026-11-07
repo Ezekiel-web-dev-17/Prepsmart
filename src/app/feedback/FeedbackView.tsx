@@ -91,7 +91,7 @@ export default function FeedbackView({ initialItems }: FeedbackViewProps) {
         <div className="max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-wider">
             <LightbulbIcon className="w-3.5 h-3.5" />
-            <span>Community Feedback &amp; Product Roadmap</span>
+            <span>Community Feedback &amp; Feature Pipeline</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight leading-tight">

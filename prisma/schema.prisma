@@ -226,7 +226,7 @@ model ExamAttempt {
 }
 
 // ==========================================
-// Failed Question Revision Queue (Duolingo-style)
+// Failed Question Revision Queue (Targeted Error Drill)
 //
 // Security: Records are only created server-side (in the submit route)
 // after validated scoring. The client can only DELETE (resolve) records

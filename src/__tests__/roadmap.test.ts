@@ -11,7 +11,7 @@ import {
 import { getSubjectCurriculum } from "../app/study/curriculum-data";
 import { generateJambDorkQueries, enrichQuestionWithConceptData } from "../lib/jamb-dorker";
 
-describe("Visual Learning Roadmap & Syllabus Architecture", () => {
+describe("Visual Learning Syllabus Architecture", () => {
   it("provides comprehensive stages and topics for Science Mathematics", () => {
     const roadmap = getRoadmapForSubject("mathematics", "science");
     assert.strictEqual(roadmap.code, "MTH");

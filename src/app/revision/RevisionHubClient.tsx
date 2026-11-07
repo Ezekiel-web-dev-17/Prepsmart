@@ -47,7 +47,7 @@ export default function RevisionHubClient({
 }: RevisionHubClientProps) {
   const { triggerXPToast } = useGamification();
 
-  // Mode: "topic-list" (Duolingo modules) | "drill" (3-question session)
+  // Mode: "topic-list" (Topic modules) | "drill" (3-question session)
   const [mode, setMode] = useState<"topic-list" | "drill">("topic-list");
 
   // Topic Groups state
@@ -229,11 +229,11 @@ export default function RevisionHubClient({
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
             <Link
-              href="/study/roadmap"
+              href="/study?tab=syllabus"
               className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2"
             >
               <SparklesIcon className="w-4 h-4 text-amber-300" />
-              <span>Continue Visual Roadmap</span>
+              <span>Continue Subject Syllabus</span>
             </Link>
             <Link
               href="/study?tab=mock-exam"
@@ -248,7 +248,7 @@ export default function RevisionHubClient({
     );
   }
 
-  // ── DRILL VIEW: Focused 3-Question Duolingo-Style Revision ──
+  // ── DRILL VIEW: Focused 3-Question Topic Revision ──
   if (mode === "drill" && activeTopic) {
     const currentQ = activeTopic.questions[currentQIndex];
 
@@ -265,7 +265,7 @@ export default function RevisionHubClient({
             <ArrowLeftIcon className="w-5 h-5" />
           </button>
 
-          {/* Duolingo Segmented Progress Bar (3 questions) */}
+          {/* Segmented Progress Bar (3 questions) */}
           <div className="flex-1 flex items-center gap-2">
             {activeTopic.questions.map((_, idx) => {
               const isPassed = drillAnswers[idx] === true;
@@ -397,7 +397,7 @@ export default function RevisionHubClient({
                 })}
               </div>
 
-              {/* Duolingo Sliding Feedback Footer */}
+              {/* Sliding Feedback Footer */}
               {feedback ? (
                 <div
                   className={`p-5 rounded-2xl border space-y-3 transition-all animate-in slide-in-from-bottom-2 ${
@@ -466,7 +466,7 @@ export default function RevisionHubClient({
     );
   }
 
-  // ── TOPIC LIST VIEW: Duolingo-Style Revision Units ──
+  // ── TOPIC LIST VIEW: Active Revision Units ──
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
       {/* Header Banner */}
@@ -474,7 +474,7 @@ export default function RevisionHubClient({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 shadow-xs">
-              DUOLINGO-STYLE REVISION
+              ACTIVE REVISION DRILLS
             </span>
             <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
               3 Questions Per Weak Topic

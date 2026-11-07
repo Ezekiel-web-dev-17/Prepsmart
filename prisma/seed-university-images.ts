@@ -10,6 +10,8 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { getUniversityImageMeta } from "../src/data/university-images";
+import { getUniversityLogoMeta } from "../src/data/university-logos";
 
 const prisma = new PrismaClient();
 
@@ -481,7 +483,7 @@ async function main() {
   console.log("🎓 Seeding university images and logos...\n");
 
   const universities = await prisma.university.findMany({
-    select: { id: true, slug: true, name: true },
+    select: { id: true, slug: true, name: true, acronym: true },
   });
 
   console.log(`Found ${universities.length} universities in the database.\n`);
@@ -491,12 +493,17 @@ async function main() {
 
   for (const uni of universities) {
     const slug = uni.slug.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const media = UNIVERSITY_MEDIA[slug] ?? DEFAULT_MEDIA;
+    const imgMeta = getUniversityImageMeta(uni.slug, uni.acronym);
+    const logoMeta = getUniversityLogoMeta(uni.slug, uni.acronym);
 
-    if (!UNIVERSITY_MEDIA[slug]) {
-      usedDefault++;
-      console.log(`  ⚠️  ${uni.name} (${uni.slug}) — using default fallback`);
-    }
+    const media: UniversityMedia = UNIVERSITY_MEDIA[slug] ?? {
+      imageUrl: imgMeta.imageUrl,
+      logoUrl: logoMeta.logoUrl,
+      imageLandmark: imgMeta.landmark,
+      imageCaption: imgMeta.caption,
+      brandColor: logoMeta.brandColor,
+      secondaryColor: logoMeta.secondaryColor,
+    };
 
     await prisma.university.update({
       where: { id: uni.id },

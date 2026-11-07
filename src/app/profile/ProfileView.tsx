@@ -208,7 +208,7 @@ export default function ProfileView() {
           <div>
             <h2 className="text-base font-black text-foreground">1. Academic Discipline &amp; Stream</h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Select your academic track. This customizes your syllabus roadmap, topic priorities, and mock exams.
+              Select your academic track. This customizes your curriculum syllabus, topic priorities, and mock exams.
             </p>
           </div>
 

@@ -149,14 +149,14 @@ export default function RoadmapView({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                  Interactive Learning Roadmap
+                  Interactive Learning Syllabus
                 </span>
                 <span className="text-[10px] font-bold text-muted-foreground">
-                  Roadmap.sh Style
+                  Official UTME Visuals
                 </span>
               </div>
               <h1 className="text-lg sm:text-xl font-black text-foreground tracking-tight flex items-center gap-2">
-                <span>{roadmap.name} Master Roadmap</span>
+                <span>{roadmap.name} Syllabus Flowchart</span>
                 <span className="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-mono">
                   {roadmap.code}
                 </span>

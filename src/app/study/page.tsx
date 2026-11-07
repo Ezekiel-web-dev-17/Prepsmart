@@ -47,13 +47,13 @@ export async function generateMetadata({
   return {
     title: "Study Hub, Subject Syllabuses & JAMB CBT Mock Exam | PrepSmart",
     description:
-      "Master the 2026 JAMB UTME syllabus with our structured 2 to 3 month roadmap, official subject topic lists, examiner trap alerts, and authentic 120-minute Computer-Based Test (CBT) mock exam simulations.",
+      "Master the 2026 JAMB UTME syllabus with our structured 2 to 3 month curriculum, official subject topic lists, examiner trap alerts, and authentic 120-minute Computer-Based Test (CBT) mock exam simulations.",
     keywords: [
       "JAMB mock exam",
       "UTME CBT simulator",
       "JAMB study curriculum",
       "JAMB 2026 syllabus",
-      "UTME study roadmap",
+      "UTME study curriculum",
       "examiner traps JAMB",
       "JAMB active recall",
     ],

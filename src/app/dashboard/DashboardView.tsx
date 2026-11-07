@@ -495,7 +495,7 @@ export default function DashboardView({
                           {sub}
                         </h4>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Official syllabus curriculum and Roadmap flowchart.
+                          Official syllabus curriculum and topic breakdowns.
                         </p>
                       </div>
 
@@ -504,7 +504,7 @@ export default function DashboardView({
                         className="w-full py-2 rounded-xl bg-muted hover:bg-blue-600 hover:text-white text-xs font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
                       >
                         <BookOpenIcon className="w-3.5 h-3.5" />
-                        <span>Open Syllabus Roadmap</span>
+                        <span>Open Subject Syllabus</span>
                       </Link>
                     </div>
                   );
@@ -594,7 +594,7 @@ export default function DashboardView({
                     </span>
                   </h4>
                   <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                    Practice your targeted 3-question Duolingo drills to resolve failed concepts and raise your Readiness Index!
+                    Practice your targeted 3-question revision drills to resolve failed concepts and raise your Readiness Index!
                   </p>
                 </div>
               </div>
@@ -755,7 +755,7 @@ export default function DashboardView({
                         {sub}
                       </div>
                       <span className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                        View Syllabus & Roadmap →
+                        View Subject Syllabus →
                       </span>
                     </Link>
                   );
@@ -826,7 +826,7 @@ export default function DashboardView({
                   Unified Study &amp; CBT Simulator
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Explore 108+ official syllabus topics, comprehensive study roadmaps, and authentic CBT timed mocks.
+                  Explore 108+ official syllabus topics, comprehensive curriculum guides, and authentic CBT timed mocks.
                 </p>
               </div>
 

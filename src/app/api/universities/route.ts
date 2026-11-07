@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUniversitiesQuerySchema } from "@/lib/validations/university";
 import type { Prisma } from "@prisma/client";
+import { getUniversityImageMeta } from "@/data/university-images";
+import { getUniversityLogoMeta } from "@/data/university-logos";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   try {
-
     const validation = getUniversitiesQuerySchema.safeParse({
       search: searchParams.get("search") ?? undefined,
       type: searchParams.get("type") ?? undefined,
@@ -25,20 +26,12 @@ export async function GET(request: Request) {
           error: "Invalid query parameters",
           details: validation.error.flatten().fieldErrors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const {
-      search,
-      type,
-      course,
-      maxCutOff,
-      minCutOff,
-      postUtme,
-      zone,
-      sort,
-    } = validation.data;
+    const { search, type, course, maxCutOff, minCutOff, postUtme, zone, sort } =
+      validation.data;
 
     const where: Prisma.UniversityWhereInput = {};
 
@@ -82,7 +75,9 @@ export async function GET(request: Request) {
       };
     }
 
-    let orderBy: Prisma.UniversityOrderByWithRelationInput | Prisma.UniversityOrderByWithRelationInput[] = [
+    let orderBy:
+      | Prisma.UniversityOrderByWithRelationInput
+      | Prisma.UniversityOrderByWithRelationInput[] = [
       { generalCutOff: "desc" },
       { name: "asc" },
     ];
@@ -114,11 +109,44 @@ export async function GET(request: Request) {
 
     const enriched = universities.map((uni) => {
       const cutOffs = uni.courses.map((c) => c.cutOffMark);
-      const minCourseCutOff = cutOffs.length > 0 ? Math.min(...cutOffs) : uni.generalCutOff;
-      const maxCourseCutOff = cutOffs.length > 0 ? Math.max(...cutOffs) : uni.generalCutOff;
+      const minCourseCutOff =
+        cutOffs.length > 0 ? Math.min(...cutOffs) : uni.generalCutOff;
+      const maxCourseCutOff =
+        cutOffs.length > 0 ? Math.max(...cutOffs) : uni.generalCutOff;
+
+      const imgMeta = getUniversityImageMeta(uni.slug, uni.acronym);
+      const logoMeta = getUniversityLogoMeta(uni.slug, uni.acronym);
+      const imageUrl = uni.imageUrl || imgMeta.imageUrl;
+      const logoUrl = uni.logoUrl || logoMeta.logoUrl;
+      const imageLandmark = uni.imageLandmark || imgMeta.landmark;
+      const imageCaption = uni.imageCaption || imgMeta.caption;
+      const brandColor = uni.brandColor || logoMeta.brandColor;
+      const secondaryColor = uni.secondaryColor || logoMeta.secondaryColor;
+
+      if (!uni.imageUrl || !uni.logoUrl) {
+        prisma.university
+          .update({
+            where: { id: uni.id },
+            data: {
+              imageUrl,
+              logoUrl,
+              imageLandmark,
+              imageCaption,
+              brandColor,
+              secondaryColor,
+            },
+          })
+          .catch(() => {});
+      }
 
       return {
         ...uni,
+        imageUrl,
+        logoUrl,
+        imageLandmark,
+        imageCaption,
+        brandColor,
+        secondaryColor,
         coursesCount: uni.courses.length,
         minCourseCutOff,
         maxCourseCutOff,
@@ -134,7 +162,7 @@ export async function GET(request: Request) {
     console.error("Failed to query universities:", error);
     return NextResponse.json(
       { error: "Failed to retrieve universities" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
