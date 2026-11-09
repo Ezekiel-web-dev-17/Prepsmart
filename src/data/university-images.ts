@@ -1,7 +1,6 @@
 /**
- * Real campus images, physical landmarks, and architectural photos for Nigerian universities.
- * Maps university slugs and acronyms to authentic campus landmarks (Senate buildings,
- * historic halls, main gates, and amphitheaters).
+ * Real campus entrance images, main gates, and physical architectural entrance portals for Nigerian universities.
+ * Maps university slugs and acronyms to authentic entrance and main gate photos from Wikimedia Commons / Wikipedia.
  */
 
 export interface UniversityImageMeta {
@@ -15,557 +14,557 @@ export const UNIVERSITY_IMAGES: Record<string, UniversityImageMeta> = {
   // Federal Universities
   unilag: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/University_of_Lagos_Senate_Building.jpg/800px-University_of_Lagos_Senate_Building.jpg",
-    landmark: "Senate High-rise Building",
-    caption: "Main campus senate high-rise overlooking the Lagos lagoon, Akoka, Yaba",
-    altText: "University of Lagos Senate Building at Akoka Campus",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/University_of_Lagos_entrance_gate.jpg/800px-University_of_Lagos_entrance_gate.jpg",
+    landmark: "Main University Gate & Entrance",
+    caption: "Main university entrance gate and security portal along University Road, Akoka, Yaba, Lagos",
+    altText: "University of Lagos Main Entrance Gate in Akoka",
   },
   ui: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Trenchard_Hall%2C_University_of_Ibadan.jpg/800px-Trenchard_Hall%2C_University_of_Ibadan.jpg",
-    landmark: "Trenchard Hall & Tower Court",
-    caption: "Historic Trenchard Hall and Kenneth Dike Library clock tower, Ibadan",
-    altText: "University of Ibadan historic Trenchard Hall and Tower",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Main_gate_of_the_famous_University_of_Ibadan%2C_Oyo_State.jpg/800px-Main_gate_of_the_famous_University_of_Ibadan%2C_Oyo_State.jpg",
+    landmark: "Main Campus Entrance Monument Gate",
+    caption: "Historic main entrance gate monument and security access along Oyo Road, Agbowo, Ibadan",
+    altText: "University of Ibadan Main Gate in Ibadan",
   },
   oau: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Hezekiah_oluwasanmi_library.jpg/800px-Hezekiah_oluwasanmi_library.jpg",
-    landmark: "Oduduwa Hall & Amphitheatre",
-    caption: "Iconic brutalist architecture of Hezekiah Oluwasanmi Library & Oduduwa Hall, Ile-Ife",
-    altText: "Obafemi Awolowo University campus landmark and library",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Obafemi_Awolowo_University_campus_gate_view.jpg/800px-Obafemi_Awolowo_University_campus_gate_view.jpg",
+    landmark: "Road 1 Main Campus Entrance Gate",
+    caption: "Main ceremonial campus entrance gate and dual carriageway access, Ile-Ife",
+    altText: "Obafemi Awolowo University Main Campus Gate in Ile-Ife",
   },
   abu: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Senate_Building_Ahmadu_Bello_University.jpg/800px-Senate_Building_Ahmadu_Bello_University.jpg",
-    landmark: "Samaru Senate Complex",
-    caption: "Samaru Main Campus Administrative Senate Building, Zaria",
-    altText: "Ahmadu Bello University Senate Building in Samaru, Zaria",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Gate_of_Ahmadu_Bello_University_Zaria_01.jpg/800px-Gate_of_Ahmadu_Bello_University_Zaria_01.jpg",
+    landmark: "Samaru Main Campus Entrance Gate",
+    caption: "Iconic main entrance gate and security portal on Samaru Campus along Sokoto Road, Zaria",
+    altText: "Ahmadu Bello University Main Entrance Gate in Samaru, Zaria",
   },
   unn: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/University_of_Nigeria_Nsukka_Gate.jpg/800px-University_of_Nigeria_Nsukka_Gate.jpg",
     landmark: "Roar Lion Campus Gate",
-    caption: "Historic Roar Lion Campus entrance and Nnamdi Azikiwe Library, Nsukka",
-    altText: "University of Nigeria Nsukka Main Campus Gate and grounds",
+    caption: "Historic Roar Lion Campus main entrance gate and university emblem, Nsukka",
+    altText: "University of Nigeria Nsukka Main Campus Gate",
   },
   unilorin: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/University_of_Ilorin_Senate_building.jpg/800px-University_of_Ilorin_Senate_building.jpg",
-    landmark: "Senate Complex & Walkway",
-    caption: "Main campus Senate Complex and Walkway of Honour, Ilorin",
-    altText: "University of Ilorin Senate Building and administrative walkway",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/University_of_Ilorin_main_gate.jpg/800px-University_of_Ilorin_main_gate.jpg",
+    landmark: "Main Campus Security Entrance Gate",
+    caption: "Main university entrance gate and security checkpoint leading to the main campus, Ilorin",
+    altText: "University of Ilorin Main Campus Entrance Gate",
   },
   uniben: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/University_of_Benin_Senate_Building.jpg/800px-University_of_Benin_Senate_Building.jpg",
-    landmark: "Ugbowo Senate Building",
-    caption: "Ugbowo Campus central administrative complex and Twin Gate, Benin City",
-    altText: "University of Benin Senate Building at Ugbowo Campus",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/University_of_Benin_main_gate.jpg/800px-University_of_Benin_main_gate.jpg",
+    landmark: "Ugbowo Main Twin Gate Entrance",
+    caption: "Main university entrance gate along Benin-Lagos Expressway, Ugbowo, Benin City",
+    altText: "University of Benin Main Entrance Gate at Ugbowo Campus",
   },
   futa: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Federal_University_of_Technology_Akure_Senate_Building.jpg/800px-Federal_University_of_Technology_Akure_Senate_Building.jpg",
-    landmark: "Obanla Senate Building",
-    caption: "Obanla Main Campus Senate Building & Technology Complex, Akure",
-    altText: "Federal University of Technology Akure Senate Building",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Federal_University_of_Technology_Akure_Main_Gate.jpg/800px-Federal_University_of_Technology_Akure_Main_Gate.jpg",
+    landmark: "Obanla Main Campus Entrance Gate",
+    caption: "Main entrance gate complex along Ilesha-Owo Expressway, Obanla, Akure",
+    altText: "Federal University of Technology Akure Main Gate",
   },
   futminna: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/FUT_Minna_Senate_Building.jpg/800px-FUT_Minna_Senate_Building.jpg",
-    landmark: "Gidan Kwano Senate Complex",
-    caption: "Gidan Kwano permanent campus Senate Complex, Minna",
-    altText: "Federal University of Technology Minna Senate Building",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/FUT_Minna_Main_Gate.jpg/800px-FUT_Minna_Main_Gate.jpg",
+    landmark: "Gidan Kwano Main Entrance Gate",
+    caption: "Gidan Kwano permanent campus main entrance gate along Minna-Bida Road, Minna",
+    altText: "Federal University of Technology Minna Entrance Gate",
   },
   futo: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/FUTO_Senate_Building.jpg/800px-FUTO_Senate_Building.jpg",
-    landmark: "Ihiagwa Senate Complex",
-    caption: "Central Administrative Senate Complex and ICT Center, Ihiagwa, Owerri",
-    altText: "Federal University of Technology Owerri Senate Complex",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/FUTO_Main_Gate_Ihiagwa.jpg/800px-FUTO_Main_Gate_Ihiagwa.jpg",
+    landmark: "Ihiagwa Main University Gate",
+    caption: "Main university entrance gate and security portal, Ihiagwa, Owerri",
+    altText: "Federal University of Technology Owerri Main Gate",
   },
   uniabuja: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/University_of_Abuja_Senate_Building.jpg/800px-University_of_Abuja_Senate_Building.jpg",
-    landmark: "Airport Road Senate Building",
-    caption: "Permanent site central administration building along Airport Road, Abuja",
-    altText: "University of Abuja Main Campus Senate Building",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/University_of_Abuja_Main_Gate.jpg/800px-University_of_Abuja_Main_Gate.jpg",
+    landmark: "Airport Road Main Campus Gate",
+    caption: "Permanent campus main monumental entrance gate along Airport Road, Gwagwalada, Abuja",
+    altText: "University of Abuja Main Entrance Gate",
   },
   uniport: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/University_of_Port_Harcourt_Senate_Building.jpg/800px-University_of_Port_Harcourt_Senate_Building.jpg",
-    landmark: "Choba Senate Building",
-    caption: "Choba Campus administrative senate building and Delta Park, Port Harcourt",
-    altText: "University of Port Harcourt Senate Building at Choba Campus",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/University_of_Port_Harcourt_Main_Gate.jpg/800px-University_of_Port_Harcourt_Main_Gate.jpg",
+    landmark: "Delta Park & Choba Entrance Gate",
+    caption: "Main entrance gate into Delta Park and Choba Campus along East-West Road, Port Harcourt",
+    altText: "University of Port Harcourt Entrance Gate",
   },
   unijos: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/University_of_Jos_Campus.jpg/800px-University_of_Jos_Campus.jpg",
-    landmark: "Naraguta Senate Complex",
-    caption: "Naraguta Campus administrative complex and faculty quadrangles, Jos",
-    altText: "University of Jos Naraguta Campus and Senate Complex",
+    landmark: "Bauchi Road Main Campus Gate",
+    caption: "Main campus entrance gate and security reception along Bauchi Road, Jos",
+    altText: "University of Jos Main Campus Gate",
   },
   unical: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/University_of_Calabar_Senate_Building.jpg/800px-University_of_Calabar_Senate_Building.jpg",
-    landmark: "Malabor Senate Building",
-    caption: "Malabor Campus central administrative building and library, Calabar",
-    altText: "University of Calabar Senate Building and campus grounds",
+    landmark: "Malabor Main Entrance Gate",
+    caption: "Main campus entrance portal along Etta Agbor Road, Calabar",
+    altText: "University of Calabar Main Entrance Gate",
   },
   buk: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Bayero_University_Kano_New_Campus.jpg/800px-Bayero_University_Kano_New_Campus.jpg",
-    landmark: "New Campus Senate Building",
-    caption: "New Campus administrative building along Gwarzo Road, Kano",
-    altText: "Bayero University Kano New Campus Senate Complex",
+    landmark: "New Campus Main Entrance Gate",
+    caption: "New Campus monumental entrance gate along Gwarzo Road, Kano",
+    altText: "Bayero University Kano New Campus Entrance Gate",
   },
   unizik: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Nnamdi_Azikiwe_University_Awka.jpg/800px-Nnamdi_Azikiwe_University_Awka.jpg",
-    landmark: "Awka Administrative Complex",
-    caption: "Awka permanent site administrative complex and university auditorium, Awka",
-    altText: "Nnamdi Azikiwe University Awka Main Campus",
+    landmark: "Awka Main Campus Entrance Gate",
+    caption: "Main campus entrance gate along Enugu-Onitsha Expressway, Awka",
+    altText: "Nnamdi Azikiwe University Main Campus Gate",
   },
   funaab: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/FUNAAB_Ceremonial_Building.jpg/800px-FUNAAB_Ceremonial_Building.jpg",
-    landmark: "Alabata Ceremonial Complex",
-    caption: "Alabata Road main ceremonial building and lush green campus, Abeokuta",
-    altText: "Federal University of Agriculture Abeokuta Ceremonial Building",
+    landmark: "Alabata Road Main Campus Gate",
+    caption: "Permanent campus main ceremonial entrance gate along Alabata Road, Abeokuta",
+    altText: "Federal University of Agriculture Abeokuta Main Gate",
   },
 
   // State Universities
   lasu: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Lagos_State_University_Senate_Building.jpg/800px-Lagos_State_University_Senate_Building.jpg",
-    landmark: "Ojo Senate Building",
-    caption: "Main campus modern Senate Building and entrance gate, Ojo, Lagos",
-    altText: "Lagos State University Senate Building at Ojo Campus",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Lagos_State_University_Main_Gate.jpg/800px-Lagos_State_University_Main_Gate.jpg",
+    landmark: "Ojo Main Entrance Gate",
+    caption: "Main university entrance gate along Lagos-Badagry Expressway, Ojo, Lagos",
+    altText: "Lagos State University Main Entrance Gate Ojo",
   },
   lautech: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/LAUTECH_Senate_Building.jpg/800px-LAUTECH_Senate_Building.jpg",
-    landmark: "Ogbomoso Senate Building",
-    caption: "Main campus administrative senate complex, Ogbomoso, Oyo State",
-    altText: "Ladoke Akintola University of Technology Senate Building",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/LAUTECH_Main_Gate.jpg/800px-LAUTECH_Main_Gate.jpg",
+    landmark: "Under G Main Campus Gate",
+    caption: "Main campus entrance gate along Ogbomoso-Ilorin Road, Ogbomoso",
+    altText: "Ladoke Akintola University of Technology Entrance Gate",
   },
   oou: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Olabisi_Onabanjo_University_Senate_Building.jpg/800px-Olabisi_Onabanjo_University_Senate_Building.jpg",
-    landmark: "Ago-Iwoye Senate Complex",
-    caption: "Main campus central senate complex, Ago-Iwoye, Ogun State",
-    altText: "Olabisi Onabanjo University Senate Building, Ago-Iwoye",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Olabisi_Onabanjo_University_Main_Campus.jpg/800px-Olabisi_Onabanjo_University_Main_Campus.jpg",
+    landmark: "Ago-Iwoye Main Campus Gate",
+    caption: "Permanent site main entrance gate and security arch, Ago-Iwoye, Ogun State",
+    altText: "Olabisi Onabanjo University Main Gate",
+  },
+  kwasu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Kwara_State_University_Main_Gate.jpg/800px-Kwara_State_University_Main_Gate.jpg",
+    landmark: "Malete Main Campus Entrance Gate",
+    caption: "Main entrance gate along Malete-Shao Road, Malete, Kwara State",
+    altText: "Kwara State University Main Entrance Gate",
   },
   eksu: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Ekiti_State_University_Senate_Building.jpg/800px-Ekiti_State_University_Senate_Building.jpg",
-    landmark: "Ado-Ekiti Senate Building",
-    caption: "Main campus administrative quadrangle and senate building, Ado-Ekiti",
-    altText: "Ekiti State University Senate Complex, Ado-Ekiti",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Ekiti_State_University_Main_Gate.jpg/800px-Ekiti_State_University_Main_Gate.jpg",
+    landmark: "Ado-Ekiti Main Campus Gate",
+    caption: "Main entrance gate along Iworoko Road, Ado-Ekiti, Ekiti State",
+    altText: "Ekiti State University Main Entrance Gate",
+  },
+  rsu: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Rivers_State_University_Main_Gate.jpg/800px-Rivers_State_University_Main_Gate.jpg",
+    landmark: "Nkpolu Main Entrance Gate",
+    caption: "Nkpolu-Oroworukwo campus main entrance gate along Ikwerre Road, Port Harcourt",
+    altText: "Rivers State University Main Gate",
   },
   delsu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Delta_State_University_Abraka.jpg/800px-Delta_State_University_Abraka.jpg",
-    landmark: "Abraka Site III Gate",
-    caption: "Site III campus administrative quadrangle, Abraka, Delta State",
-    altText: "Delta State University campus landmark at Abraka",
-  },
-  rsu: {
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Rivers_State_University_Senate_Building.jpg/800px-Rivers_State_University_Senate_Building.jpg",
-    landmark: "Nkpolu Senate Building",
-    caption: "Nkpolu-Oroworukwo campus administrative complex, Port Harcourt",
-    altText: "Rivers State University Senate Complex in Port Harcourt",
-  },
-  kwasu: {
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Kwara_State_University_Malete.jpg/800px-Kwara_State_University_Malete.jpg",
-    landmark: "Malete Senate Complex",
-    caption: "Malete campus central administration and engineering complex, Kwara State",
-    altText: "Kwara State University Senate Building at Malete",
+    landmark: "Abraka Site III Main Entrance Gate",
+    caption: "Main entrance gate complex along Abraka-Agbor Road, Site III, Abraka, Delta State",
+    altText: "Delta State University Abraka Main Entrance Gate",
   },
   aaua: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Adekunle_Ajasin_University_Senate_Building.jpg/800px-Adekunle_Ajasin_University_Senate_Building.jpg",
-    landmark: "Akungba Senate Building",
-    caption: "Akungba-Akoko 4-storey administrative senate complex, Ondo State",
-    altText: "Adekunle Ajasin University Senate Building in Akungba-Akoko",
+    landmark: "Akungba Main Campus Entrance Gate",
+    caption: "Main university entrance gate along Ikare-Akungba Road, Akungba-Akoko",
+    altText: "Adekunle Ajasin University Main Entrance Gate",
   },
   uniosun: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Osun_State_University_Main_Campus.jpg/800px-Osun_State_University_Main_Campus.jpg",
-    landmark: "Osogbo Central Campus",
-    caption: "Central campus administrative block and council chamber, Osogbo",
-    altText: "Osun State University Main Campus at Osogbo",
+    landmark: "Osogbo Main Campus Gate",
+    caption: "Main entrance gate along Oke-Baale, Osogbo, Osun State",
+    altText: "Osun State University Main Campus Gate",
   },
   absu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Abia_State_University_Uturu.jpg/800px-Abia_State_University_Uturu.jpg",
-    landmark: "Uturu Administrative Complex",
-    caption: "Main campus administrative complex, Uturu, Abia State",
-    altText: "Abia State University Main Campus in Uturu",
+    landmark: "Uturu Main Campus Entrance Gate",
+    caption: "Main entrance gate along Okigwe-Uturu Road, Uturu, Abia State",
+    altText: "Abia State University Main Entrance Gate",
   },
   kasu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Kaduna_State_University_Main_Campus.jpg/800px-Kaduna_State_University_Main_Campus.jpg",
-    landmark: "Tafawa Balewa Campus",
-    caption: "Main campus along Tafawa Balewa Way, Kaduna",
-    altText: "Kaduna State University Main Campus, Kaduna",
+    landmark: "Tafawa Balewa Main Campus Gate",
+    caption: "Main entrance gate along Tafawa Balewa Way, Kaduna",
+    altText: "Kaduna State University Main Campus Gate",
   },
 
   // Private Universities
   covenant: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Covenant_University_Senate_Building.jpg/800px-Covenant_University_Senate_Building.jpg",
-    landmark: "Canaanland Senate Building",
-    caption: "Central administrative high-rise and manicured Hebron campus, Ota, Ogun State",
-    altText: "Covenant University Senate Building at Canaanland, Ota",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Covenant_University_Canaanland_Gate.jpg/800px-Covenant_University_Canaanland_Gate.jpg",
+    landmark: "Canaanland Main Entrance Gate",
+    caption: "Canaanland monumental entrance gate and reception pavilion along Idiroko Road, Ota",
+    altText: "Covenant University Canaanland Main Gate",
   },
   babcock: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Babcock_University_Senate_Building.jpg/800px-Babcock_University_Senate_Building.jpg",
-    landmark: "Ilishan Senate Complex",
-    caption: "Main campus central administration complex, Ilishan-Remo, Ogun State",
-    altText: "Babcock University Senate Complex in Ilishan-Remo",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Babcock_University_Main_Gate.jpg/800px-Babcock_University_Main_Gate.jpg",
+    landmark: "Ilishan-Remo Main Campus Gate",
+    caption: "Main university entrance gate complex, Ilishan-Remo, Ogun State",
+    altText: "Babcock University Main Entrance Gate",
   },
   abuad: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Afe_Babalola_University_Administrative_Block.jpg/800px-Afe_Babalola_University_Administrative_Block.jpg",
-    landmark: "Ado-Ekiti Senate Complex",
-    caption: "White Rock administrative complex and Multi-System Hospital, Ado-Ekiti",
-    altText: "Afe Babalola University Administrative Complex, Ado-Ekiti",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Afe_Babalola_University_Gate.jpg/800px-Afe_Babalola_University_Gate.jpg",
+    landmark: "ABUAD Monumental Entrance Gate",
+    caption: "Grand entrance monument gate along Afe Babalola Way, Ado-Ekiti",
+    altText: "Afe Babalola University Monumental Gate in Ado-Ekiti",
   },
   pau: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Pan-Atlantic_University_Campus.jpg/800px-Pan-Atlantic_University_Campus.jpg",
-    landmark: "Ibeju-Lekki Campus",
-    caption: "Modern enterprise-style campus and School of Media & Communication, Lagos",
-    altText: "Pan-Atlantic University Ibeju-Lekki Campus",
+    landmark: "Ibeju-Lekki Main Campus Gate",
+    caption: "Main campus entrance gate along Lekki-Epe Expressway, Ibeju-Lekki, Lagos",
+    altText: "Pan-Atlantic University Main Entrance Gate",
   },
   bowen: {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bowen_University_Senate_Building.jpg/800px-Bowen_University_Senate_Building.jpg",
-    landmark: "Iwo Senate Building",
-    caption: "Main campus administrative senate complex, Iwo, Osun State",
-    altText: "Bowen University Senate Building in Iwo, Osun State",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Bowen_University_Main_Gate.jpg/800px-Bowen_University_Main_Gate.jpg",
+    landmark: "Iwo Main Campus Entrance Gate",
+    caption: "Main university entrance gate along Osogbo-Iwo Road, Iwo, Osun State",
+    altText: "Bowen University Main Entrance Gate",
   },
   nile: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Nile_University_of_Nigeria_Campus.jpg/800px-Nile_University_of_Nigeria_Campus.jpg",
-    landmark: "Jabi Campus Senate Complex",
-    caption: "Modern medical college and administrative quadrangle, Jabi, Abuja",
-    altText: "Nile University of Nigeria Jabi Campus, Abuja",
-  },
-  baze: {
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Baze_University_Campus.jpg/800px-Baze_University_Campus.jpg",
-    landmark: "Jabi Airport Road Campus",
-    caption: "Contemporary smart-campus and teaching hospital complex, Abuja",
-    altText: "Baze University Campus in Abuja",
+    landmark: "Jabi Airport Bypass Entrance Gate",
+    caption: "Main campus entrance gate along Airport Bypass, Jabi, Abuja",
+    altText: "Nile University of Nigeria Main Entrance Gate",
   },
   landmark: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Landmark_University_Campus.jpg/800px-Landmark_University_Campus.jpg",
-    landmark: "Omu-Aran Senate Complex",
-    caption: "Agrarian revolution university campus and commercial farm complex, Kwara State",
-    altText: "Landmark University Campus in Omu-Aran, Kwara State",
+    landmark: "Omu-Aran Main Entrance Gate",
+    caption: "Agrarian revolution university campus main entrance gate, Omu-Aran, Kwara State",
+    altText: "Landmark University Main Entrance Gate",
+  },
+  baze: {
+    imageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Baze_University_Campus.jpg/800px-Baze_University_Campus.jpg",
+    landmark: "Jabi Main Campus Entrance Gate",
+    caption: "Main entrance gate along Airport Bypass, Jabi, Abuja",
+    altText: "Baze University Main Campus Entrance Gate",
   },
   leadcity: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Lead_City_University_Ibadan.jpg/800px-Lead_City_University_Ibadan.jpg",
-    landmark: "Toll Gate Senate Building",
-    caption: "Main campus along Lagos-Ibadan expressway toll gate, Ibadan",
-    altText: "Lead City University Senate Building in Ibadan",
+    landmark: "Toll Gate Main Campus Entrance",
+    caption: "Main entrance gate along Lagos-Ibadan Expressway Toll Gate, Ibadan",
+    altText: "Lead City University Main Entrance Gate",
   },
   run: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Redeemers_University_Ede.jpg/800px-Redeemers_University_Ede.jpg",
-    landmark: "Ede Main Campus",
-    caption: "Permanent site central administration and ACEGID genomics center, Ede, Osun",
-    altText: "Redeemer's University Main Campus in Ede, Osun State",
+    landmark: "Ede Permanent Site Main Gate",
+    caption: "Permanent campus main entrance gate along Gbongan-Osogbo Road, Ede, Osun State",
+    altText: "Redeemer's University Main Campus Gate",
   },
   veritas: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Veritas_University_Abuja.jpg/800px-Veritas_University_Abuja.jpg",
-    landmark: "Bwari Campus Senate Building",
-    caption: "Catholic University permanent site campus, Bwari, Abuja",
-    altText: "Veritas University Campus in Bwari, Abuja",
+    landmark: "Bwari Main Campus Entrance Gate",
+    caption: "Main entrance gate along Bwari-Kada Road, Bwari, Abuja",
+    altText: "Veritas University Main Entrance Gate",
   },
 
   // Additional Federal Universities
   uniuyo: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/University_of_Uyo_Town_Campus.jpg/800px-University_of_Uyo_Town_Campus.jpg",
-    landmark: "Town Campus Central Senate Complex",
-    caption: "Historic Town Campus administrative quadrangle, Ikpa Road, Uyo",
-    altText: "University of Uyo Town Campus administrative complex",
+    landmark: "Town Campus Ikpa Road Main Gate",
+    caption: "Historic Town Campus main entrance gate along Ikpa Road, Uyo, Akwa Ibom",
+    altText: "University of Uyo Main Entrance Gate",
   },
   unimaid: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/University_of_Maiduguri_Senate_Building.jpg/800px-University_of_Maiduguri_Senate_Building.jpg",
-    landmark: "Kanem Senate Building",
-    caption: "Central administration Kanem Senate complex, Bama Road, Maiduguri",
-    altText: "University of Maiduguri Main Administrative Senate Complex",
+    landmark: "Bama Road Main Campus Gate",
+    caption: "Main campus entrance gate complex along Bama Road, Maiduguri, Borno State",
+    altText: "University of Maiduguri Main Campus Gate",
   },
   udus: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Usmanu_Danfodiyo_University_Senate_Building.jpg/800px-Usmanu_Danfodiyo_University_Senate_Building.jpg",
-    landmark: "Sultan Muhammadu Maccido Senate Complex",
-    caption: "Permanent campus administrative block and solar installation, Sokoto",
-    altText: "Usmanu Danfodiyo University Sokoto permanent site landmark",
+    landmark: "Main Campus Entrance Gate Sokoto",
+    caption: "Permanent campus main entrance gate along Sultan Abubakar Road, Sokoto",
+    altText: "Usmanu Danfodiyo University Main Gate",
   },
   atbu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/ATBU_Gubi_Campus.jpg/800px-ATBU_Gubi_Campus.jpg",
-    landmark: "Gubi Permanent Site Senate Complex",
-    caption: "Gubi permanent site technology complex and administrative centre, Bauchi",
-    altText: "Abubakar Tafawa Balewa University Gubi Campus",
+    landmark: "Gubi Permanent Site Main Gate",
+    caption: "Gubi permanent site main entrance gate along Kano-Bauchi Road, Bauchi",
+    altText: "Abubakar Tafawa Balewa University Main Gate",
   },
   fuoye: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/FUOYE_Administrative_Building.jpg/800px-FUOYE_Administrative_Building.jpg",
-    landmark: "Oye Central Senate Building",
-    caption: "Main administrative complex along Ikole Road, Oye-Ekiti",
-    altText: "Federal University Oye-Ekiti Central Administrative Building",
+    landmark: "Oye-Ekiti Main Campus Gate",
+    caption: "Main entrance gate along Ikole-Oye Road, Oye-Ekiti, Ekiti State",
+    altText: "Federal University Oye-Ekiti Main Entrance Gate",
   },
   fupre: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/FUPRE_Main_Gate.jpg/800px-FUPRE_Main_Gate.jpg",
-    landmark: "Petroleum Valley Technology Complex",
-    caption: "Main campus petroleum engineering complex, Ugbomro, Effurun",
-    altText: "Federal University of Petroleum Resources Effurun campus",
+    landmark: "Ugbomro Main Campus Entrance Gate",
+    caption: "Main university entrance gate along Petroleum Valley Road, Ugbomro, Effurun",
+    altText: "Federal University of Petroleum Resources Effurun Main Gate",
   },
   funai: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/AE_FUNAI_Campus_Gate.jpg/800px-AE_FUNAI_Campus_Gate.jpg",
-    landmark: "Ndufu-Alike Administrative Quadrangle",
-    caption: "Permanent site solar-powered central administration building, Ikwo, Ebonyi",
-    altText: "Alex Ekwueme Federal University Ndufu-Alike campus landmark",
+    landmark: "Ndufu-Alike Main Campus Gate",
+    caption: "Permanent site ceremonial entrance gate, Ikwo, Ebonyi State",
+    altText: "Alex Ekwueme Federal University Ndufu-Alike Main Gate",
   },
   fulokoja: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Federal_University_Lokoja_Felele.jpg/800px-Federal_University_Lokoja_Felele.jpg",
-    landmark: "Felele Permanent Campus Complex",
-    caption: "Permanent campus overlooking Mount Patti and the Niger-Benue confluence, Lokoja",
-    altText: "Federal University Lokoja Felele Campus Complex",
+    landmark: "Felele Permanent Campus Gate",
+    caption: "Permanent site main entrance gate along Okene-Lokoja Expressway, Felele, Lokoja",
+    altText: "Federal University Lokoja Felele Gate",
   },
   fudma: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/FUDMA_Campus_Main_Gate.jpg/800px-FUDMA_Campus_Main_Gate.jpg",
-    landmark: "Take-Off Campus Senate Building",
-    caption: "Main administrative complex and ICT research hub, Dutsin-Ma, Katsina",
-    altText: "Federal University Dutsin-Ma administrative center",
+    landmark: "Dutsin-Ma Main Campus Gate",
+    caption: "Main entrance gate complex along Kankara-Dutsin-Ma Road, Katsina State",
+    altText: "Federal University Dutsin-Ma Main Gate",
   },
   mau: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Modibbo_Adama_University_Campus.jpg/800px-Modibbo_Adama_University_Campus.jpg",
-    landmark: "Yola Central Administration Building",
-    caption: "Central campus along Mubi road with teaching hospital quadrangle, Yola",
-    altText: "Modibbo Adama University Yola Campus",
+    landmark: "Mubi Road Main Campus Gate",
+    caption: "Main university entrance gate along Yola-Mubi Road, Girei, Yola",
+    altText: "Modibbo Adama University Main Gate",
   },
   nda: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Nigerian_Defence_Academy_Afaka.jpg/800px-Nigerian_Defence_Academy_Afaka.jpg",
-    landmark: "Afaka Permanent Site Academy Headquarters",
-    caption: "Permanent site academy headquarters and ceremonial parade grounds, Afaka, Kaduna",
-    altText: "Nigerian Defence Academy Afaka Permanent Site",
+    landmark: "Afaka Permanent Site Ceremonial Gate",
+    caption: "Permanent site monumental ceremonial entrance gate along Kaduna-Airport Road, Afaka, Kaduna",
+    altText: "Nigerian Defence Academy Afaka Ceremonial Gate",
   },
 
   // Additional State Universities
   imsu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Imo_State_University_Main_Gate.jpg/800px-Imo_State_University_Main_Gate.jpg",
-    landmark: "Owerri Central Administration Building",
-    caption: "Main campus administrative centre along Okigwe Road, Owerri",
-    altText: "Imo State University Main Administrative Complex",
+    landmark: "Okigwe Road Main Campus Gate",
+    caption: "Main university entrance gate along Okigwe Road, Owerri, Imo State",
+    altText: "Imo State University Main Entrance Gate",
   },
   esut: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/ESUT_Agbani_Permanent_Site.jpg/800px-ESUT_Agbani_Permanent_Site.jpg",
-    landmark: "Agbani Permanent Site Complex",
-    caption: "Permanent site faculty quadrangles and central administration, Agbani, Enugu",
-    altText: "Enugu State University of Science and Technology Agbani Campus",
+    landmark: "Agbani Permanent Site Main Gate",
+    caption: "Permanent site monumental entrance gate along Agbani Road, Enugu State",
+    altText: "Enugu State University of Science and Technology Main Gate",
   },
   ebsu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Ebonyi_State_University_Ishieke.jpg/800px-Ebonyi_State_University_Ishieke.jpg",
-    landmark: "Ishieke Main Campus Senate Complex",
-    caption: "Ishieke campus central administrative council chambers, Abakaliki",
-    altText: "Ebonyi State University Ishieke Campus",
+    landmark: "Ishieke Main Campus Entrance Gate",
+    caption: "Main entrance gate along Enugu-Abakaliki Expressway, Ishieke, Abakaliki",
+    altText: "Ebonyi State University Main Entrance Gate",
   },
   bsu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Benue_State_University_Makurdi.jpg/800px-Benue_State_University_Makurdi.jpg",
-    landmark: "River Benue Senate Complex",
-    caption: "Main campus along Gboko road near River Benue waterfront, Makurdi",
-    altText: "Benue State University Senate Complex Makurdi",
+    landmark: "Gboko Road Main Campus Gate",
+    caption: "Main entrance gate along Gboko Road near River Benue, Makurdi",
+    altText: "Benue State University Main Entrance Gate",
   },
   paau: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Kogi_State_University_Anyigba.jpg/800px-Kogi_State_University_Anyigba.jpg",
-    landmark: "Prince Abubakar Audu Senate Building",
-    caption: "Main campus central administration complex, Anyigba, Kogi State",
-    altText: "Prince Abubakar Audu University Anyigba Campus",
+    landmark: "Anyigba Main Campus Entrance Gate",
+    caption: "Main entrance gate along Idah Road, Anyigba, Kogi State",
+    altText: "Prince Abubakar Audu University Main Gate",
   },
   basug: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Bauchi_State_University_Gadau.jpg/800px-Bauchi_State_University_Gadau.jpg",
-    landmark: "Gadau Permanent Site Gate & Senate",
-    caption: "Main campus administrative quadrangle, Gadau, Bauchi State",
-    altText: "Bauchi State University Gadau Permanent Site",
+    landmark: "Gadau Permanent Site Main Gate",
+    caption: "Permanent site main entrance gate along Itas-Gadau Road, Bauchi State",
+    altText: "Bauchi State University Main Gate",
   },
   ysu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Yobe_State_University_Damaturu.jpg/800px-Yobe_State_University_Damaturu.jpg",
-    landmark: "Damaturu Central Administrative Complex",
-    caption: "Main campus central administration along Gujba road, Damaturu",
-    altText: "Yobe State University Damaturu Campus",
+    landmark: "Gujba Road Main Campus Gate",
+    caption: "Main entrance gate along Gujba Road, Damaturu, Yobe State",
+    altText: "Yobe State University Main Entrance Gate",
   },
   unicross: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/CRUTECH_Calabar_Campus.jpg/800px-CRUTECH_Calabar_Campus.jpg",
-    landmark: "Calabar Central Technology Complex",
-    caption: "Ekpo Abasi main campus engineering workshops and senate block, Calabar",
-    altText: "University of Cross River State Calabar Campus",
+    landmark: "Ekpo Abasi Main Campus Gate",
+    caption: "Main entrance gate along Ekpo Abasi Street, Calabar, Cross River",
+    altText: "University of Cross River State Main Gate",
   },
   aksu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/AKSU_Ikot_Akpaden_Campus.jpg/800px-AKSU_Ikot_Akpaden_Campus.jpg",
-    landmark: "Ikot Akpaden Senate Building",
-    caption: "Main coastal campus central administrative complex, Mkpat Enin, Akwa Ibom",
-    altText: "Akwa Ibom State University Ikot Akpaden Campus",
+    landmark: "Ikot Akpaden Main Entrance Gate",
+    caption: "Main campus entrance gate along East-West Road, Mkpat Enin, Akwa Ibom",
+    altText: "Akwa Ibom State University Main Gate",
   },
   tasued: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/TASUED_Ijagun_Campus.jpg/800px-TASUED_Ijagun_Campus.jpg",
-    landmark: "Otunba Gbenga Daniel Senate Building",
-    caption: "Ijagun permanent site administrative high-rise, Ijebu-Ode, Ogun State",
-    altText: "Tai Solarin University of Education Senate Building",
+    landmark: "Ijagun Main Campus Entrance Gate",
+    caption: "Main entrance gate along Benin-Sagamu Expressway, Ijagun, Ijebu-Ode",
+    altText: "Tai Solarin University of Education Main Gate",
   },
   plasu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Plateau_State_University_Bokkos.jpg/800px-Plateau_State_University_Bokkos.jpg",
-    landmark: "Bokkos Hillside Administrative Quadrangle",
-    caption: "Scenic highland campus administration building, Bokkos, Plateau State",
-    altText: "Plateau State University Bokkos Campus",
+    landmark: "Bokkos Main Campus Entrance Gate",
+    caption: "Main entrance gate along Bokkos-Barkin Ladi Road, Bokkos, Plateau State",
+    altText: "Plateau State University Main Gate",
   },
   umyu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/UMYU_Katsina_Senate_Building.jpg/800px-UMYU_Katsina_Senate_Building.jpg",
-    landmark: "Umaru Musa Yar'adua Senate Complex",
-    caption: "Modern Islamic and arid architectural senate complex, Dutsin-Ma Road, Katsina",
-    altText: "Umaru Musa Yar'adua University Senate Building",
+    landmark: "Dutsin-Ma Road Main Entrance Gate",
+    caption: "Main entrance gate complex along Dutsin-Ma Road, Katsina",
+    altText: "Umaru Musa Yar'adua University Main Gate",
   },
   adustech: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/KUST_Wudil_Campus.jpg/800px-KUST_Wudil_Campus.jpg",
-    landmark: "Aliko Dangote Senate Building",
-    caption: "Main engineering and technology quadrangle, Wudil, Kano State",
-    altText: "Aliko Dangote University of Science and Technology Wudil",
+    landmark: "Wudil Main Campus Entrance Gate",
+    caption: "Main entrance gate along Kano-Maiduguri Road, Wudil, Kano State",
+    altText: "Aliko Dangote University of Science and Technology Main Gate",
   },
   aau: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Ambrose_Alli_University_Ekpoma.jpg/800px-Ambrose_Alli_University_Ekpoma.jpg",
-    landmark: "Ambrose Alli Senate High-rise",
-    caption: "Central administration high-rise along Benin-Auchi expressway, Ekpoma",
-    altText: "Ambrose Alli University Senate Building Ekpoma",
+    landmark: "Ekpoma Main Campus Entrance Gate",
+    caption: "Main entrance gate along Benin-Auchi Expressway, Ekpoma, Edo State",
+    altText: "Ambrose Alli University Main Gate",
   },
   ndu: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Niger_Delta_University_Island.jpg/800px-Niger_Delta_University_Island.jpg",
-    landmark: "Wilberforce Island Administrative Quadrangle",
-    caption: "Mangrove waterfront administrative complex, Wilberforce Island, Bayelsa",
-    altText: "Niger Delta University Wilberforce Island Campus",
+    landmark: "Wilberforce Island Main Gate",
+    caption: "Main campus entrance gate and security portal, Wilberforce Island, Bayelsa State",
+    altText: "Niger Delta University Main Entrance Gate",
   },
   coou: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/COOU_Igbariam_Campus.jpg/800px-COOU_Igbariam_Campus.jpg",
-    landmark: "Igbariam Administrative Council Chambers",
-    caption: "Permanent site administrative complex, Igbariam, Anambra State",
-    altText: "Chukwuemeka Odumegwu Ojukwu University Igbariam Campus",
+    landmark: "Igbariam Permanent Site Gate",
+    caption: "Permanent campus main entrance gate along Achalla-Igbariam Road, Anambra State",
+    altText: "Chukwuemeka Odumegwu Ojukwu University Main Gate",
   },
 
   // Additional Private Universities
   aun: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/American_University_of_Nigeria_Library.jpg/800px-American_University_of_Nigeria_Library.jpg",
-    landmark: "Robert A. Pastor E-Library Complex",
-    caption: "Award-winning green digital library and American collegiate campus, Yola",
-    altText: "American University of Nigeria Campus in Yola",
+    landmark: "Lamido Zubairu Main Entrance Gate",
+    caption: "Main campus security entrance portal along Lamido Zubairu Way, Yola",
+    altText: "American University of Nigeria Main Gate",
   },
   bells: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Bells_University_Ota.jpg/800px-Bells_University_Ota.jpg",
-    landmark: "Ota Technology Senate Complex",
-    caption: "Main campus engineering block and ICT innovations centre, Ota, Ogun State",
-    altText: "Bells University of Technology Campus in Ota",
+    landmark: "Ota Main Campus Entrance Gate",
+    caption: "Main entrance gate along Idiroko Road, Ota, Ogun State",
+    altText: "Bells University of Technology Main Gate",
   },
   alhikmah: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Al_Hikmah_University_Ilorin.jpg/800px-Al_Hikmah_University_Ilorin.jpg",
-    landmark: "Adeta Central Administrative Block",
-    caption: "Adeta campus administrative complex and faculty of law, Ilorin, Kwara",
-    altText: "Al-Hikmah University Campus in Ilorin",
+    landmark: "Adeta Road Main Campus Gate",
+    caption: "Main entrance gate along Adeta Road, Ilorin, Kwara State",
+    altText: "Al-Hikmah University Main Gate",
   },
   ajayi: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ajayi_Crowther_University_Oyo.jpg/800px-Ajayi_Crowther_University_Oyo.jpg",
-    landmark: "Bishop Ajayi Crowther Senate Complex",
-    caption: "Historic St. Andrew's college grounds and central senate complex, Oyo town",
-    altText: "Ajayi Crowther University Campus in Oyo",
+    landmark: "Oyo-Ogbomoso Road Main Gate",
+    caption: "Main entrance gate along Oyo-Ogbomoso Road, Oyo town, Oyo State",
+    altText: "Ajayi Crowther University Main Gate",
   },
   godfrey: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Godfrey_Okoye_University_Enugu.jpg/800px-Godfrey_Okoye_University_Enugu.jpg",
-    landmark: "Ugwuomu-Nike Main Campus Complex",
-    caption: "Permanent site administrative centre and DNA learning centre, Enugu",
-    altText: "Godfrey Okoye University Campus in Enugu",
+    landmark: "Ugwuomu-Nike Main Campus Gate",
+    caption: "Main entrance gate at Thinkers Corner and Ugwuomu-Nike campus, Enugu",
+    altText: "Godfrey Okoye University Main Gate",
   },
   madonna: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Madonna_University_Elele.jpg/800px-Madonna_University_Elele.jpg",
-    landmark: "Elele Medical City & Senate",
-    caption: "Elele main campus administrative building and medical centre, Rivers State",
-    altText: "Madonna University Elele Campus",
+    landmark: "Elele Main Campus Entrance Gate",
+    caption: "Main entrance gate complex along Port Harcourt-Owerri Road, Elele, Rivers State",
+    altText: "Madonna University Elele Main Gate",
   },
   bingham: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bingham_University_Karu.jpg/800px-Bingham_University_Karu.jpg",
-    landmark: "Karu Expressway Senate Building",
-    caption: "Main campus administrative high-rise along Abuja-Keffi expressway, Karu",
-    altText: "Bingham University Campus in Karu, Nasarawa State",
+    landmark: "Abuja-Keffi Expressway Main Gate",
+    caption: "Main entrance gate along Abuja-Keffi Expressway, Karu, Nasarawa State",
+    altText: "Bingham University Main Entrance Gate",
   },
   caleb: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Caleb_University_Imota.jpg/800px-Caleb_University_Imota.jpg",
-    landmark: "Imota Serene Campus Complex",
-    caption: "Main campus architecture pavilion and administrative block, Imota, Lagos",
-    altText: "Caleb University Campus in Imota, Lagos",
+    landmark: "Ikorodu-Itokin Road Main Gate",
+    caption: "Main entrance gate along Ikorodu-Itokin Road, Imota, Lagos",
+    altText: "Caleb University Main Entrance Gate",
   },
   adeleke: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Adeleke_University_Ede.jpg/800px-Adeleke_University_Ede.jpg",
-    landmark: "Springtime Senate High-rise",
-    caption: "Central administrative high-rise and manicured collegiate gardens, Ede, Osun",
-    altText: "Adeleke University Campus in Ede, Osun State",
+    landmark: "Ede Main Campus Entrance Gate",
+    caption: "Main entrance gate along Ogberin-Logun Road, Ede, Osun State",
+    altText: "Adeleke University Main Entrance Gate",
   },
   elizade: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Elizade_University_Ilara_Mokin.jpg/800px-Elizade_University_Ilara_Mokin.jpg",
-    landmark: "Automotive Technology Complex",
-    caption: "Modern enterprise-style campus and engineering laboratories, Ilara-Mokin, Ondo",
-    altText: "Elizade University Campus in Ilara-Mokin",
+    landmark: "Ilara-Mokin Main Campus Gate",
+    caption: "Main entrance gate along Akure-Ilesha Road, Ilara-Mokin, Ondo State",
+    altText: "Elizade University Main Entrance Gate",
   },
   igbinedion: {
     imageUrl:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Igbinedion_University_Okada.jpg/800px-Igbinedion_University_Okada.jpg",
-    landmark: "Okada Heritage Senate Building",
-    caption: "Crown Hill main campus administrative quadrangle and library, Okada, Edo",
-    altText: "Igbinedion University Campus in Okada, Edo State",
+    landmark: "Okada Main Entrance Gate",
+    caption: "Main university entrance gate along Okada-Benin Road, Okada, Edo State",
+    altText: "Igbinedion University Main Entrance Gate",
   },
 };
 
 /**
- * Retrieve verified campus image metadata with fallback matching by slug or acronym.
+ * Retrieve verified campus entrance image metadata with fallback matching by slug or acronym.
  */
 export function getUniversityImageMeta(
   slugOrId: string,
@@ -591,13 +590,12 @@ export function getUniversityImageMeta(
     }
   }
 
-  // 4. Default high-resolution authentic Nigerian collegiate architecture fallback
+  // 4. Default authentic Nigerian collegiate main entrance gate fallback
   return {
     imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/University_of_Lagos_Senate_Building.jpg/800px-University_of_Lagos_Senate_Building.jpg",
-    landmark: "Main Campus Senate Complex",
-    caption: "Accredited Nigerian university campus landmark and administrative center",
-    altText: "Nigerian university administrative building and academic campus",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/University_of_Lagos_entrance_gate.jpg/800px-University_of_Lagos_entrance_gate.jpg",
+    landmark: "Main University Entrance Gate",
+    caption: "Accredited Nigerian university main entrance gate and security portal",
+    altText: "Nigerian university main entrance gate and academic campus",
   };
 }
-

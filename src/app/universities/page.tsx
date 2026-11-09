@@ -46,15 +46,18 @@ export default async function UniversitiesPage() {
   const dbUniversities: UniversityData[] = rawUniversities.map((uni) => {
     const imgMeta = getUniversityImageMeta(uni.slug, uni.acronym);
     const logoMeta = getUniversityLogoMeta(uni.slug, uni.acronym);
-    const imageUrl = uni.imageUrl || imgMeta.imageUrl;
+    // Self-healing: ensure authentic entrance/main gate photo and official logo URL
+    const isGate =
+      uni.imageLandmark?.toLowerCase().includes("gate") ||
+      uni.imageLandmark?.toLowerCase().includes("entrance");
+    const imageUrl = uni.imageUrl && isGate ? uni.imageUrl : imgMeta.imageUrl;
     const logoUrl = uni.logoUrl || logoMeta.logoUrl;
-    const imageLandmark = uni.imageLandmark || imgMeta.landmark;
-    const imageCaption = uni.imageCaption || imgMeta.caption;
+    const imageLandmark = uni.imageLandmark && isGate ? uni.imageLandmark : imgMeta.landmark;
+    const imageCaption = uni.imageCaption && isGate ? uni.imageCaption : imgMeta.caption;
     const brandColor = uni.brandColor || logoMeta.brandColor;
     const secondaryColor = uni.secondaryColor || logoMeta.secondaryColor;
 
-    // Self-healing: backfill database record if missing image or logo URL
-    if (!uni.imageUrl || !uni.logoUrl) {
+    if (!uni.imageUrl || !uni.logoUrl || !isGate) {
       prisma.university
         .update({
           where: { id: uni.id },

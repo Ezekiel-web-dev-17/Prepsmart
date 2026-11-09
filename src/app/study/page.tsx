@@ -85,10 +85,12 @@ export default async function StudyPage({ searchParams }: StudyPageProps) {
   let userSubjects: string[] = ["Use of English", "Mathematics", "Physics", "Chemistry"];
 
   if (userId) {
-    const profile = await prisma.onboardingProfile.findUnique({
-      where: { userId },
-      select: { selectedSubjects: true },
-    });
+    const profile = await prisma.onboardingProfile
+      .findUnique({
+        where: { userId },
+        select: { selectedSubjects: true },
+      })
+      .catch(() => null);
 
     if (profile?.selectedSubjects) {
       try {

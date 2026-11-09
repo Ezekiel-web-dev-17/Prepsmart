@@ -40,14 +40,17 @@ export async function GET(
 
     const imgMeta = getUniversityImageMeta(university.slug, university.acronym);
     const logoMeta = getUniversityLogoMeta(university.slug, university.acronym);
-    const imageUrl = university.imageUrl || imgMeta.imageUrl;
+    const isGate =
+      university.imageLandmark?.toLowerCase().includes("gate") ||
+      university.imageLandmark?.toLowerCase().includes("entrance");
+    const imageUrl = university.imageUrl && isGate ? university.imageUrl : imgMeta.imageUrl;
     const logoUrl = university.logoUrl || logoMeta.logoUrl;
-    const imageLandmark = university.imageLandmark || imgMeta.landmark;
-    const imageCaption = university.imageCaption || imgMeta.caption;
+    const imageLandmark = university.imageLandmark && isGate ? university.imageLandmark : imgMeta.landmark;
+    const imageCaption = university.imageCaption && isGate ? university.imageCaption : imgMeta.caption;
     const brandColor = university.brandColor || logoMeta.brandColor;
     const secondaryColor = university.secondaryColor || logoMeta.secondaryColor;
 
-    if (!university.imageUrl || !university.logoUrl) {
+    if (!university.imageUrl || !university.logoUrl || !isGate) {
       prisma.university
         .update({
           where: { id: university.id },
@@ -63,18 +66,26 @@ export async function GET(
         .catch(() => {});
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        ...university,
-        imageUrl,
-        logoUrl,
-        imageLandmark,
-        imageCaption,
-        brandColor,
-        secondaryColor,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          ...university,
+          imageUrl,
+          logoUrl,
+          imageLandmark,
+          imageCaption,
+          brandColor,
+          secondaryColor,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control":
+            "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+        },
+      }
+    );
   } catch (error) {
     console.error("Failed to fetch university details:", error);
     return NextResponse.json(

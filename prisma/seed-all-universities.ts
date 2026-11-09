@@ -150,13 +150,7 @@ const BASE_DOCUMENTS = [
 async function main() {
   console.log("🇳🇬 Seeding all Nigerian Universities into PostgreSQL...\n");
 
-  // Clean existing university records
-  console.log("Cleaning old university relations...");
-  await prisma.admissionDocument.deleteMany({});
-  await prisma.courseRequirement.deleteMany({});
-  await prisma.university.deleteMany({});
-
-  console.log(`Starting insertion of ${UNIVERSITIES_DATA.length} universities...\n`);
+  console.log(`Starting synchronization of ${UNIVERSITIES_DATA.length} universities with Wikipedia data...\n`);
 
   let count = 0;
   for (const uni of UNIVERSITIES_DATA) {
@@ -167,29 +161,41 @@ async function main() {
     const imgMeta = getUniversityImageMeta(uni.id, uni.acronym);
     const logoMeta = getUniversityLogoMeta(uni.id, uni.acronym);
 
-    const createdUniversity = await prisma.university.create({
-      data: {
-        slug: uni.id,
-        name: uni.name,
-        acronym: uni.acronym || null,
-        type: uni.type,
-        state: uni.state,
-        city: uni.city,
-        zone: uni.zone || null,
-        generalCutOff: uni.generalCutOff,
-        postUtmeRequired: postUtmeRequired,
-        screeningType: uni.screeningType,
-        annualTuitionEst: uni.annualTuitionEst || null,
-        estYear: uni.estYear || null,
-        website: uni.website || null,
-        campusHighlights: uni.campusHighlights || null,
-        imageUrl: imgMeta.imageUrl,
-        logoUrl: logoMeta.logoUrl,
-        imageLandmark: imgMeta.landmark,
-        imageCaption: imgMeta.caption,
-        brandColor: logoMeta.brandColor,
-        secondaryColor: logoMeta.secondaryColor,
-      },
+    const universityPayload = {
+      slug: uni.id,
+      name: uni.name,
+      acronym: uni.acronym || null,
+      type: uni.type,
+      state: uni.state,
+      city: uni.city,
+      zone: uni.zone || null,
+      generalCutOff: uni.generalCutOff,
+      postUtmeRequired: postUtmeRequired,
+      screeningType: uni.screeningType,
+      annualTuitionEst: uni.annualTuitionEst || null,
+      estYear: uni.estYear || null,
+      website: uni.website || null,
+      campusHighlights: uni.campusHighlights || null,
+      imageUrl: imgMeta.imageUrl,
+      logoUrl: logoMeta.logoUrl,
+      imageLandmark: imgMeta.landmark,
+      imageCaption: imgMeta.caption,
+      brandColor: logoMeta.brandColor,
+      secondaryColor: logoMeta.secondaryColor,
+    };
+
+    const createdUniversity = await prisma.university.upsert({
+      where: { slug: uni.id },
+      update: universityPayload,
+      create: universityPayload,
+    });
+
+    // Clean previous sub-relations for this specific university to ensure fresh data
+    await prisma.courseRequirement.deleteMany({
+      where: { universityId: createdUniversity.id },
+    });
+    await prisma.admissionDocument.deleteMany({
+      where: { universityId: createdUniversity.id },
     });
 
     const coursesToInsert = [];

@@ -116,14 +116,17 @@ export async function GET(request: Request) {
 
       const imgMeta = getUniversityImageMeta(uni.slug, uni.acronym);
       const logoMeta = getUniversityLogoMeta(uni.slug, uni.acronym);
-      const imageUrl = uni.imageUrl || imgMeta.imageUrl;
+      const isGate =
+        uni.imageLandmark?.toLowerCase().includes("gate") ||
+        uni.imageLandmark?.toLowerCase().includes("entrance");
+      const imageUrl = uni.imageUrl && isGate ? uni.imageUrl : imgMeta.imageUrl;
       const logoUrl = uni.logoUrl || logoMeta.logoUrl;
-      const imageLandmark = uni.imageLandmark || imgMeta.landmark;
-      const imageCaption = uni.imageCaption || imgMeta.caption;
+      const imageLandmark = uni.imageLandmark && isGate ? uni.imageLandmark : imgMeta.landmark;
+      const imageCaption = uni.imageCaption && isGate ? uni.imageCaption : imgMeta.caption;
       const brandColor = uni.brandColor || logoMeta.brandColor;
       const secondaryColor = uni.secondaryColor || logoMeta.secondaryColor;
 
-      if (!uni.imageUrl || !uni.logoUrl) {
+      if (!uni.imageUrl || !uni.logoUrl || !isGate) {
         prisma.university
           .update({
             where: { id: uni.id },
@@ -153,11 +156,19 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json({
-      success: true,
-      count: enriched.length,
-      data: enriched,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        count: enriched.length,
+        data: enriched,
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+        },
+      }
+    );
   } catch (error) {
     console.error("Failed to query universities:", error);
     return NextResponse.json(

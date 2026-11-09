@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    minimumCacheTTL: 2592000, // 30 days cache for remote images (prevents repeated S3 GET requests)
     remotePatterns: [
       {
         protocol: "https",

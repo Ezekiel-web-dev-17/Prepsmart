@@ -314,13 +314,14 @@ export function getRateLimitHeaders(result: RateLimitResult): Record<string, str
 
 // ==========================================
 // Pre-configured Tiered Rate Limiters
+// Optimized to protect AWS Free Tier limits (EC2 compute, S3 GET/PUT quotas, and egress bandwidth)
 // ==========================================
 
-const envApiMax = Number(process.env.RATE_LIMIT_API_MAX) || 60;
-const envMutationMax = Number(process.env.RATE_LIMIT_MUTATION_MAX) || 20;
-const envAuthMax = Number(process.env.RATE_LIMIT_AUTH_MAX) || 15;
-const envPageMax = Number(process.env.RATE_LIMIT_PAGE_MAX) || 120;
-const envActionMax = Number(process.env.RATE_LIMIT_ACTION_MAX) || 20;
+const envApiMax = Number(process.env.RATE_LIMIT_API_MAX) || 30;
+const envMutationMax = Number(process.env.RATE_LIMIT_MUTATION_MAX) || 10;
+const envAuthMax = Number(process.env.RATE_LIMIT_AUTH_MAX) || 5;
+const envPageMax = Number(process.env.RATE_LIMIT_PAGE_MAX) || 60;
+const envActionMax = Number(process.env.RATE_LIMIT_ACTION_MAX) || 10;
 
 /** API Read endpoints (e.g. GET /api/*) */
 export const apiLimiter = new RateLimiter({
